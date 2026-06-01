@@ -19,6 +19,7 @@ export default function RoadmapPage() {
         {chapters.map((chapter) => (
           <li
             key={chapter.slug}
+            data-testid={`chapter-${chapter.slug}`}
             className={`rounded-lg border p-5 ${
               chapter.status === "ready"
                 ? "border-slate-200 bg-white"
