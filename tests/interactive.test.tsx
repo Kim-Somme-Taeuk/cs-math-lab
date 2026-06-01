@@ -1,6 +1,7 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
+import ConditionalPlayground from "../src/components/interactive/ConditionalPlayground";
 import MultipleChoiceQuiz from "../src/components/interactive/MultipleChoiceQuiz";
 import SetVennPlayground from "../src/components/interactive/SetVennPlayground";
 import TruthTablePlayground from "../src/components/interactive/TruthTablePlayground";
@@ -31,16 +32,32 @@ describe("set helpers", () => {
 });
 
 describe("TruthTablePlayground", () => {
-  it("updates the selected truth values and implication explanation", async () => {
+  it("updates basic logic operations", async () => {
     const user = userEvent.setup();
     render(<TruthTablePlayground />);
 
     const playground = screen.getByRole("region", { name: "진리표 실험" });
-    expect(within(playground).getByText(/현재 조건문/)).toHaveTextContent("거짓");
+    expect(within(playground).getByRole("row", { name: /P AND Q/ })).toHaveTextContent("거짓");
+    expect(within(playground).getByRole("row", { name: /P OR Q/ })).toHaveTextContent("참");
 
     await user.click(within(playground).getByRole("button", { name: /명제 Q/ }));
 
-    expect(within(playground).getByText(/현재 조건문/)).toHaveTextContent("참");
+    expect(within(playground).getByRole("row", { name: /P AND Q/ })).toHaveTextContent("참");
+  });
+});
+
+describe("ConditionalPlayground", () => {
+  it("updates the implication explanation", async () => {
+    const user = userEvent.setup();
+    render(<ConditionalPlayground />);
+
+    const playground = screen.getByRole("region", { name: "조건문 실험" });
+    expect(within(playground).getByText(/P -> Q =/)).toHaveTextContent("거짓");
+    expect(within(playground).getByText(/약속을 직접 어긴 사례/)).toBeInTheDocument();
+
+    await user.click(within(playground).getByRole("button", { name: /결론 Q/ }));
+
+    expect(within(playground).getByText(/P -> Q =/)).toHaveTextContent("참");
   });
 });
 

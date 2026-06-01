@@ -17,18 +17,29 @@ test("roadmap visually separates ready and draft chapters", async ({ page }) => 
   expect(draftClassName).toContain("bg-slate-100");
 });
 
-test("truth table interaction updates implication result and stays within mobile width", async ({ page }) => {
+test("logic interaction updates basic operators and stays within mobile width", async ({ page }) => {
   await page.goto("/chapters/logic");
 
   const playground = page.getByRole("region", { name: "진리표 실험" });
-  await expect(playground.getByRole("cell", { name: "P -> Q" })).toBeVisible();
-  await expect(playground.getByText(/현재 조건문/)).toContainText("거짓");
+  await expect(playground.getByRole("cell", { name: "P AND Q" })).toBeVisible();
+  await expect(playground.getByRole("row", { name: /P AND Q/ })).toContainText("거짓");
 
   await playground.getByRole("button", { name: /명제 Q/ }).click();
-  await expect(playground.getByText(/현재 조건문/)).toContainText("참");
+  await expect(playground.getByRole("row", { name: /P AND Q/ })).toContainText("참");
 
   const hasHorizontalOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   expect(hasHorizontalOverflow).toBe(false);
+});
+
+test("conditional interaction focuses on implication violation", async ({ page }) => {
+  await page.goto("/chapters/conditionals");
+
+  const playground = page.getByRole("region", { name: "조건문 실험" });
+  await expect(playground.getByText(/P -> Q =/)).toContainText("거짓");
+  await expect(playground.getByText(/약속을 직접 어긴 사례/)).toBeVisible();
+
+  await playground.getByRole("button", { name: /결론 Q/ }).click();
+  await expect(playground.getByText(/P -> Q =/)).toContainText("참");
 });
 
 test("set playground calculates set operations correctly", async ({ page }) => {

@@ -15,10 +15,6 @@ function TruthBadge({ value }: { value: boolean }) {
   );
 }
 
-function formatTruth(value: boolean) {
-  return value ? "참" : "거짓";
-}
-
 function ToggleButton({
   label,
   value,
@@ -53,15 +49,6 @@ export default function TruthTablePlayground() {
     ["P OR Q", result.or, "둘 중 하나라도 참이면 참입니다."],
     ["NOT P", result.notP, "P의 참/거짓을 뒤집습니다."],
     ["NOT Q", result.notQ, "Q의 참/거짓을 뒤집습니다."],
-    ["P -> Q", result.implication, "P가 참인데 Q가 거짓일 때만 약속이 깨집니다."],
-    ["P <-> Q", result.biconditional, "P와 Q의 값이 같을 때 참입니다."],
-  ] as const;
-
-  const truthTable = [
-    [true, true],
-    [true, false],
-    [false, true],
-    [false, false],
   ] as const;
 
   return (
@@ -79,7 +66,7 @@ export default function TruthTablePlayground() {
       </div>
 
       <div className="mt-5 overflow-x-auto rounded-lg border border-slate-200 bg-white">
-        <table className="min-w-[520px]">
+        <table className="min-w-[460px]">
           <thead>
             <tr>
               <th>식</th>
@@ -101,37 +88,9 @@ export default function TruthTablePlayground() {
         </table>
       </div>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_1fr]">
-        <div className="rounded-md bg-white p-4 text-sm leading-6 text-slate-700">
-          현재 조건문 <strong>P -&gt; Q</strong>는 <TruthBadge value={result.implication} /> 입니다.
-          조건문은 “P라면 Q이다”라는 약속입니다. 그래서 P가 참인데 Q가 거짓인 경우만
-          약속 위반이고, P가 거짓이면 아직 약속을 검사할 상황이 아니라고 봅니다.
-        </div>
-        <div className="overflow-x-auto rounded-md border border-slate-200 bg-white">
-          <table className="min-w-[360px]">
-            <thead>
-              <tr>
-                <th>P</th>
-                <th>Q</th>
-                <th>P -&gt; Q</th>
-              </tr>
-            </thead>
-            <tbody>
-              {truthTable.map(([rowP, rowQ]) => {
-                const active = rowP === p && rowQ === q;
-                return (
-                  <tr key={`${String(rowP)}-${String(rowQ)}`} className={active ? "bg-teal-50" : ""}>
-                    <td>{formatTruth(rowP)}</td>
-                    <td>{formatTruth(rowQ)}</td>
-                    <td>
-                      <TruthBadge value={!rowP || rowQ} />
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+      <div className="mt-4 rounded-md bg-white p-4 text-sm leading-6 text-slate-700">
+        이 챕터에서는 AND, OR, NOT처럼 조건을 조합하는 기본 부품에 집중합니다. “P라면 Q이다”
+        형태의 조건문은 다음 챕터에서 별도로 다룹니다.
       </div>
     </section>
   );
