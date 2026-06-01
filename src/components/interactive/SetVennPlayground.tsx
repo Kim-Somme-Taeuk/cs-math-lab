@@ -20,6 +20,46 @@ function formatSet(items: string[]) {
   return items.length > 0 ? `{ ${items.join(", ")} }` : "{ }";
 }
 
+function getVennPosition(item: string, index: number, setA: string[], setB: string[]) {
+  const inA = setA.includes(item);
+  const inB = setB.includes(item);
+  const buckets = {
+    aOnly: [
+      [132, 112],
+      [148, 156],
+      [116, 150],
+    ],
+    both: [
+      [210, 112],
+      [210, 156],
+      [210, 134],
+    ],
+    bOnly: [
+      [288, 112],
+      [272, 156],
+      [304, 150],
+    ],
+    outside: [
+      [72, 58],
+      [348, 58],
+      [76, 206],
+      [344, 206],
+      [210, 50],
+      [210, 216],
+    ],
+  } satisfies Record<string, number[][]>;
+
+  const bucket = inA && inB ? buckets.both : inA ? buckets.aOnly : inB ? buckets.bOnly : buckets.outside;
+  return bucket[index % bucket.length];
+}
+
+const operationDescriptions: Record<SetOperation, string> = {
+  union: "A 또는 B에 들어 있는 모든 원소를 모읍니다.",
+  intersection: "A와 B에 동시에 들어 있는 원소만 남깁니다.",
+  difference: "A에는 있지만 B에는 없는 원소만 남깁니다.",
+  complement: "전체집합 U에서 A에 들어 있지 않은 원소를 고릅니다.",
+};
+
 export default function SetVennPlayground() {
   const [setA, setSetA] = useState(["1", "2", "3"]);
   const [setB, setSetB] = useState(["3", "4", "5"]);
@@ -27,7 +67,7 @@ export default function SetVennPlayground() {
   const result = useMemo(() => evaluateSetOperation(operation, setA, setB), [operation, setA, setB]);
 
   return (
-    <section className="my-8 rounded-lg border border-slate-200 bg-slate-50 p-4 sm:p-5">
+    <section aria-label="집합 연산 실험" className="my-8 rounded-lg border border-slate-200 bg-slate-50 p-4 sm:p-5">
       <h3 className="m-0 text-lg font-black text-slate-950">집합 연산 실험</h3>
       <p className="mt-1 text-sm text-slate-600">전체집합 U = {formatSet(universe)}에서 A와 B를 바꿔 봅니다.</p>
 
@@ -103,15 +143,7 @@ export default function SetVennPlayground() {
               B
             </text>
             {universe.map((item, index) => {
-              const positions = [
-                [128, 118],
-                [160, 164],
-                [210, 130],
-                [260, 164],
-                [292, 118],
-                [210, 48],
-              ];
-              const [x, y] = positions[index];
+              const [x, y] = getVennPosition(item, index, setA, setB);
               const active = result.includes(item);
               return (
                 <g key={item}>
@@ -135,6 +167,7 @@ export default function SetVennPlayground() {
             <p className="mt-3 text-sm leading-6 text-slate-700">
               A = {formatSet(setA)}, B = {formatSet(setB)}
             </p>
+            <p className="mt-2 text-sm leading-6 text-slate-700">{operationDescriptions[operation]}</p>
             <p className="mt-2 text-base font-bold text-teal-800">결과 = {formatSet(result)}</p>
           </div>
         </div>

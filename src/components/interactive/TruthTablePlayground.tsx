@@ -15,6 +15,10 @@ function TruthBadge({ value }: { value: boolean }) {
   );
 }
 
+function formatTruth(value: boolean) {
+  return value ? "참" : "거짓";
+}
+
 function ToggleButton({
   label,
   value,
@@ -53,8 +57,15 @@ export default function TruthTablePlayground() {
     ["P <-> Q", result.biconditional, "P와 Q의 값이 같을 때 참입니다."],
   ] as const;
 
+  const truthTable = [
+    [true, true],
+    [true, false],
+    [false, true],
+    [false, false],
+  ] as const;
+
   return (
-    <section className="my-8 rounded-lg border border-slate-200 bg-slate-50 p-4 sm:p-5">
+    <section aria-label="진리표 실험" className="my-8 rounded-lg border border-slate-200 bg-slate-50 p-4 sm:p-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h3 className="m-0 text-lg font-black text-slate-950">진리표 실험</h3>
@@ -90,10 +101,37 @@ export default function TruthTablePlayground() {
         </table>
       </div>
 
-      <div className="mt-4 rounded-md bg-white p-4 text-sm leading-6 text-slate-700">
-        현재 조건문 <strong>P -&gt; Q</strong>는 <TruthBadge value={result.implication} /> 입니다.
-        조건문은 “P라면 Q이다”라는 약속이므로, P가 거짓인 상황에서는 약속을 어긴 사례가 아직
-        나오지 않은 것으로 봅니다.
+      <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_1fr]">
+        <div className="rounded-md bg-white p-4 text-sm leading-6 text-slate-700">
+          현재 조건문 <strong>P -&gt; Q</strong>는 <TruthBadge value={result.implication} /> 입니다.
+          조건문은 “P라면 Q이다”라는 약속입니다. 그래서 P가 참인데 Q가 거짓인 경우만
+          약속 위반이고, P가 거짓이면 아직 약속을 검사할 상황이 아니라고 봅니다.
+        </div>
+        <div className="overflow-x-auto rounded-md border border-slate-200 bg-white">
+          <table className="min-w-[360px]">
+            <thead>
+              <tr>
+                <th>P</th>
+                <th>Q</th>
+                <th>P -&gt; Q</th>
+              </tr>
+            </thead>
+            <tbody>
+              {truthTable.map(([rowP, rowQ]) => {
+                const active = rowP === p && rowQ === q;
+                return (
+                  <tr key={`${String(rowP)}-${String(rowQ)}`} className={active ? "bg-teal-50" : ""}>
+                    <td>{formatTruth(rowP)}</td>
+                    <td>{formatTruth(rowQ)}</td>
+                    <td>
+                      <TruthBadge value={!rowP || rowQ} />
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
   );

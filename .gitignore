@@ -28,3 +28,7 @@ pnpm-debug.log*
 
 # typescript
 *.tsbuildinfo
+
+# test output
+coverage/
+test-results/

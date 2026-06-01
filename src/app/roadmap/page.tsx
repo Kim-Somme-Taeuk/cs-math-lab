@@ -17,24 +17,61 @@ export default function RoadmapPage() {
 
       <ol className="mt-10 grid gap-4">
         {chapters.map((chapter) => (
-          <li key={chapter.slug} className="rounded-lg border border-slate-200 bg-white p-5">
+          <li
+            key={chapter.slug}
+            className={`rounded-lg border p-5 ${
+              chapter.status === "ready"
+                ? "border-slate-200 bg-white"
+                : "border-slate-200 bg-slate-100 text-slate-500"
+            }`}
+          >
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <div className="flex flex-wrap items-center gap-3">
-                  <span className="rounded-md bg-slate-100 px-2.5 py-1 text-sm font-bold text-slate-700">
+                  <span
+                    className={`rounded-md px-2.5 py-1 text-sm font-bold ${
+                      chapter.status === "ready"
+                        ? "bg-slate-100 text-slate-700"
+                        : "bg-slate-200 text-slate-500"
+                    }`}
+                  >
                     {chapter.order}
                   </span>
-                  <h2 className="text-xl font-bold text-slate-950">{chapter.title}</h2>
-                  <span className="rounded-md bg-teal-50 px-2.5 py-1 text-xs font-bold text-teal-700">
+                  <h2
+                    className={`text-xl font-bold ${
+                      chapter.status === "ready" ? "text-slate-950" : "text-slate-500"
+                    }`}
+                  >
+                    {chapter.title}
+                  </h2>
+                  <span
+                    className={`rounded-md px-2.5 py-1 text-xs font-bold ${
+                      chapter.status === "ready"
+                        ? "bg-teal-50 text-teal-700"
+                        : "bg-slate-200 text-slate-500"
+                    }`}
+                  >
                     {chapter.status === "ready" ? "완성" : "초안"}
                   </span>
                 </div>
-                <p className="mt-3 leading-7 text-slate-700">{chapter.description}</p>
-                <p className="mt-2 text-sm font-medium text-slate-500">CS 연결: {chapter.csConnection}</p>
+                <p
+                  className={`mt-3 leading-7 ${
+                    chapter.status === "ready" ? "text-slate-700" : "text-slate-500"
+                  }`}
+                >
+                  {chapter.description}
+                </p>
+                <p className="mt-2 text-sm font-medium text-slate-500">
+                  CS 연결: {chapter.csConnection}
+                </p>
               </div>
               <Link
                 href={`/chapters/${chapter.slug}`}
-                className="rounded-md border border-slate-300 px-4 py-2 text-center text-sm font-bold text-slate-800 hover:bg-slate-100"
+                className={`rounded-md border px-4 py-2 text-center text-sm font-bold ${
+                  chapter.status === "ready"
+                    ? "border-slate-300 text-slate-800 hover:bg-slate-100"
+                    : "border-slate-300 text-slate-500 hover:bg-slate-200"
+                }`}
               >
                 열기
               </Link>
