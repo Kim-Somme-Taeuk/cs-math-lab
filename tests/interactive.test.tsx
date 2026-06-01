@@ -102,7 +102,7 @@ describe("MultipleChoiceQuiz", () => {
       />,
     );
 
-    const quiz = screen.getByRole("region", { name: "손풀이 문제" });
+    const quiz = screen.getByRole("region", { name: "문제 풀기" });
     expect(within(quiz).getByRole("button", { name: "채점하기" })).toBeDisabled();
 
     await user.click(within(quiz).getByLabelText("{ 3 }"));

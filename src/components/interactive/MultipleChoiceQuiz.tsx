@@ -24,10 +24,10 @@ export default function MultipleChoiceQuiz({ questions }: { questions: QuizQuest
   const allAnswered = questions.every((_, index) => answers[index] !== undefined);
 
   return (
-    <section aria-label="손풀이 문제" className="my-6 rounded-lg border border-slate-200 bg-slate-50 p-4 sm:p-5">
+    <section aria-label="문제 풀기" className="my-6 rounded-lg border border-slate-200 bg-slate-50 p-4 sm:p-5">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h3 className="m-0 text-lg font-black text-slate-950">손풀이 문제</h3>
+          <h3 className="m-0 text-lg font-black text-slate-950">문제 풀기</h3>
           <p className="mt-1 text-sm text-slate-600">
             답을 고른 뒤 채점하면 바로 해설을 확인할 수 있습니다.
           </p>
