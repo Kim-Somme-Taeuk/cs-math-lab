@@ -26,7 +26,7 @@ export default function Home() {
               </Link>
               <Link
                 href="/roadmap"
-                className="rounded-md border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-800 hover:bg-slate-100"
+                className="rounded-md bg-teal-700 px-5 py-3 text-sm font-bold text-white hover:bg-teal-800"
               >
                 로드맵 보기
               </Link>

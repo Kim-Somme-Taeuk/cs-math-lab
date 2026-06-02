@@ -69,19 +69,19 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
                     : "text-slate-700 hover:bg-slate-100"
                 }`}
               >
-                {item.order}. {item.shortTitle}
+                {item.order}. {item.title}
               </Link>
             ))}
           </div>
           <div className="mt-6 grid gap-2 border-t border-slate-200 pt-4">
             {previous ? (
               <Link className="text-sm font-bold text-slate-700 hover:text-teal-700" href={`/chapters/${previous.slug}`}>
-                이전: {previous.shortTitle}
+                이전: {previous.title}
               </Link>
             ) : null}
             {next ? (
               <Link className="text-sm font-bold text-slate-700 hover:text-teal-700" href={`/chapters/${next.slug}`}>
-                다음: {next.shortTitle}
+                다음: {next.title}
               </Link>
             ) : null}
           </div>

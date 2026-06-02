@@ -9,6 +9,16 @@ export type QuizQuestion = {
   explanation: string;
 };
 
+function renderInlineCode(text: string) {
+  return text.split(/(`[^`]+`)/g).map((part, index) => {
+    if (part.startsWith("`") && part.endsWith("`")) {
+      return <code key={`${part}-${index}`}>{part.slice(1, -1)}</code>;
+    }
+
+    return part;
+  });
+}
+
 export default function MultipleChoiceQuiz({ questions }: { questions: QuizQuestion[] }) {
   const quizId = useId();
   const [answers, setAnswers] = useState<Record<number, number>>({});
@@ -50,7 +60,9 @@ export default function MultipleChoiceQuiz({ questions }: { questions: QuizQuest
               <legend className="px-1 text-sm font-bold text-slate-500">
                 문제 {questionIndex + 1}
               </legend>
-              <p className="mt-2 font-bold leading-7 text-slate-950">{question.prompt}</p>
+              <p className="mt-2 font-bold leading-7 text-slate-950">
+                {renderInlineCode(question.prompt)}
+              </p>
               <div className="mt-4 grid gap-2">
                 {question.choices.map((choice, choiceIndex) => {
                   const checked = selected === choiceIndex;
@@ -80,7 +92,7 @@ export default function MultipleChoiceQuiz({ questions }: { questions: QuizQuest
                         }}
                         className="mt-1 h-4 w-4 accent-slate-950"
                       />
-                      <span>{choice}</span>
+                      <span>{renderInlineCode(choice)}</span>
                     </label>
                   );
                 })}
@@ -92,7 +104,7 @@ export default function MultipleChoiceQuiz({ questions }: { questions: QuizQuest
                   }`}
                 >
                   <strong>{isCorrect ? "정답입니다." : "다시 확인해 보세요."}</strong>{" "}
-                  {question.explanation}
+                  {renderInlineCode(question.explanation)}
                 </p>
               ) : null}
             </fieldset>
