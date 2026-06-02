@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 
 export type QuizQuestion = {
   prompt: string;
@@ -10,6 +10,7 @@ export type QuizQuestion = {
 };
 
 export default function MultipleChoiceQuiz({ questions }: { questions: QuizQuestion[] }) {
+  const quizId = useId();
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [submitted, setSubmitted] = useState(false);
 
@@ -71,7 +72,7 @@ export default function MultipleChoiceQuiz({ questions }: { questions: QuizQuest
                     >
                       <input
                         type="radio"
-                        name={`quiz-${questionIndex}`}
+                        name={`${quizId}-quiz-${questionIndex}`}
                         checked={checked}
                         onChange={() => {
                           setSubmitted(false);

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { chapters, getChapter, getChapterNavigation } from "@/lib/chapters";
+import { getChapter, getChapterNavigation, getReadyChapters } from "@/lib/chapters";
 import { chapterContentLoaders } from "@/lib/content";
 
 type ChapterPageProps = {
@@ -10,14 +10,14 @@ type ChapterPageProps = {
 };
 
 export function generateStaticParams() {
-  return chapters.map((chapter) => ({ slug: chapter.slug }));
+  return getReadyChapters().map((chapter) => ({ slug: chapter.slug }));
 }
 
 export async function generateMetadata({ params }: ChapterPageProps) {
   const { slug } = await params;
   const chapter = getChapter(slug);
 
-  if (!chapter) {
+  if (!chapter || chapter.status !== "ready") {
     return {};
   }
 
@@ -32,10 +32,11 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
   const chapter = getChapter(slug);
   const loader = chapterContentLoaders[slug];
 
-  if (!chapter || !loader) {
+  if (!chapter || chapter.status !== "ready" || !loader) {
     notFound();
   }
 
+  const readyChapters = getReadyChapters();
   const { previous, next } = getChapterNavigation(slug);
   const Content = (await loader()).default;
 
@@ -58,7 +59,7 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
         <aside className="h-fit rounded-lg border border-slate-200 bg-white p-5 lg:sticky lg:top-6">
           <h2 className="text-sm font-bold text-slate-500">챕터 이동</h2>
           <div className="mt-4 grid gap-2">
-            {chapters.map((item) => (
+            {readyChapters.map((item) => (
               <Link
                 key={item.slug}
                 href={`/chapters/${item.slug}`}

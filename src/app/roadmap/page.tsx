@@ -66,16 +66,18 @@ export default function RoadmapPage() {
                   CS 연결: {chapter.csConnection}
                 </p>
               </div>
-              <Link
-                href={`/chapters/${chapter.slug}`}
-                className={`rounded-md border px-4 py-2 text-center text-sm font-bold ${
-                  chapter.status === "ready"
-                    ? "border-slate-300 text-slate-800 hover:bg-slate-100"
-                    : "border-slate-300 text-slate-500 hover:bg-slate-200"
-                }`}
-              >
-                열기
-              </Link>
+              {chapter.status === "ready" ? (
+                <Link
+                  href={`/chapters/${chapter.slug}`}
+                  className="rounded-md border border-slate-300 px-4 py-2 text-center text-sm font-bold text-slate-800 hover:bg-slate-100"
+                >
+                  열기
+                </Link>
+              ) : (
+                <span className="rounded-md border border-slate-300 px-4 py-2 text-center text-sm font-bold text-slate-500">
+                  준비 중
+                </span>
+              )}
             </div>
           </li>
         ))}

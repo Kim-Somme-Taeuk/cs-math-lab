@@ -61,16 +61,27 @@ test("set playground calculates set operations correctly", async ({ page }) => {
 test("multiple choice quiz scores submitted answers", async ({ page }) => {
   await page.goto("/chapters/sets");
 
-  const quiz = page.getByRole("region", { name: "손풀이 문제" });
+  const quiz = page.getByRole("region", { name: "문제 풀기" }).last();
   await expect(quiz.getByRole("button", { name: "채점하기" })).toBeDisabled();
 
   const questions = quiz.locator("fieldset");
-  await questions.nth(0).getByLabel("{ 1, 2, 3, 4, 5 }").check();
-  await questions.nth(1).getByLabel("{ 3 }").check();
-  await questions.nth(2).getByLabel("{ 1, 2 }").check();
-  await questions.nth(3).getByLabel("{ 4, 5, 6 }").check();
+  const correctAnswers = [
+    "{ 1, 2, 3, 4, 5 }",
+    "{ 3 }",
+    "{ 1, 2 }",
+    "{ 4, 5, 6 }",
+    "아니다. 1과 2가 B에 없기 때문이다.",
+    "같은 원소를 가지므로 같은 집합으로 볼 수 있다.",
+    "합집합",
+    "교집합",
+    "이미 방문한 정점을 다시 처리하지 않기 위해서",
+  ];
+
+  for (const [index, answer] of correctAnswers.entries()) {
+    await questions.nth(index).getByLabel(answer).check();
+  }
 
   await quiz.getByRole("button", { name: "채점하기" }).click();
-  await expect(quiz.getByText("4 / 4 정답")).toBeVisible();
-  await expect(quiz.getByText("정답입니다.")).toHaveCount(4);
+  await expect(quiz.getByText("9 / 9 정답")).toBeVisible();
+  await expect(quiz.getByText("정답입니다.")).toHaveCount(9);
 });

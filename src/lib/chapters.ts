@@ -89,10 +89,15 @@ export function getChapter(slug: string) {
   return chapters.find((chapter) => chapter.slug === slug);
 }
 
+export function getReadyChapters() {
+  return chapters.filter((chapter) => chapter.status === "ready");
+}
+
 export function getChapterNavigation(slug: string) {
-  const index = chapters.findIndex((chapter) => chapter.slug === slug);
+  const readyChapters = getReadyChapters();
+  const index = readyChapters.findIndex((chapter) => chapter.slug === slug);
   return {
-    previous: index > 0 ? chapters[index - 1] : null,
-    next: index >= 0 && index < chapters.length - 1 ? chapters[index + 1] : null,
+    previous: index > 0 ? readyChapters[index - 1] : null,
+    next: index >= 0 && index < readyChapters.length - 1 ? readyChapters[index + 1] : null,
   };
 }
