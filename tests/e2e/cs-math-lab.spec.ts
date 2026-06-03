@@ -36,17 +36,19 @@ test("subject cards open the matching roadmap subject", async ({ page }) => {
     )
     .toBe(true);
   await expect.poll(() => page.locator("#discrete-math").evaluate((element) => (element as HTMLDetailsElement).open)).toBe(false);
+  await expect
+    .poll(() => page.locator("#linear-algebra").evaluate((element) => element.getBoundingClientRect().top))
+    .toBeLessThan(120);
 });
 
 test("logic interaction updates basic operators and stays within mobile width", async ({ page }) => {
   await page.goto("/chapters/logic");
 
   const playground = page.getByRole("region", { name: "진리표 실험" });
-  await expect(playground.getByRole("cell", { name: "P AND Q" })).toBeVisible();
-  await expect(playground.getByRole("row", { name: /P AND Q/ })).toContainText("거짓");
+  await expect(playground.getByText("최종 결과: 거짓")).toBeVisible();
 
   await playground.getByRole("button", { name: /명제 Q/ }).click();
-  await expect(playground.getByRole("row", { name: /P AND Q/ })).toContainText("참");
+  await expect(playground.getByText("최종 결과: 참")).toBeVisible();
 
   const hasHorizontalOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   expect(hasHorizontalOverflow).toBe(false);
@@ -56,27 +58,27 @@ test("conditional interaction focuses on implication violation", async ({ page }
   await page.goto("/chapters/conditionals");
 
   const playground = page.getByRole("region", { name: "조건문 실험" });
-  await expect(playground.getByText(/P -> Q =/)).toContainText("거짓");
-  await expect(playground.getByText(/약속을 직접 어긴 사례/)).toBeVisible();
+  await expect(playground.getByText(/P가 참인데 Q가 거짓/)).toBeVisible();
+  await expect(playground.getByText("P 참, Q 거짓")).toBeVisible();
 
   await playground.getByRole("button", { name: /결론 Q/ }).click();
-  await expect(playground.getByText(/P -> Q =/)).toContainText("참");
+  await expect(playground.getByText(/약속이 지켜졌으므로/)).toBeVisible();
 });
 
 test("set playground calculates set operations correctly", async ({ page }) => {
   await page.goto("/chapters/sets");
 
   const playground = page.getByRole("region", { name: "집합 연산 실험" });
-  await expect(playground.getByText("결과 = { 1, 2, 3, 4, 5 }")).toBeVisible();
+  await expect(playground.getByText("결과 = { 2, 4, 5, 6 }")).toBeVisible();
 
   await playground.getByRole("button", { name: "A ∩ B" }).click();
-  await expect(playground.getByText("결과 = { 3 }")).toBeVisible();
+  await expect(playground.getByText("결과 = { 4, 6 }")).toBeVisible();
 
   await playground.getByRole("button", { name: "A - B" }).click();
-  await expect(playground.getByText("결과 = { 1, 2 }")).toBeVisible();
+  await expect(playground.getByText("결과 = { 2 }")).toBeVisible();
 
-  await playground.getByRole("button", { name: "Aᶜ" }).click();
-  await expect(playground.getByText("결과 = { 4, 5, 6 }")).toBeVisible();
+  await playground.getByRole("button", { name: "소수" }).first().click();
+  await expect(playground.getByText("결과 = { 2, 3 }")).toBeVisible();
 });
 
 test("multiple choice quiz scores submitted answers", async ({ page }) => {
@@ -85,7 +87,6 @@ test("multiple choice quiz scores submitted answers", async ({ page }) => {
   const quiz = page.getByRole("region", { name: "문제 풀기" }).last();
   await expect(quiz.getByRole("button", { name: "채점하기" })).toBeDisabled();
 
-  const questions = quiz.locator("fieldset");
   const correctAnswers = [
     "{ 1, 2, 3, 4, 5 }",
     "{ 3 }",
@@ -99,10 +100,13 @@ test("multiple choice quiz scores submitted answers", async ({ page }) => {
   ];
 
   for (const [index, answer] of correctAnswers.entries()) {
-    await questions.nth(index).getByLabel(answer).check();
+    await quiz.getByLabel(answer).check();
+    if (index < correctAnswers.length - 1) {
+      await quiz.getByRole("button", { name: "다음" }).click();
+    }
   }
 
   await quiz.getByRole("button", { name: "채점하기" }).click();
   await expect(quiz.getByText("9 / 9 정답")).toBeVisible();
-  await expect(quiz.getByText("정답입니다.")).toHaveCount(9);
+  await expect(quiz.getByText("정답입니다.")).toBeVisible();
 });

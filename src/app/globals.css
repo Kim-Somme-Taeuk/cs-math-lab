@@ -58,7 +58,7 @@ samp {
 }
 
 .math-content h3 {
-  margin-top: 1.8rem;
+  margin-top: 0;
   margin-bottom: 0.65rem;
   font-size: 1.1rem;
   line-height: 1.35;
@@ -80,6 +80,15 @@ samp {
   margin-top: 0.35rem;
 }
 
+.math-content section[aria-label] ul,
+.math-content section[aria-label] ol {
+  margin: 0;
+}
+
+.math-content section[aria-label] li + li {
+  margin-top: 0;
+}
+
 .math-content code {
   border-radius: 0.35rem;
   background: #e2e8f0;
@@ -92,6 +101,7 @@ samp {
 }
 
 .math-content pre {
+  margin: 1.1rem 0 1.25rem;
   overflow-x: auto;
   border-radius: 0.65rem;
   border: 1px solid #cbd5e1;
@@ -107,6 +117,7 @@ samp {
 }
 
 .math-content table {
+  margin: 1.1rem 0 1.25rem;
   width: 100%;
   border-collapse: collapse;
   overflow: hidden;
@@ -132,4 +143,18 @@ samp {
   background: #f0fdfa;
   padding: 0.8rem 1rem;
   color: #115e59;
+}
+
+.math-content .katex-display {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0.15rem;
+}
+
+@media (max-width: 640px) {
+  .math-content > section[aria-label$="실험"] {
+    max-height: 86vh;
+    overflow-y: auto;
+  }
 }

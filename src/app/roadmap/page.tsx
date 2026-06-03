@@ -41,6 +41,14 @@ export default function RoadmapPage() {
   const [openSubjectIds, setOpenSubjectIds] = useState<string[]>([]);
 
   useEffect(() => {
+    function scrollToSubject(subjectId: string) {
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+          document.getElementById(subjectId)?.scrollIntoView({ block: "start" });
+        });
+      });
+    }
+
     function syncOpenSubjectWithHash() {
       const subjectId = window.location.hash.replace("#", "");
       const subjectExists = roadmapSubjects.some((subject) => subject.id === subjectId);
@@ -51,6 +59,7 @@ export default function RoadmapPage() {
       }
 
       setOpenSubjectIds((current) => (current.includes(subjectId) ? current : [...current, subjectId]));
+      scrollToSubject(subjectId);
     }
 
     syncOpenSubjectWithHash();

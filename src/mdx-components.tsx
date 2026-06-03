@@ -5,6 +5,7 @@ import FunctionMappingPlayground from "@/components/interactive/FunctionMappingP
 import GraphTraversalPlayground from "@/components/interactive/GraphTraversalPlayground";
 import InductionVisualizer from "@/components/interactive/InductionVisualizer";
 import MultipleChoiceQuiz from "@/components/interactive/MultipleChoiceQuiz";
+import RelationPlayground from "@/components/interactive/RelationPlayground";
 import TruthTablePlayground from "@/components/interactive/TruthTablePlayground";
 import SetVennPlayground from "@/components/interactive/SetVennPlayground";
 
@@ -16,6 +17,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     GraphTraversalPlayground,
     InductionVisualizer,
     MultipleChoiceQuiz,
+    RelationPlayground,
     TruthTablePlayground,
     SetVennPlayground,
     ...components,

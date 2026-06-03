@@ -37,12 +37,13 @@ describe("TruthTablePlayground", () => {
     render(<TruthTablePlayground />);
 
     const playground = screen.getByRole("region", { name: "진리표 실험" });
-    expect(within(playground).getByRole("row", { name: /P AND Q/ })).toHaveTextContent("거짓");
-    expect(within(playground).getByRole("row", { name: /P OR Q/ })).toHaveTextContent("참");
+    expect(within(playground).getByText("최종 결과: 거짓")).toBeInTheDocument();
+    await user.click(within(playground).getByRole("button", { name: "P OR NOT Q" }));
+    expect(within(playground).getByText(/P가 참이므로 OR 결과가 참/)).toBeInTheDocument();
 
     await user.click(within(playground).getByRole("button", { name: /명제 Q/ }));
-
-    expect(within(playground).getByRole("row", { name: /P AND Q/ })).toHaveTextContent("참");
+    await user.click(within(playground).getByRole("button", { name: "P AND Q" }));
+    expect(within(playground).getByText("최종 결과: 참")).toBeInTheDocument();
   });
 });
 
@@ -52,12 +53,12 @@ describe("ConditionalPlayground", () => {
     render(<ConditionalPlayground />);
 
     const playground = screen.getByRole("region", { name: "조건문 실험" });
-    expect(within(playground).getByText(/P -> Q =/)).toHaveTextContent("거짓");
-    expect(within(playground).getByText(/약속을 직접 어긴 사례/)).toBeInTheDocument();
+    expect(within(playground).getByText(/P가 참인데 Q가 거짓/)).toBeInTheDocument();
+    expect(within(playground).getByText("P 참, Q 거짓")).toBeInTheDocument();
 
     await user.click(within(playground).getByRole("button", { name: /결론 Q/ }));
 
-    expect(within(playground).getByText(/P -> Q =/)).toHaveTextContent("참");
+    expect(within(playground).getByText(/약속이 지켜졌으므로/)).toBeInTheDocument();
   });
 });
 
@@ -67,16 +68,16 @@ describe("SetVennPlayground", () => {
     render(<SetVennPlayground />);
 
     const playground = screen.getByRole("region", { name: "집합 연산 실험" });
-    expect(within(playground).getByText("결과 = { 1, 2, 3, 4, 5 }")).toBeInTheDocument();
+    expect(within(playground).getByText("결과 = { 2, 4, 5, 6 }")).toBeInTheDocument();
 
     await user.click(within(playground).getByRole("button", { name: "A ∩ B" }));
-    expect(within(playground).getByText("결과 = { 3 }")).toBeInTheDocument();
+    expect(within(playground).getByText("결과 = { 4, 6 }")).toBeInTheDocument();
 
     await user.click(within(playground).getByRole("button", { name: "A - B" }));
-    expect(within(playground).getByText("결과 = { 1, 2 }")).toBeInTheDocument();
+    expect(within(playground).getByText("결과 = { 2 }")).toBeInTheDocument();
 
-    await user.click(within(playground).getByRole("button", { name: "Aᶜ" }));
-    expect(within(playground).getByText("결과 = { 4, 5, 6 }")).toBeInTheDocument();
+    await user.click(within(playground).getAllByRole("button", { name: "소수" })[0]);
+    expect(within(playground).getByText("결과 = { 2, 3 }")).toBeInTheDocument();
   });
 });
 
@@ -106,10 +107,11 @@ describe("MultipleChoiceQuiz", () => {
     expect(within(quiz).getByRole("button", { name: "채점하기" })).toBeDisabled();
 
     await user.click(within(quiz).getByLabelText("{ 3 }"));
+    await user.click(within(quiz).getByRole("button", { name: "다음" }));
     await user.click(within(quiz).getByLabelText("거짓"));
     await user.click(within(quiz).getByRole("button", { name: "채점하기" }));
 
     expect(within(quiz).getByText("2 / 2 정답")).toBeInTheDocument();
-    expect(within(quiz).getAllByText("정답입니다.")).toHaveLength(2);
+    expect(within(quiz).getByText("정답입니다.")).toBeInTheDocument();
   });
 });

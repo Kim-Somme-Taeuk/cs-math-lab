@@ -33,7 +33,15 @@
 서로 다른 n개 중 r개를 순서 있게 고르면 순열, 순서 없이 고르면 조합입니다.
 
 $$
-P(n,r) = \frac{n!}{(n-r)!}, \quad C(n,r) = \binom{n}{r} = \frac{n!}{r!(n-r)!}
+P(n,r) = \frac{n!}{(n-r)!}
+$$
+
+$$
+C(n,r) = \binom{n}{r}
+$$
+
+$$
+\binom{n}{r} = \frac{n!}{r!(n-r)!}
 $$
 
 여기서는 서로 다른 n개 중에서 r개를 고르고, 0 ≤ r ≤ n인 경우를 다룹니다.
@@ -224,4 +232,9 @@ for i in range(len(items)):
 
 ## 다음으로
 
-다음에는 정점과 간선으로 연결 구조를 표현하는 그래프를 배웁니다.
+<a
+  href="/chapters/graphs"
+  className="inline-flex rounded-md border border-teal-700 bg-white px-5 py-3 text-sm font-black text-slate-950 shadow-sm hover:bg-teal-50"
+>
+  다음 챕터: 그래프 기초
+</a>
