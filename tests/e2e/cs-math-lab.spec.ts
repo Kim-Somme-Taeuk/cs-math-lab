@@ -1,20 +1,41 @@
 import { expect, test } from "@playwright/test";
 
-test("roadmap visually separates ready and draft chapters", async ({ page }) => {
+test("roadmap visually separates ready and planned chapters", async ({ page }) => {
   await page.goto("/roadmap");
 
+  await expect.poll(() => page.locator("#discrete-math").evaluate((element) => (element as HTMLDetailsElement).open)).toBe(false);
+
+  await page.locator("#discrete-math-title").click();
   const readyCard = page.getByTestId("chapter-logic");
-  const draftCard = page.getByTestId("chapter-functions");
-
   await expect(readyCard.getByText("완성")).toBeVisible();
-  await expect(draftCard.getByText("초안")).toBeVisible();
 
-  const readyBackground = await readyCard.evaluate((element) => getComputedStyle(element).backgroundColor);
-  const draftBackground = await draftCard.evaluate((element) => getComputedStyle(element).backgroundColor);
-  const draftClassName = await draftCard.evaluate((element) => element.className);
+  await page.locator("#discrete-math-level-2").click();
+  const plannedCard = page.getByTestId("chapter-proof-techniques");
+  await expect(plannedCard.getByText("예정").first()).toBeVisible();
 
-  expect(readyBackground).not.toBe(draftBackground);
-  expect(draftClassName).toContain("bg-slate-100");
+  const readyClassName = await readyCard.evaluate((element) => element.className);
+  const plannedClassName = await plannedCard.evaluate((element) => element.className);
+
+  expect(readyClassName).not.toContain("border-dashed");
+  expect(plannedClassName).toContain("border-dashed");
+});
+
+test("subject cards open the matching roadmap subject", async ({ page }) => {
+  await page.goto("/");
+
+  await page.getByRole("link", { name: /선형대수/ }).click();
+
+  await expect(page).toHaveURL(/\/roadmap#linear-algebra$/);
+  await expect.poll(() => page.locator("#linear-algebra").evaluate((element) => (element as HTMLDetailsElement).open)).toBe(true);
+  await expect
+    .poll(() =>
+      page
+        .locator("#linear-algebra-level-1")
+        .locator("xpath=ancestor::details[1]")
+        .evaluate((element) => (element as HTMLDetailsElement).open),
+    )
+    .toBe(true);
+  await expect.poll(() => page.locator("#discrete-math").evaluate((element) => (element as HTMLDetailsElement).open)).toBe(false);
 });
 
 test("logic interaction updates basic operators and stays within mobile width", async ({ page }) => {

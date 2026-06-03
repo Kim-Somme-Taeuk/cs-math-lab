@@ -1,21 +1,24 @@
 import Link from "next/link";
-import { chapters } from "@/lib/chapters";
+import { chapters, roadmapSubjects } from "@/lib/chapters";
 
 const readyChapters = chapters.filter((chapter) => chapter.status === "ready");
+const activeSubject = roadmapSubjects.find((subject) => subject.status === "active");
 
 export default function Home() {
   return (
     <main>
       <section className="border-b border-slate-200 bg-white">
-        <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+        <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 lg:grid-cols-[1.35fr_0.65fr] lg:items-center">
           <div>
             <p className="mb-4 text-sm font-bold text-teal-700">컴공생을 위한 수학 학습 실험실</p>
-            <h1 className="max-w-3xl text-4xl font-black tracking-tight text-slate-950 sm:text-5xl">
-              수학 개념을 전공 맥락과 직접 연결합니다.
+            <h1 className="max-w-3xl text-3xl font-black tracking-tight text-slate-950 sm:text-4xl lg:text-[2.85rem] lg:leading-tight">
+              수학 개념을 전공 맥락과
+              <br className="hidden sm:block" /> 직접 연결합니다.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-700">
-              CS Math Lab은 이산수학의 핵심 개념을 직관적인 설명, 인터랙티브 예제,
-              손풀이 문제, 코드 연결로 학습하는 정적 웹사이트입니다.
+              CS Math Lab은 이산수학, 선형대수, 미적분, 확률통계를 컴공 전공 맥락과
+              연결해 학습하는 정적 웹사이트입니다. 현재는 이산수학 입문 챕터부터
+              순차적으로 공개합니다.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
@@ -32,31 +35,78 @@ export default function Home() {
               </Link>
             </div>
           </div>
-          <div className="rounded-lg border border-slate-200 bg-slate-50 p-5">
-            <div className="grid gap-3">
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-bold text-slate-500">현재 공개 중</p>
+                <h2 className="mt-1 text-xl font-black text-slate-950">{activeSubject?.title} Level 1</h2>
+              </div>
+              <span className="rounded-md bg-teal-50 px-2.5 py-1 text-xs font-bold text-teal-700">
+                {readyChapters.length}개 챕터
+              </span>
+            </div>
+            <div className="mt-4 grid grid-cols-2 gap-2">
               {readyChapters.map((chapter) => (
                 <Link
                   key={chapter.slug}
                   href={`/chapters/${chapter.slug}`}
-                  className="rounded-md border border-slate-200 bg-white p-4 hover:border-teal-500"
+                  className="rounded-md border border-slate-200 bg-white px-3 py-2 hover:border-teal-500"
                 >
-                  <p className="text-sm font-bold text-teal-700">
+                  <p className="text-xs font-bold text-teal-700">
                     {String(chapter.order).padStart(2, "0")}
                   </p>
-                  <h2 className="mt-1 font-bold text-slate-950">{chapter.title}</h2>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">{chapter.description}</p>
+                  <h2 className="mt-0.5 text-sm font-bold text-slate-950">{chapter.title}</h2>
                 </Link>
               ))}
             </div>
+            <Link
+              href="/roadmap"
+              className="mt-4 inline-flex w-full justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800 hover:bg-slate-100"
+            >
+              전체 로드맵 보기
+            </Link>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-6xl gap-5 px-5 py-12 md:grid-cols-3">
+      <section className="mx-auto max-w-6xl px-5 py-12">
+        <div className="max-w-3xl">
+          <p className="text-sm font-bold text-teal-700">Math Subjects</p>
+          <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">대주제별 학습 구조</h2>
+          <p className="mt-3 leading-7 text-slate-600">
+            각 대주제 안에서 Level을 나누고, Level별 챕터를 차례로 공개합니다.
+          </p>
+        </div>
+        <div className="mt-6 grid gap-4 md:grid-cols-4">
+          {roadmapSubjects.map((subject) => (
+            <Link
+              key={subject.id}
+              href={`/roadmap#${subject.id}`}
+              className="rounded-lg border border-slate-200 bg-white p-5 hover:border-teal-500"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <h3 className="font-black text-slate-950">{subject.title}</h3>
+                <span
+                  className={`rounded-md px-2 py-1 text-xs font-bold ${
+                    subject.status === "active"
+                      ? "bg-teal-50 text-teal-700"
+                      : "bg-amber-50 text-amber-700"
+                  }`}
+                >
+                  {subject.status === "active" ? "진행 중" : "예정"}
+                </span>
+              </div>
+              <p className="mt-3 text-sm leading-6 text-slate-600">{subject.description}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto grid max-w-6xl gap-5 px-5 pb-12 md:grid-cols-3">
         {[
           ["왜 배우는가", "정의부터 외우기보다 자료구조, 알고리즘, 조건문과의 연결을 먼저 봅니다."],
           ["직접 조작한다", "진리표와 집합 연산을 바꿔 보며 결과가 어떻게 달라지는지 확인합니다."],
-          ["확장 가능하다", "MDX 콘텐츠와 React 컴포넌트를 분리해 선형대수, 확률통계로 넓힐 수 있습니다."],
+          ["확장 가능하다", "MDX 콘텐츠와 React 컴포넌트를 분리해 여러 수학 대주제로 넓힐 수 있습니다."],
         ].map(([title, body]) => (
           <div key={title} className="rounded-lg border border-slate-200 bg-white p-5">
             <h2 className="text-lg font-bold text-slate-950">{title}</h2>

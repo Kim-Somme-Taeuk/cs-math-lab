@@ -60,7 +60,7 @@
 DFS와 BFS도 자주 섞입니다.
 
 - DFS는 한 길을 깊게 들어갔다가 돌아옵니다. 재귀나 스택과 잘 어울립니다.
-- BFS는 가까운 정점부터 넓게 퍼집니다. 큐와 잘 어울리고 최단 간선 수를 찾는 데 자주 씁니다.
+- BFS는 가까운 정점부터 넓게 퍼집니다. 큐와 잘 어울리고, 가중치가 없는 그래프에서는 시작점으로부터의 최단 간선 수를 찾는 데 자주 씁니다.
 
 방문 집합도 중요합니다. 이미 방문한 정점을 기록하지 않으면 사이클이 있는 그래프에서
 탐색이 끝나지 않을 수 있습니다.
@@ -83,8 +83,7 @@ DFS와 BFS도 자주 섞입니다.
 
 ## 직접 실험하기
 
-DFS와 BFS 탐색 시각화는 다음 단계에서 추가합니다. 지금은 작은 그래프의 인접 리스트를 보고
-탐색 순서를 손으로 따라갑니다.
+<GraphTraversalPlayground />
 
 ### 예제를 해석하는 순서
 
@@ -103,33 +102,32 @@ A에서 C로 가는 직접 간선이 있다고 말하려면 그 간선이 따로
 
 ## 코드로 읽기
 
-```ts
-const graph = {
-  A: ["B", "C"],
-  B: ["D"],
-  C: [],
-  D: [],
-};
+```python
+graph = {
+    "A": ["B", "C"],
+    "B": ["D"],
+    "C": [],
+    "D": [],
+}
 ```
 
 이 객체는 인접 리스트입니다. `A`의 값이 `["B", "C"]`이므로 A에서 B와 C로 갈 수 있습니다.
 
 BFS는 큐와 방문 집합을 함께 씁니다.
 
-```ts
-const queue = ["A"];
-const visited = new Set(["A"]);
+```python
+from collections import deque
 
-while (queue.length > 0) {
-  const current = queue.shift()!;
+queue = deque(["A"])
+visited = {"A"}
 
-  for (const next of graph[current]) {
-    if (!visited.has(next)) {
-      visited.add(next);
-      queue.push(next);
-    }
-  }
-}
+while queue:
+    current = queue.popleft()
+
+    for next_node in graph[current]:
+        if next_node not in visited:
+            visited.add(next_node)
+            queue.append(next_node)
 ```
 
 여기서 `visited`는 집합 챕터와 연결됩니다. 이미 방문한 정점을 다시 큐에 넣지 않으므로
@@ -161,6 +159,85 @@ while (queue.length > 0) {
 - 추천 시스템: 사용자와 상품의 연결을 분석합니다.
 - 컴파일러: 모듈 import 관계를 따라 순환 의존성을 찾습니다.
 
+## 종합 점검
+
+<MultipleChoiceQuiz
+  questions={[
+    {
+      prompt: "그래프 G = (V, E)에서 V는 무엇인가?",
+      choices: ["정점 집합", "간선 집합", "방문 순서", "실행 시간"],
+      correctIndex: 0,
+      explanation: "V는 그래프를 이루는 대상, 즉 정점들의 집합입니다.",
+    },
+    {
+      prompt: "방향 그래프에서 A -> B가 있을 때 반드시 참인 것은?",
+      choices: [
+        "A에서 B로 가는 직접 간선이 있다.",
+        "B에서 A로 가는 직접 간선도 자동으로 있다.",
+        "A와 B는 같은 정점이다.",
+        "A에서 B로 가는 경로가 절대 없다.",
+      ],
+      correctIndex: 0,
+      explanation: "방향 간선은 주어진 방향의 직접 연결만 의미합니다.",
+    },
+    {
+      prompt: "A -> B, B -> C가 있을 때 올바른 설명은?",
+      choices: [
+        "A에서 C로 가는 경로는 있지만 A -> C 직접 간선은 별도로 주어져야 한다.",
+        "A -> C 직접 간선이 자동으로 생긴다.",
+        "C에서 A로 반드시 갈 수 있다.",
+        "그래프가 함수가 아니므로 해석할 수 없다.",
+      ],
+      correctIndex: 0,
+      explanation: "경로와 직접 간선은 구분해야 합니다.",
+    },
+    {
+      prompt: "BFS가 보통 큐와 잘 어울리는 이유는?",
+      choices: [
+        "먼저 발견한 정점부터 처리해 가까운 곳부터 넓게 퍼지기 때문이다.",
+        "항상 가장 깊은 곳만 먼저 방문하기 때문이다.",
+        "방문 집합이 필요 없기 때문이다.",
+        "간선을 모두 삭제하기 때문이다.",
+      ],
+      correctIndex: 0,
+      explanation: "큐는 먼저 들어온 것을 먼저 처리하므로 BFS의 넓게 퍼지는 성질과 맞습니다.",
+    },
+    {
+      prompt: "DFS가 스택이나 재귀와 잘 어울리는 이유는?",
+      choices: [
+        "한 갈래를 깊게 따라갔다가 돌아오는 구조이기 때문이다.",
+        "항상 최단 경로만 찾기 때문이다.",
+        "정점을 절대 다시 보지 않기 때문이다.",
+        "가중치를 자동으로 계산하기 때문이다.",
+      ],
+      correctIndex: 0,
+      explanation: "DFS는 깊게 들어가는 탐색이라 스택 구조와 잘 맞습니다.",
+    },
+    {
+      prompt: "사이클이 있는 그래프에서 `visited` 집합이 필요한 이유는?",
+      choices: [
+        "이미 처리한 정점을 반복 방문해 무한히 도는 일을 막기 위해서",
+        "정점 이름을 숫자로 바꾸기 위해서",
+        "모든 간선을 무방향으로 만들기 위해서",
+        "그래프를 항상 트리로 만들기 위해서",
+      ],
+      correctIndex: 0,
+      explanation: "방문 기록이 없으면 사이클을 따라 계속 반복할 수 있습니다.",
+    },
+    {
+      prompt: "인접 리스트 `graph[\"A\"] = [\"B\", \"C\"]`의 의미는?",
+      choices: [
+        "A에서 B와 C로 갈 수 있다.",
+        "B와 C에서만 A로 갈 수 있다.",
+        "A는 고립 정점이다.",
+        "A, B, C는 모두 같은 정점이다.",
+      ],
+      correctIndex: 0,
+      explanation: "인접 리스트는 각 정점에서 바로 갈 수 있는 이웃을 저장합니다.",
+    },
+  ]}
+/>
+
 ## 다음으로
 
-이산수학 입문 이후에는 선형대수, 확률통계, 정수론으로 확장할 수 있습니다.
+그래프 기초를 익혔다면 트리, DAG, 최단 경로처럼 더 구체적인 그래프 주제로 확장할 수 있습니다.

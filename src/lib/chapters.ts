@@ -1,5 +1,6 @@
 export type ChapterStatus = "ready" | "draft" | "planned";
 export type RoadmapLevelId = 1 | 2 | 3;
+export type MathSubjectId = "discrete-math" | "linear-algebra" | "calculus" | "probability-statistics";
 
 export type Chapter = {
   slug: string;
@@ -17,6 +18,14 @@ export type RoadmapLevel = {
   title: string;
   description: string;
   chapters: Chapter[];
+};
+
+export type RoadmapSubject = {
+  id: MathSubjectId;
+  title: string;
+  description: string;
+  status: "active" | "planned";
+  levels: RoadmapLevel[];
 };
 
 export const chapters: Chapter[] = [
@@ -68,7 +77,7 @@ export const chapters: Chapter[] = [
     shortTitle: "관계",
     description: "두 집합 사이의 연결과 반사성, 대칭성, 추이성을 배웁니다.",
     csConnection: "그래프, 데이터베이스 관계, 동치 관계",
-    status: "draft",
+    status: "ready",
   },
   {
     slug: "induction",
@@ -78,7 +87,7 @@ export const chapters: Chapter[] = [
     shortTitle: "귀납법",
     description: "기저 사례와 귀납 단계를 재귀와 알고리즘 증명으로 연결합니다.",
     csConnection: "재귀 함수, 루프 불변식, 알고리즘 정확성",
-    status: "draft",
+    status: "ready",
   },
   {
     slug: "counting",
@@ -88,7 +97,7 @@ export const chapters: Chapter[] = [
     shortTitle: "경우의 수",
     description: "순열과 조합을 구분하고 선택 문제의 구조를 파악합니다.",
     csConnection: "브루트포스, 조합 탐색, 확률 기초",
-    status: "draft",
+    status: "ready",
   },
   {
     slug: "graphs",
@@ -98,7 +107,7 @@ export const chapters: Chapter[] = [
     shortTitle: "그래프",
     description: "정점과 간선, 탐색 순서를 자료구조 관점에서 이해합니다.",
     csConnection: "DFS, BFS, 네트워크, 의존성 그래프",
-    status: "draft",
+    status: "ready",
   },
 ];
 
@@ -291,7 +300,7 @@ const level3Chapters: Chapter[] = [
 export const roadmapLevels: RoadmapLevel[] = [
   {
     level: 1,
-    title: "Level 1. 이산수학 입문",
+    title: "Level 1. 입문",
     description: "현재 MVP 범위입니다. 컴공 전공 학습에 필요한 이산수학 첫 도구를 다룹니다.",
     chapters,
   },
@@ -306,6 +315,200 @@ export const roadmapLevels: RoadmapLevel[] = [
     title: "Level 3. 컴공 응용",
     description: "알고리즘, 그래프, 정수론처럼 전공 과목과 직접 맞닿는 주제로 확장할 예정입니다.",
     chapters: level3Chapters,
+  },
+];
+
+function plannedChapters(subjectId: MathSubjectId, level: RoadmapLevelId, titles: string[]): Chapter[] {
+  return titles.map((title, index) => ({
+    slug: `${subjectId}-level-${level}-${index + 1}`,
+    order: index + 1,
+    level,
+    title,
+    shortTitle: title,
+    description: `${title}을 컴공 맥락과 연결해 다룰 예정입니다.`,
+    csConnection: "전공 기초, 모델링, 문제 해결",
+    status: "planned",
+  }));
+}
+
+const plannedSubjectLevels = {
+  linearAlgebra: [
+    {
+      level: 1,
+      title: "Level 1. 벡터와 행렬 입문",
+      description: "벡터, 행렬, 선형변환을 컴공 맥락에서 다루는 입문 범위입니다.",
+      chapters: plannedChapters("linear-algebra", 1, [
+        "벡터란 무엇인가",
+        "벡터 덧셈과 스칼라배",
+        "좌표와 차원",
+        "내적과 유사도",
+        "행렬이란 무엇인가",
+        "행렬 덧셈과 스칼라배",
+        "행렬곱의 의미",
+        "연립일차방정식",
+      ]),
+    },
+    {
+      level: 2,
+      title: "Level 2. 선형공간과 변환",
+      description: "기저, 차원, 고유값처럼 선형대수의 핵심 도구로 확장할 예정입니다.",
+      chapters: plannedChapters("linear-algebra", 2, [
+        "선형결합",
+        "Span",
+        "선형독립과 선형종속",
+        "기저와 차원",
+        "선형변환",
+        "행렬과 선형변환",
+        "역행렬",
+        "행렬식",
+        "랭크",
+      ]),
+    },
+    {
+      level: 3,
+      title: "Level 3. 응용과 고급 개념",
+      description: "고유값, 정사영, 최소제곱, 선형 모델처럼 응용 주제로 확장할 예정입니다.",
+      chapters: plannedChapters("linear-algebra", 3, [
+        "고유값과 고유벡터",
+        "대각화",
+        "직교성과 정사영",
+        "최소제곱법",
+        "공분산 행렬",
+        "PCA 맛보기",
+        "그래픽스에서의 행렬 변환",
+        "머신러닝에서의 선형 모델",
+        "신경망에서의 행렬 연산",
+      ]),
+    },
+  ],
+  calculus: [
+    {
+      level: 1,
+      title: "Level 1. 함수와 변화율",
+      description: "변화율과 누적량을 코드, 그래프, 최적화 감각과 연결할 예정입니다.",
+      chapters: plannedChapters("calculus", 1, [
+        "함수와 그래프",
+        "입력과 출력",
+        "증가와 감소",
+        "평균 변화율",
+        "극한의 직관",
+        "연속의 의미",
+        "기울기와 접선",
+        "미분의 직관",
+      ]),
+    },
+    {
+      level: 2,
+      title: "Level 2. 미분과 적분",
+      description: "도함수, 미분 공식, 최적화, 적분과 누적량으로 확장할 예정입니다.",
+      chapters: plannedChapters("calculus", 2, [
+        "도함수",
+        "기본 미분 공식",
+        "합성함수와 연쇄법칙",
+        "곱의 미분과 몫의 미분",
+        "최댓값과 최솟값",
+        "최적화 문제",
+        "적분의 직관",
+        "정적분과 누적량",
+        "미적분의 기본정리",
+      ]),
+    },
+    {
+      level: 3,
+      title: "Level 3. 다변수와 최적화",
+      description: "다변수 변화율과 최적화, 역전파, 수치 계산으로 확장할 예정입니다.",
+      chapters: plannedChapters("calculus", 3, [
+        "다변수 함수",
+        "편미분",
+        "그래디언트",
+        "방향도함수",
+        "경사하강법",
+        "손실함수의 의미",
+        "체인룰과 역전파 맛보기",
+        "테일러 근사",
+        "수치미분과 수치적분",
+      ]),
+    },
+  ],
+  probabilityStatistics: [
+    {
+      level: 1,
+      title: "Level 1. 확률 기초",
+      description: "불확실한 사건과 데이터를 해석하는 기본 언어를 다룰 예정입니다.",
+      chapters: plannedChapters("probability-statistics", 1, [
+        "사건과 표본공간",
+        "확률의 의미",
+        "경우의 수와 확률",
+        "여사건",
+        "합사건과 곱사건",
+        "조건부확률",
+        "독립",
+        "베이즈 정리 맛보기",
+      ]),
+    },
+    {
+      level: 2,
+      title: "Level 2. 확률변수와 분포",
+      description: "확률변수, 기대값, 분산, 대표 분포와 샘플링으로 확장할 예정입니다.",
+      chapters: plannedChapters("probability-statistics", 2, [
+        "확률변수",
+        "이산확률변수",
+        "기대값",
+        "분산과 표준편차",
+        "베르누이 분포",
+        "이항분포",
+        "정규분포의 직관",
+        "확률분포 시각화",
+        "샘플링과 난수",
+      ]),
+    },
+    {
+      level: 3,
+      title: "Level 3. 통계 추론과 데이터 해석",
+      description: "표본, 추정, 검정, 상관과 회귀, 모델 평가로 확장할 예정입니다.",
+      chapters: plannedChapters("probability-statistics", 3, [
+        "모집단과 표본",
+        "표본평균",
+        "표본분산",
+        "추정의 의미",
+        "신뢰구간 맛보기",
+        "가설검정 맛보기",
+        "상관관계",
+        "회귀분석 맛보기",
+        "모델 평가와 오차",
+      ]),
+    },
+  ],
+} satisfies Record<string, RoadmapLevel[]>;
+
+export const roadmapSubjects: RoadmapSubject[] = [
+  {
+    id: "discrete-math",
+    title: "이산수학",
+    description: "논리, 집합, 함수, 관계, 그래프처럼 컴공 기초와 직접 맞닿는 수학입니다.",
+    status: "active",
+    levels: roadmapLevels,
+  },
+  {
+    id: "linear-algebra",
+    title: "선형대수",
+    description: "벡터와 행렬을 중심으로 데이터 표현, 그래픽스, 머신러닝의 기반을 다룹니다.",
+    status: "planned",
+    levels: plannedSubjectLevels.linearAlgebra,
+  },
+  {
+    id: "calculus",
+    title: "미적분",
+    description: "변화율, 누적, 최적화 개념을 알고리즘과 모델 학습 맥락에 연결합니다.",
+    status: "planned",
+    levels: plannedSubjectLevels.calculus,
+  },
+  {
+    id: "probability-statistics",
+    title: "확률통계",
+    description: "불확실성, 데이터 해석, 실험 판단에 필요한 확률과 통계 기초를 다룹니다.",
+    status: "planned",
+    levels: plannedSubjectLevels.probabilityStatistics,
   },
 ];
 
