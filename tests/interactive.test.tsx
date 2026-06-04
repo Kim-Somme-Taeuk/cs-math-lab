@@ -2,6 +2,7 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import ConditionalPlayground from "../src/components/interactive/ConditionalPlayground";
+import CountingPlayground from "../src/components/interactive/CountingPlayground";
 import MultipleChoiceQuiz from "../src/components/interactive/MultipleChoiceQuiz";
 import SetVennPlayground from "../src/components/interactive/SetVennPlayground";
 import TruthTablePlayground from "../src/components/interactive/TruthTablePlayground";
@@ -78,6 +79,21 @@ describe("SetVennPlayground", () => {
 
     await user.click(within(playground).getAllByRole("button", { name: "소수" })[0]);
     expect(within(playground).getByText("결과 = { 2, 3 }")).toBeInTheDocument();
+  });
+});
+
+describe("CountingPlayground", () => {
+  it("keeps unordered results readable without summary placeholders", async () => {
+    const user = userEvent.setup();
+    render(<CountingPlayground />);
+
+    const playground = screen.getByRole("region", { name: "경우의 수 실험" });
+    await user.click(within(playground).getByRole("button", { name: "5개" }));
+    await user.click(within(playground).getByRole("button", { name: "순서 고려" }));
+
+    expect(within(playground).getByText("전체 10개")).toBeInTheDocument();
+    expect(within(playground).getByText("{A,B}")).toBeInTheDocument();
+    expect(within(playground).queryByText(/\+\d+개/)).not.toBeInTheDocument();
   });
 });
 

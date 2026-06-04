@@ -80,6 +80,12 @@ export default function RoadmapPage() {
           미적분, 확률통계로 확장되도록 설계합니다. 현재는 이산수학 Level 1의 ready
           챕터만 상세 페이지로 열립니다.
         </p>
+        <Link
+          href="/chapters/logic"
+          className="mt-6 inline-flex rounded-md bg-slate-950 px-5 py-3 text-sm font-black text-white hover:bg-slate-800"
+        >
+          처음이면 여기서 시작
+        </Link>
       </div>
 
       <div className="mt-10 grid gap-10">

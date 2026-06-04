@@ -3,6 +3,7 @@ import { expect, test } from "@playwright/test";
 test("roadmap visually separates ready and planned chapters", async ({ page }) => {
   await page.goto("/roadmap");
 
+  await expect(page.getByRole("link", { name: "처음이면 여기서 시작" })).toHaveAttribute("href", "/chapters/logic");
   await expect.poll(() => page.locator("#discrete-math").evaluate((element) => (element as HTMLDetailsElement).open)).toBe(false);
 
   await page.locator("#discrete-math-title").click();

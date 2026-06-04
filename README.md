@@ -88,7 +88,12 @@ npm install
 npm run dev
 ```
 
-기본 `dev` 스크립트는 Next.js 기본 포트 정책을 따릅니다.
+`dev` 스크립트는 개발 서버 출력 폴더를 `.next-dev`로 분리해 실행합니다. 일반 Next.js 기본
+동작 그대로 확인해야 할 때는 `dev:default`를 사용합니다.
+
+```bash
+npm run dev:default
+```
 
 이 작업환경에서는 `plana-ai`가 `localhost:3000`을 사용하므로, CS Math Lab을 확인할 때는
 다음처럼 3001 포트로 실행합니다.
