@@ -48,6 +48,11 @@
 | 인접 리스트 | 각 정점에서 갈 수 있는 이웃 목록을 저장 |
 | 인접 행렬 | 정점 쌍마다 연결 여부를 표처럼 저장 |
 
+<UnderstandingCheck
+  concept="그래프 기본 용어"
+  prompt="정점, 간선, 경로, 방향 그래프의 차이를 설명할 수 있나요?"
+/>
+
 ## 자주 헷갈리는 지점
 
 방향 그래프에서는 A에서 B로 가는 간선이 있어도 B에서 A로 가는 간선이 자동으로 생기지
@@ -84,6 +89,11 @@ DFS와 BFS도 자주 섞입니다.
 ## 직접 실험하기
 
 <GraphTraversalPlayground />
+
+<UnderstandingCheck
+  concept="DFS와 BFS"
+  prompt="DFS와 BFS가 각각 어떤 순서로 정점을 방문하는지 구분할 수 있나요?"
+/>
 
 ### 예제를 해석하는 순서
 
@@ -164,6 +174,7 @@ while queue:
 ## 종합 점검
 
 <MultipleChoiceQuiz
+  title="종합 점검"
   questions={[
     {
       prompt: "그래프 G = (V, E)에서 V는 무엇인가?",

@@ -45,17 +45,6 @@ function firstReadyChapter(subject: Subject) {
   return subject.levels.flatMap((level) => level.chapters).find((chapter) => chapter.status === "ready");
 }
 
-function countChapters(subject: Subject) {
-  return subject.levels.flatMap((level) => level.chapters).reduce(
-    (counts, chapter) => {
-      counts[chapter.status] += 1;
-      counts.total += 1;
-      return counts;
-    },
-    { ready: 0, draft: 0, planned: 0, total: 0 } satisfies Record<ChapterStatus | "total", number>,
-  );
-}
-
 export default async function SubjectPage({ params }: SubjectPageProps) {
   const { subjectSlug } = await params;
   const subject = roadmapSubjects.find((item) => item.id === subjectSlug);
@@ -64,7 +53,6 @@ export default async function SubjectPage({ params }: SubjectPageProps) {
     notFound();
   }
 
-  const counts = countChapters(subject);
   const startChapter = firstReadyChapter(subject);
 
   return (
@@ -89,7 +77,7 @@ export default async function SubjectPage({ params }: SubjectPageProps) {
           {startChapter ? (
             <>
               <p className="mt-1 text-lg font-black text-slate-950">{startChapter.title}</p>
-              <p className="mt-2 text-sm leading-6 text-slate-600">CS 연결: {startChapter.csConnection}</p>
+              <p className="mt-2 text-sm leading-6 text-slate-600">{startChapter.csConnection}</p>
               <Link
                 href={`/chapters/${startChapter.slug}`}
                 className="mt-4 inline-flex w-full justify-center rounded-md bg-slate-950 px-4 py-2.5 text-sm font-black text-white hover:bg-slate-800"
@@ -108,24 +96,11 @@ export default async function SubjectPage({ params }: SubjectPageProps) {
         </div>
       </section>
 
-      <section aria-labelledby="summary-title" className="mt-8 grid gap-3 sm:grid-cols-4">
-        <h2 id="summary-title" className="sr-only">
-          과목 상태 요약
-        </h2>
-        <Stat label="Level" value={subject.levels.length} />
-        <Stat label="전체 챕터" value={counts.total} />
-        <Stat label="공개" value={counts.ready} tone="ready" />
-        <Stat label="예정" value={counts.planned} tone="planned" />
-      </section>
-
       <section aria-labelledby="levels-title" className="mt-10">
         <div>
           <h2 id="levels-title" className="text-2xl font-black tracking-tight text-slate-950">
             Level별 학습 과정
           </h2>
-          <p className="mt-2 text-sm leading-6 text-slate-600">
-            ready 챕터는 상세 페이지로 이동할 수 있고, planned 챕터는 예정 상태로만 표시합니다.
-          </p>
         </div>
 
         <div className="mt-5 grid gap-5">
@@ -140,11 +115,10 @@ export default async function SubjectPage({ params }: SubjectPageProps) {
 
 function LevelSection({ level }: { level: Level }) {
   const status = levelStatus(level);
-  const readyCount = level.chapters.filter((chapter) => chapter.status === "ready").length;
 
   return (
     <section className="rounded-lg border border-slate-200 bg-white p-4 sm:p-5">
-      <div className="flex flex-col gap-3 border-b border-slate-200 pb-4 sm:flex-row sm:items-start sm:justify-between">
+      <div className="border-b border-slate-200 pb-4">
         <div className="max-w-3xl">
           <div className="flex flex-wrap items-center gap-3">
             <h3 className="text-xl font-black tracking-tight text-slate-950">{level.title}</h3>
@@ -152,11 +126,6 @@ function LevelSection({ level }: { level: Level }) {
               {statusLabel(status)}
             </span>
           </div>
-          <p className="mt-2 text-sm leading-6 text-slate-600">{level.description}</p>
-        </div>
-        <div className="flex gap-2 text-xs font-bold text-slate-500">
-          <span className="rounded bg-slate-50 px-2 py-1">{level.chapters.length}개 챕터</span>
-          <span className="rounded bg-teal-50 px-2 py-1 text-teal-700">{readyCount}개 공개</span>
         </div>
       </div>
 
@@ -190,7 +159,7 @@ function ChapterCard({ chapter }: { chapter: Chapter }) {
           </span>
         </div>
       </div>
-      <p className="text-xs font-bold text-slate-400">CS 연결: {chapter.csConnection}</p>
+      <p className="text-xs font-bold text-slate-400">{chapter.csConnection}</p>
     </div>
   );
 
@@ -387,21 +356,6 @@ function PlannedVisual({
         ))}
       </div>
       <span className={`ml-3 text-xs font-black ${text}`}>#{order}</span>
-    </div>
-  );
-}
-
-function Stat({ label, value, tone = "default" }: { label: string; value: number; tone?: "default" | "ready" | "planned" }) {
-  const toneStyles = {
-    default: "bg-slate-50 text-slate-950",
-    ready: "bg-teal-50 text-teal-700",
-    planned: "bg-amber-50 text-amber-700",
-  };
-
-  return (
-    <div className={`rounded-lg border border-slate-200 bg-white p-4 ${toneStyles[tone]}`}>
-      <p className="text-2xl font-black">{value}</p>
-      <p className="mt-1 text-xs font-bold opacity-75">{label}</p>
     </div>
   );
 }

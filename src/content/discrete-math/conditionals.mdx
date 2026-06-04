@@ -88,6 +88,11 @@ valid_rule = (not is_member) or has_discount
 외우기 위한 대상이 아니라, 조건문 $P \to Q$가 어떤 참/거짓 판단으로 바뀌는지 확인하는
 보조 도구입니다.
 
+<UnderstandingCheck
+  concept="조건문"
+  prompt="P → Q가 언제 거짓이 되는지, 특히 P가 참이고 Q가 거짓인 경우를 설명할 수 있나요?"
+/>
+
 ## 자주 헷갈리는 지점
 
 P가 거짓인데 조건문이 참인 경우가 가장 낯설게 느껴집니다. 하지만 조건문은 "P인 상황에서
@@ -148,6 +153,11 @@ Q: 삭제할 수 있다.
 
 이 마지막 줄이 중요합니다. 조건문은 보장하는 범위와 보장하지 않는 범위를 함께 읽어야
 오해가 줄어듭니다.
+
+<UnderstandingCheck
+  concept="조건문의 범위"
+  prompt="조건문이 보장하는 경우와 아직 말하지 않은 경우를 구분할 수 있나요?"
+/>
 
 
 
@@ -222,6 +232,7 @@ def submit_email(email):
 ## 종합 점검
 
 <MultipleChoiceQuiz
+  title="종합 점검"
   questions={[
     {
       prompt: '조건문 P -> Q가 거짓이 되는 경우는?',

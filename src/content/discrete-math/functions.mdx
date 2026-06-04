@@ -84,6 +84,11 @@ $f(a)$를 대응시키는 규칙입니다.
 치역도 `{0, 1}`입니다. 하지만 정의역을 `{2, 4, 6}`으로 제한하면 실제 출력은 항상 `0`이므로
 치역은 `{0}`입니다.
 
+<UnderstandingCheck
+  concept="함수의 정의"
+  prompt="입력 하나가 정확히 하나의 출력으로 가야 함수라는 조건을 설명할 수 있나요?"
+/>
+
 ## 자주 헷갈리는 지점
 
 첫 번째 오해는 "여러 입력이 같은 출력으로 가면 함수가 아니다"입니다. 그렇지 않습니다.
@@ -144,6 +149,11 @@ def lucky_score(user_id):
 ## 직접 실험하기
 
 <FunctionMappingPlayground />
+
+<UnderstandingCheck
+  concept="함수 판별"
+  prompt="매핑 그림을 보고 함수인지 아닌지, 왜 그런지 판별할 수 있나요?"
+/>
 
 ### 예제를 해석하는 순서
 
@@ -282,6 +292,7 @@ function scoreOf(base: number) {
 아래 문제는 정의역, 공역, 치역, 함수 판별, 코드 연결을 함께 확인합니다.
 
 <MultipleChoiceQuiz
+  title="종합 점검"
   questions={[
     {
       prompt: "A = {1, 2, 3}, B = {a, b}일 때 `1 -> a`, `2 -> a`, `3 -> b`는 함수인가?",

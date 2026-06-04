@@ -52,6 +52,11 @@ $$
 합의 법칙은 둘 중 하나를 선택하는 경우에 씁니다. 서로 겹치지 않는 선택지가 a가지와 b가지
 있다면 전체는 $a + b$가지입니다.
 
+<UnderstandingCheck
+  concept="순열과 조합"
+  prompt="순서를 고려하면 순열, 순서를 무시하면 조합이라는 차이를 구분할 수 있나요?"
+/>
+
 ## 자주 헷갈리는 지점
 
 "A, B"와 "B, A"를 같은 선택으로 볼지 다른 선택으로 볼지가 핵심입니다.
@@ -71,6 +76,11 @@ $$
 ## 직접 실험하기
 
 <CountingPlayground />
+
+<UnderstandingCheck
+  concept="경우의 수 조건"
+  prompt="순서 고려와 중복 허용 여부가 결과 개수를 어떻게 바꾸는지 감이 오나요?"
+/>
 
 ### 예제를 해석하는 순서
 
@@ -154,6 +164,7 @@ for i in range(len(items)):
 ## 종합 점검
 
 <MultipleChoiceQuiz
+  title="종합 점검"
   questions={[
     {
       prompt: "5명 중 회장과 부회장을 뽑는 경우가 순열인 이유는?",

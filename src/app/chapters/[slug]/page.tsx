@@ -54,7 +54,7 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
   return (
     <main className="mx-auto max-w-6xl px-0 py-0 sm:px-5 sm:py-10">
       <details className="group fixed bottom-4 right-4 z-50 lg:hidden">
-        <summary className="flex h-12 w-12 list-none items-center justify-center rounded-full bg-slate-950/75 text-white shadow-lg shadow-slate-900/20 backdrop-blur marker:hidden">
+        <summary className="flex h-12 w-12 list-none items-center justify-center rounded-full bg-slate-950/40 text-white shadow-lg shadow-slate-900/20 backdrop-blur marker:hidden">
           <span className="sr-only">챕터 이동 열기</span>
           <span className="grid gap-1" aria-hidden="true">
             <span className="block h-0.5 w-5 rounded-full bg-white" />

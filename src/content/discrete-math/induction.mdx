@@ -48,6 +48,11 @@
 3. 귀납 단계: 그 가정으로부터 $P(k+1)$이 참임을 보입니다.
 4. 결론: 모든 n에 대해 $P(n)$이 참입니다.
 
+<UnderstandingCheck
+  concept="귀납법 구조"
+  prompt="기저 사례, 귀납 가정, 귀납 단계가 각각 어떤 역할을 하는지 설명할 수 있나요?"
+/>
+
 ## 자주 헷갈리는 지점
 
 기저 사례와 귀납 단계 중 하나라도 빠지면 전체 주장을 보장할 수 없습니다.
@@ -91,6 +96,11 @@ def sum_to(n):
 ## 직접 실험하기
 
 <InductionVisualizer />
+
+<UnderstandingCheck
+  concept="귀납 연결"
+  prompt="P(k)를 가정하고 P(k+1)을 새로 보여야 한다는 흐름이 보이나요?"
+/>
 
 ### 예제를 해석하는 순서
 
@@ -162,6 +172,7 @@ for i in range(1, n + 1):
 ## 종합 점검
 
 <MultipleChoiceQuiz
+  title="종합 점검"
   questions={[
     {
       prompt: "수학적 귀납법에서 기저 사례가 하는 역할은?",

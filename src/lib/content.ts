@@ -9,4 +9,5 @@ export const chapterContentLoaders: Record<string, () => Promise<{ default: Comp
   induction: () => import("@/content/discrete-math/induction.mdx"),
   counting: () => import("@/content/discrete-math/counting.mdx"),
   graphs: () => import("@/content/discrete-math/graphs.mdx"),
+  "proof-techniques": () => import("@/content/discrete-math/proof-techniques.mdx"),
 };

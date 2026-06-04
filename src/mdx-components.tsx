@@ -3,12 +3,15 @@ import type { MDXComponents } from "mdx/types";
 import ConditionalPlayground from "@/components/interactive/ConditionalPlayground";
 import CountingPlayground from "@/components/interactive/CountingPlayground";
 import FunctionMappingPlayground from "@/components/interactive/FunctionMappingPlayground";
+import GeneratedReviewQuiz from "@/components/interactive/GeneratedReviewQuiz";
 import GraphTraversalPlayground from "@/components/interactive/GraphTraversalPlayground";
 import InductionVisualizer from "@/components/interactive/InductionVisualizer";
 import MultipleChoiceQuiz from "@/components/interactive/MultipleChoiceQuiz";
+import ProofStrategyPlayground from "@/components/interactive/ProofStrategyPlayground";
 import RelationPlayground from "@/components/interactive/RelationPlayground";
 import TruthTablePlayground from "@/components/interactive/TruthTablePlayground";
 import SetVennPlayground from "@/components/interactive/SetVennPlayground";
+import UnderstandingCheck from "@/components/interactive/UnderstandingCheck";
 
 const headingIds: Record<string, string> = {
   "왜 배우나": "why",
@@ -44,12 +47,15 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ConditionalPlayground,
     CountingPlayground,
     FunctionMappingPlayground,
+    GeneratedReviewQuiz,
     GraphTraversalPlayground,
     InductionVisualizer,
     MultipleChoiceQuiz,
+    ProofStrategyPlayground,
     RelationPlayground,
     TruthTablePlayground,
     SetVennPlayground,
+    UnderstandingCheck,
     ...components,
   };
 }

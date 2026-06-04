@@ -1,4 +1,5 @@
 import Link from "next/link";
+import PersonalizedPathPanel from "@/components/personalization/PersonalizedPathPanel";
 import { roadmapSubjects, type ChapterStatus } from "@/lib/chapters";
 
 const subjectStatusStyles = {
@@ -14,6 +15,10 @@ const levelStatusStyles: Record<ChapterStatus, string> = {
 
 type Subject = (typeof roadmapSubjects)[number];
 type Level = Subject["levels"][number];
+
+const subjectCardDescriptions: Partial<Record<Subject["id"], string>> = {
+  calculus: "변화율, 누적, 최적화 개념을 알고리즘과 모델 학습에 연결합니다.",
+};
 
 function countChapters(subject: Subject) {
   return subject.levels.flatMap((level) => level.chapters).reduce(
@@ -39,6 +44,11 @@ function statusLabel(status: ChapterStatus) {
 }
 
 export default function RoadmapPage() {
+  const readyChapters = roadmapSubjects
+    .flatMap((subject) => subject.levels)
+    .flatMap((level) => level.chapters)
+    .filter((chapter) => chapter.status === "ready");
+
   return (
     <main className="mx-auto max-w-6xl px-5 py-12">
       <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-end">
@@ -48,8 +58,7 @@ export default function RoadmapPage() {
             컴공 수학 로드맵
           </h1>
           <p className="mt-4 text-lg leading-8 text-slate-700">
-            과목별 학습 트랙을 먼저 고르고, 각 과목 페이지에서 Level별 챕터를 확인합니다.
-            현재는 이산수학 Level 1이 실제 공개 범위입니다.
+            과목별 학습 트랙을 고르고, Level별 챕터를 확인합니다.
           </p>
         </div>
 
@@ -68,14 +77,13 @@ export default function RoadmapPage() {
         </div>
       </section>
 
+      <PersonalizedPathPanel readyChapters={readyChapters} />
+
       <section aria-labelledby="subjects-title" className="mt-10">
         <div>
           <h2 id="subjects-title" className="text-2xl font-black tracking-tight text-slate-950">
             대주제
           </h2>
-          <p className="mt-2 text-sm leading-6 text-slate-600">
-            전체 챕터를 한 화면에 펼치기보다, 과목을 선택한 뒤 해당 과목의 학습 과정을 봅니다.
-          </p>
         </div>
 
         <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -94,7 +102,9 @@ export default function RoadmapPage() {
                     {subject.status === "active" ? "진행 중" : "예정"}
                   </span>
                 </div>
-                <p className="mt-3 min-h-24 text-sm leading-6 text-slate-600">{subject.description}</p>
+                <p className="mt-3 text-sm leading-6 text-slate-600">
+                  {subjectCardDescriptions[subject.id] ?? subject.description}
+                </p>
                 <div className="mt-4 grid grid-cols-3 gap-2 text-center">
                   <Stat label="Level" value={subject.levels.length} />
                   <Stat label="공개" value={counts.ready} tone="ready" />

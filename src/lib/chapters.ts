@@ -1,16 +1,28 @@
 export type ChapterStatus = "ready" | "draft" | "planned";
 export type RoadmapLevelId = 1 | 2 | 3;
 export type MathSubjectId = "discrete-math" | "linear-algebra" | "calculus" | "probability-statistics";
+export type LearningTrackTag =
+  | "cs-foundation"
+  | "coding-test"
+  | "ai-ml"
+  | "data-analysis"
+  | "graphics"
+  | "practice"
+  | "code";
 
 export type Chapter = {
   slug: string;
   order: number;
   level: RoadmapLevelId;
+  subjectId?: MathSubjectId;
   title: string;
   shortTitle: string;
   description: string;
   csConnection: string;
   status: ChapterStatus;
+  prerequisites?: string[];
+  conceptTags?: string[];
+  trackTags?: LearningTrackTag[];
 };
 
 export type RoadmapLevel = {
@@ -28,7 +40,121 @@ export type RoadmapSubject = {
   levels: RoadmapLevel[];
 };
 
-export const chapters: Chapter[] = [
+type LearningMeta = Pick<Chapter, "subjectId" | "prerequisites" | "conceptTags" | "trackTags">;
+
+const learningMetaBySlug: Record<string, LearningMeta> = {
+  logic: {
+    subjectId: "discrete-math",
+    prerequisites: [],
+    conceptTags: ["명제", "논리 연산", "조건식"],
+    trackTags: ["cs-foundation", "coding-test", "code"],
+  },
+  conditionals: {
+    subjectId: "discrete-math",
+    prerequisites: ["logic"],
+    conceptTags: ["조건문", "대우", "진리표"],
+    trackTags: ["cs-foundation", "coding-test", "code"],
+  },
+  sets: {
+    subjectId: "discrete-math",
+    prerequisites: ["logic"],
+    conceptTags: ["집합", "부분집합", "집합 연산"],
+    trackTags: ["cs-foundation", "data-analysis", "practice"],
+  },
+  functions: {
+    subjectId: "discrete-math",
+    prerequisites: ["sets"],
+    conceptTags: ["함수", "정의역", "대응"],
+    trackTags: ["cs-foundation", "ai-ml", "code"],
+  },
+  relations: {
+    subjectId: "discrete-math",
+    prerequisites: ["sets"],
+    conceptTags: ["관계", "반사성", "대칭성", "추이성"],
+    trackTags: ["cs-foundation", "data-analysis"],
+  },
+  induction: {
+    subjectId: "discrete-math",
+    prerequisites: ["conditionals", "proof-techniques"],
+    conceptTags: ["귀납법", "기저 사례", "재귀"],
+    trackTags: ["cs-foundation", "coding-test", "practice"],
+  },
+  counting: {
+    subjectId: "discrete-math",
+    prerequisites: ["sets"],
+    conceptTags: ["경우의 수", "순열", "조합"],
+    trackTags: ["coding-test", "data-analysis", "practice"],
+  },
+  graphs: {
+    subjectId: "discrete-math",
+    prerequisites: ["relations"],
+    conceptTags: ["그래프", "DFS", "BFS"],
+    trackTags: ["cs-foundation", "coding-test", "practice"],
+  },
+  "proof-techniques": {
+    subjectId: "discrete-math",
+    prerequisites: ["logic", "conditionals"],
+    conceptTags: ["증명", "대우", "반례", "모순"],
+    trackTags: ["cs-foundation", "coding-test", "practice"],
+  },
+  "logical-equivalence": {
+    subjectId: "discrete-math",
+    prerequisites: ["logic"],
+    conceptTags: ["논리적 동치", "드모르간 법칙"],
+    trackTags: ["cs-foundation", "coding-test", "code"],
+  },
+  "predicate-logic": {
+    subjectId: "discrete-math",
+    prerequisites: ["logic", "sets"],
+    conceptTags: ["술어 논리", "전칭", "존재"],
+    trackTags: ["cs-foundation", "code"],
+  },
+  "equivalence-relations": {
+    subjectId: "discrete-math",
+    prerequisites: ["relations"],
+    conceptTags: ["동치관계", "분할"],
+    trackTags: ["cs-foundation", "data-analysis"],
+  },
+  "partial-orders": {
+    subjectId: "discrete-math",
+    prerequisites: ["relations"],
+    conceptTags: ["부분순서", "의존성"],
+    trackTags: ["cs-foundation", "coding-test"],
+  },
+  recurrences: {
+    subjectId: "discrete-math",
+    prerequisites: ["induction"],
+    conceptTags: ["점화식", "재귀"],
+    trackTags: ["coding-test", "practice"],
+  },
+  "inclusion-exclusion": {
+    subjectId: "discrete-math",
+    prerequisites: ["counting", "sets"],
+    conceptTags: ["포함배제", "중복 세기"],
+    trackTags: ["coding-test", "data-analysis", "practice"],
+  },
+  "pigeonhole-principle": {
+    subjectId: "discrete-math",
+    prerequisites: ["counting"],
+    conceptTags: ["비둘기집 원리", "충돌"],
+    trackTags: ["coding-test", "practice"],
+  },
+  trees: {
+    subjectId: "discrete-math",
+    prerequisites: ["graphs"],
+    conceptTags: ["트리", "재귀 구조"],
+    trackTags: ["cs-foundation", "coding-test", "practice"],
+  },
+};
+
+function withLearningMeta(chapters: Chapter[]) {
+  return chapters.map((chapter) => ({
+    ...chapter,
+    ...learningMetaBySlug[chapter.slug],
+  }));
+}
+
+export const chapters: Chapter[] = withLearningMeta([
   {
     slug: "logic",
     order: 1,
@@ -109,9 +235,9 @@ export const chapters: Chapter[] = [
     csConnection: "DFS, BFS, 네트워크, 의존성 그래프",
     status: "ready",
   },
-];
+]);
 
-const level2Chapters: Chapter[] = [
+const level2Chapters: Chapter[] = withLearningMeta([
   {
     slug: "proof-techniques",
     order: 1,
@@ -120,7 +246,7 @@ const level2Chapters: Chapter[] = [
     shortTitle: "증명",
     description: "직접 증명, 대우 증명, 모순 증명의 기본 구조를 다룹니다.",
     csConnection: "알고리즘 정확성, 명세 검증",
-    status: "planned",
+    status: "ready",
   },
   {
     slug: "logical-equivalence",
@@ -202,7 +328,7 @@ const level2Chapters: Chapter[] = [
     csConnection: "파일 시스템, DOM, 탐색 트리",
     status: "planned",
   },
-];
+]);
 
 const level3Chapters: Chapter[] = [
   {
@@ -323,6 +449,7 @@ function plannedChapters(subjectId: MathSubjectId, level: RoadmapLevelId, titles
     slug: `${subjectId}-level-${level}-${index + 1}`,
     order: index + 1,
     level,
+    subjectId,
     title,
     shortTitle: title,
     description: `${title}을 컴공 맥락과 연결해 다룰 예정입니다.`,
@@ -513,11 +640,17 @@ export const roadmapSubjects: RoadmapSubject[] = [
 ];
 
 export function getChapter(slug: string) {
-  return chapters.find((chapter) => chapter.slug === slug);
+  return roadmapSubjects
+    .flatMap((subject) => subject.levels)
+    .flatMap((level) => level.chapters)
+    .find((chapter) => chapter.slug === slug);
 }
 
 export function getReadyChapters() {
-  return chapters.filter((chapter) => chapter.status === "ready");
+  return roadmapSubjects
+    .flatMap((subject) => subject.levels)
+    .flatMap((level) => level.chapters)
+    .filter((chapter) => chapter.status === "ready");
 }
 
 export function getChapterNavigation(slug: string) {

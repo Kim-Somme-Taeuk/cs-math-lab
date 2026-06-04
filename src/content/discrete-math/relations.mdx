@@ -58,6 +58,11 @@ R = {(alice, cs), (bob, math), (bob, cs)}
 | 대칭성 | a가 b와 관계 있으면 b도 a와 관계 있다 |
 | 추이성 | a가 b와 관계 있고 b가 c와 관계 있으면 a도 c와 관계 있다 |
 
+<UnderstandingCheck
+  concept="관계 성질"
+  prompt="반사성, 대칭성, 추이성이 각각 어떤 관계쌍을 요구하는지 구분할 수 있나요?"
+/>
+
 ## 자주 헷갈리는 지점
 
 관계는 함수보다 느슨합니다. 하나의 원소가 여러 원소와 연결되어도 관계로는 문제가 없습니다.
@@ -93,6 +98,11 @@ R = {(alice, cs), (bob, math), (bob, cs)}
 ## 직접 판별하기
 
 <RelationPlayground />
+
+<UnderstandingCheck
+  concept="관계 반례"
+  prompt="관계 성질이 깨질 때 어떤 순서쌍이 반례가 되는지 찾을 수 있나요?"
+/>
 
 다음 관계를 직접 판별해 봅시다.
 
@@ -176,6 +186,7 @@ is_symmetric = all(
 ## 종합 점검
 
 <MultipleChoiceQuiz
+  title="종합 점검"
   questions={[
     {
       prompt: "관계를 순서쌍의 집합으로 보는 설명으로 맞는 것은?",
