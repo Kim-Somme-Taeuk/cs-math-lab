@@ -45,6 +45,9 @@ test("subject cards open the matching roadmap subject", async ({ page }) => {
 test("logic interaction updates basic operators and stays within mobile width", async ({ page }) => {
   await page.goto("/chapters/logic");
 
+  await expect(page.locator("#practice")).toBeVisible();
+  await expect(page.locator('a[href="#practice"]').first()).toBeAttached();
+
   const playground = page.getByRole("region", { name: "진리표 실험" });
   await expect(playground.getByText("최종 결과: 거짓")).toBeVisible();
 

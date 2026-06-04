@@ -29,6 +29,7 @@ export default function MultipleChoiceQuiz({ questions }: { questions: QuizQuest
   const isCorrect = selected === currentQuestion.correctIndex;
   const answeredCount = questions.filter((_, index) => answers[index] !== undefined).length;
   const paged = questions.length > 1;
+  const title = paged ? "종합 점검" : "연습 문제";
 
   const score = useMemo(
     () =>
@@ -44,7 +45,7 @@ export default function MultipleChoiceQuiz({ questions }: { questions: QuizQuest
     <section aria-label="문제 풀기" className="mt-3 mb-6 rounded-lg border border-slate-200 bg-slate-50 p-3 sm:p-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h3 className="m-0 text-lg font-black text-slate-950">문제 풀기</h3>
+          <h3 className="m-0 text-lg font-black text-slate-950">{title}</h3>
           <p className="mt-1 text-sm text-slate-600">
             {paged ? "문제를 순서대로 넘기며 답을 고른 뒤 채점합니다." : "답을 고른 뒤 채점하면 바로 해설을 확인할 수 있습니다."}
           </p>
