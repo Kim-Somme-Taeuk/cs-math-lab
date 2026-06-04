@@ -256,7 +256,7 @@ const level2Chapters: Chapter[] = withLearningMeta([
     shortTitle: "논리적 동치",
     description: "논리식을 같은 의미의 다른 형태로 바꾸는 규칙을 익힙니다.",
     csConnection: "조건식 단순화, 불리언 리팩터링",
-    status: "planned",
+    status: "ready",
   },
   {
     slug: "predicate-logic",
@@ -266,7 +266,7 @@ const level2Chapters: Chapter[] = withLearningMeta([
     shortTitle: "술어 논리",
     description: "모든, 어떤 같은 수량 표현을 논리식으로 다룹니다.",
     csConnection: "반복 조건, 쿼리 조건, 타입 제약",
-    status: "planned",
+    status: "ready",
   },
   {
     slug: "equivalence-relations",
@@ -276,7 +276,7 @@ const level2Chapters: Chapter[] = withLearningMeta([
     shortTitle: "동치관계",
     description: "같다고 묶을 수 있는 관계와 분할의 의미를 봅니다.",
     csConnection: "분류, 캐시 키, 유니온 파인드",
-    status: "planned",
+    status: "ready",
   },
   {
     slug: "partial-orders",
@@ -286,37 +286,37 @@ const level2Chapters: Chapter[] = withLearningMeta([
     shortTitle: "부분순서",
     description: "항상 일렬로 비교되지는 않는 순서 구조를 배웁니다.",
     csConnection: "의존성, 작업 순서, 버전 비교",
-    status: "planned",
-  },
-  {
-    slug: "recurrences",
-    order: 6,
-    level: 2,
-    title: "점화식",
-    shortTitle: "점화식",
-    description: "이전 값으로 다음 값을 정의하는 식을 이해합니다.",
-    csConnection: "재귀 알고리즘, 동적 계획법",
-    status: "planned",
+    status: "ready",
   },
   {
     slug: "inclusion-exclusion",
-    order: 7,
+    order: 6,
     level: 2,
     title: "포함배제 원리",
     shortTitle: "포함배제",
     description: "겹치는 경우를 중복 없이 세는 방법을 배웁니다.",
     csConnection: "필터 조합, 집계 로직",
-    status: "planned",
+    status: "ready",
   },
   {
     slug: "pigeonhole-principle",
-    order: 8,
+    order: 7,
     level: 2,
     title: "비둘기집 원리",
     shortTitle: "비둘기집",
     description: "공간보다 대상이 많을 때 반드시 생기는 충돌을 다룹니다.",
     csConnection: "해시 충돌, 하한 증명",
-    status: "planned",
+    status: "ready",
+  },
+  {
+    slug: "recurrences",
+    order: 8,
+    level: 2,
+    title: "점화식",
+    shortTitle: "점화식",
+    description: "이전 값으로 다음 값을 정의하는 식을 이해합니다.",
+    csConnection: "재귀 알고리즘, 동적 계획법",
+    status: "ready",
   },
   {
     slug: "trees",
@@ -326,7 +326,7 @@ const level2Chapters: Chapter[] = withLearningMeta([
     shortTitle: "트리",
     description: "사이클이 없는 연결 그래프와 계층 구조를 봅니다.",
     csConnection: "파일 시스템, DOM, 탐색 트리",
-    status: "planned",
+    status: "ready",
   },
 ]);
 
@@ -653,8 +653,24 @@ export function getReadyChapters() {
     .filter((chapter) => chapter.status === "ready");
 }
 
+export function getReadyChaptersInSameLevel(slug: string) {
+  const currentChapter = getChapter(slug);
+
+  if (!currentChapter) return [];
+
+  return roadmapSubjects
+    .flatMap((subject) => subject.levels)
+    .flatMap((level) => level.chapters)
+    .filter(
+      (chapter) =>
+        chapter.status === "ready" &&
+        chapter.subjectId === currentChapter.subjectId &&
+        chapter.level === currentChapter.level,
+    );
+}
+
 export function getChapterNavigation(slug: string) {
-  const readyChapters = getReadyChapters();
+  const readyChapters = getReadyChaptersInSameLevel(slug);
   const index = readyChapters.findIndex((chapter) => chapter.slug === slug);
   return {
     previous: index > 0 ? readyChapters[index - 1] : null,

@@ -1,0 +1,140 @@
+## 왜 배우나
+
+관계 챕터에서는 원소 사이의 연결을 배웠습니다. 동치관계는 그중에서도 <strong>"같다고 묶을 수 있는" 관계</strong>입니다. 완전히 같은 값이 아니어도 같은 그룹으로 취급할 수 있으면 동치관계가 자주 등장합니다.
+
+## 먼저 감 잡기
+
+파일을 확장자로 묶어 봅시다. `main.py`와 `test.py`는 같은 Python 파일 그룹입니다. `logo.png`는
+다른 그룹입니다. "확장자가 같다"는 관계는 파일들을 겹치지 않는 그룹으로 나눕니다.
+
+여기서 핵심은 단순히 "비슷하다"가 아니라, <strong>같은 기준으로 안정적으로 묶인다</strong>는 점입니다. 한 파일은
+정확히 하나의 확장자 그룹에 들어가고, 그룹끼리는 서로 겹치지 않습니다.
+
+## 핵심 정의
+
+관계 R이 동치관계가 되려면 <strong>세 성질을 모두 만족</strong>해야 합니다.
+
+- 반사성: 모든 x에 대해 xRx
+- 대칭성: xRy이면 yRx
+- 추이성: xRy이고 yRz이면 xRz
+
+동치관계가 있으면 각 원소는 자기와 동치인 원소들의 묶음, 즉 동치류에 들어갑니다. 전체 원소들은
+겹치지 않는 동치류들로 나뉘는데, 이것을 분할이라고 합니다.
+
+반대로 전체 집합을 겹치지 않는 그룹으로 나누면, <strong>"같은 그룹에 속한다"는 관계</strong>는 동치관계가
+됩니다. 그래서 동치관계는 관계를 확인하는 문제이면서 동시에 <strong>그룹을 만드는 기준</strong>이기도 합니다.
+
+## 자주 헷갈리는 지점
+
+동치관계는 *비슷해 보인다*가 아닙니다. <strong>반사성, 대칭성, 추이성</strong>을 모두 확인해야 합니다.
+특히 "친구 관계"는 대칭적일 수는 있지만 추이적이지 않을 수 있습니다. A와 B가 친구이고 B와 C가
+친구라고 해서 A와 C가 반드시 친구는 아닙니다.
+
+<UnderstandingCheck
+  concept="동치관계"
+  prompt="반사성, 대칭성, 추이성이 모두 필요하다는 점이 보이나요?"
+/>
+
+## 직접 실험하기
+
+관계 챕터의 격자 판별기를 떠올려 봅니다. 동치관계는 세 조건을 동시에 통과해야 합니다.
+
+예: 집합 `{1, 2, 3, 4}`에서 "2로 나눈 나머지가 같다"는 관계
+
+- 1과 3은 같은 그룹입니다.
+- 2와 4는 같은 그룹입니다.
+- 그룹은 `{1, 3}`, `{2, 4}`로 나뉩니다.
+
+아래 실험에서는 관계를 바꿨을 때 <strong>동치류로 깔끔하게 나뉘는 경우</strong>와 추이성이 깨지는 경우를
+비교합니다.
+
+<EquivalenceRelationPlayground />
+
+## 코드로 읽기
+
+상황: 파일 확장자가 같으면 같은 그룹으로 묶습니다.
+
+```python
+def extension(filename):
+    return filename.split(".")[-1]
+
+def same_extension(left, right):
+    return extension(left) == extension(right)
+```
+
+`same_extension(a, b)`는 반사성, 대칭성, 추이성을 만족합니다. 그래서 확장자별 분류는
+<strong>동치류를 만드는 일</strong>로 볼 수 있습니다.
+
+예를 들어 `same_extension("main.py", "test.py")`와 `same_extension("test.py", "tool.py")`가
+참이면, `main.py`와 `tool.py`도 같은 확장자 그룹에 있어야 합니다. 이것이 코드 예시에서 보이는
+추이성입니다.
+
+## 전공에서 만나는 장면
+
+- 사용자 그룹화
+- 캐시 키
+- 파일 확장자별 분류
+- 유니온 파인드
+- 동일성 판정
+
+## 종합 점검
+
+<MultipleChoiceQuiz
+  title="종합 점검"
+  questions={[
+    {
+      prompt: "동치관계가 만족해야 하는 세 성질은?",
+      choices: [
+        "반사성, 대칭성, 추이성",
+        "반사성, 반대칭성, 전사성",
+        "단사성, 전사성, 추이성",
+        "최솟값, 최댓값, 높이",
+      ],
+      correctIndex: 0,
+      explanation: "동치관계는 반사성, 대칭성, 추이성을 모두 만족하는 관계입니다.",
+      conceptTags: ["동치관계"],
+      questionType: "definition",
+    },
+    {
+      prompt: "동치류의 의미로 맞는 것은?",
+      choices: [
+        "한 원소와 동치인 원소들의 묶음",
+        "항상 원소가 하나뿐인 집합",
+        "순서가 있는 리스트",
+        "최단 경로",
+      ],
+      correctIndex: 0,
+      explanation: "동치류는 같은 관계로 묶이는 원소들의 그룹입니다.",
+      conceptTags: ["동치류"],
+      questionType: "equivalence-class",
+    },
+    {
+      prompt: "친구 관계가 보통 동치관계가 되기 어려운 이유는?",
+      choices: [
+        "추이성이 항상 성립하지 않기 때문이다.",
+        "대칭성이 절대 성립하지 않기 때문이다.",
+        "반사성이 항상 충분하기 때문이다.",
+        "관계가 아니기 때문이다.",
+      ],
+      correctIndex: 0,
+      explanation: "A-B, B-C가 친구여도 A-C가 친구라고 보장되지 않습니다.",
+      conceptTags: ["추이성"],
+      questionType: "counterexample",
+      reasonTags: ["추이성 조건 누락"],
+    },
+    {
+      prompt: "동치관계가 전체 집합에 만드는 구조는?",
+      choices: ["분할", "스택", "큐", "정렬 리스트"],
+      correctIndex: 0,
+      explanation: "동치관계는 전체 원소를 겹치지 않는 동치류들로 나눕니다.",
+      conceptTags: ["분할"],
+      questionType: "structure",
+    },
+  ]}
+/>
+
+## 다음으로
+
+<a href="/chapters/partial-orders" className="inline-flex rounded-md border border-teal-700 bg-white px-5 py-3 text-sm font-black text-slate-950 shadow-sm hover:bg-teal-50">
+  다음 챕터로 가기
+</a>

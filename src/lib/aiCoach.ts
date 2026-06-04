@@ -4,6 +4,8 @@ export const aiCoachFallbackMemo =
   "지금은 저장된 학습 기록을 기준으로 약한 개념을 짧게 복습하고, 추천 경로의 다음 챕터를 이어가는 것이 좋습니다.";
 
 export const aiCoachCacheStorageKey = "cs-math-lab:ai-coach-cache";
+export const aiCoachUsageStorageKey = "cs-math-lab:ai-coach-usage";
+export const aiCoachDailyLimit = 5;
 
 export type AiCoachRequestPayload = {
   context: AiLearningContext;
@@ -39,7 +41,8 @@ function isRecentAttempt(value: unknown) {
     value.scoreRatio >= 0 &&
     value.scoreRatio <= 1 &&
     isStringArray(value.missedConcepts) &&
-    isStringArray(value.missedQuestionTypes)
+    isStringArray(value.missedQuestionTypes) &&
+    isStringArray(value.missedReasonTags)
   );
 }
 
@@ -79,6 +82,10 @@ export function validateAiCoachPayload(value: unknown): value is AiCoachRequestP
     isStringArray(context.reviewChapterSlugs) &&
     isStringArray(context.weakConcepts) &&
     isStringArray(context.weakQuestionTypes) &&
+    isStringArray(context.weakReasonTags) &&
+    isStringArray(context.reviewReasons) &&
+    (typeof context.nextChapterReason === "string" || context.nextChapterReason === null) &&
+    (context.nextChapterReason === null || context.nextChapterReason.length <= maxTextLength * 2) &&
     Array.isArray(context.recentAttempts) &&
     context.recentAttempts.length <= 8 &&
     context.recentAttempts.every(isRecentAttempt) &&

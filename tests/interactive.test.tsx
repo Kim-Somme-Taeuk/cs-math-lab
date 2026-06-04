@@ -3,12 +3,13 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import ConditionalPlayground from "../src/components/interactive/ConditionalPlayground";
 import CountingPlayground from "../src/components/interactive/CountingPlayground";
+import CounterexamplePlayground from "../src/components/interactive/CounterexamplePlayground";
 import MultipleChoiceQuiz from "../src/components/interactive/MultipleChoiceQuiz";
 import SetVennPlayground from "../src/components/interactive/SetVennPlayground";
 import TruthTablePlayground from "../src/components/interactive/TruthTablePlayground";
 import { buildAiLearningContext } from "../src/lib/aiLearningContext";
 import { normalizeCoachMemo, validateAiCoachPayload } from "../src/lib/aiCoach";
-import { chapters, roadmapSubjects } from "../src/lib/chapters";
+import { chapters, getChapterNavigation, getReadyChaptersInSameLevel, roadmapSubjects } from "../src/lib/chapters";
 import { generateSetReviewQuestions } from "../src/lib/generatedReview";
 import { evaluateLogic } from "../src/lib/logic";
 import { getLearningInsights, getRecommendedChapters, quizResultsStorageKey } from "../src/lib/personalization";
@@ -44,6 +45,7 @@ describe("set helpers", () => {
     expect(firstAttempt[0].prompt).toContain("A ∪ B");
     expect(firstAttempt[0].questionType).toBe("union");
     expect(firstAttempt[0].conceptTags).toContain("합집합");
+    expect(firstAttempt[0].reasonTags).toContain("합집합과 교집합 혼동");
     expect(secondAttempt[0].prompt).toContain("A ∪ B");
     expect(secondAttempt[0].prompt).not.toBe(firstAttempt[0].prompt);
     expect(firstAttempt[0].choices[firstAttempt[0].correctIndex]).toMatch(/^\{ /);
@@ -115,6 +117,22 @@ describe("CountingPlayground", () => {
   });
 });
 
+describe("CounterexamplePlayground", () => {
+  it("marks an ascending multi-item list as a counterexample", async () => {
+    const user = userEvent.setup();
+    render(<CounterexamplePlayground />);
+
+    const playground = screen.getByRole("region", { name: "반례 찾기 실험" });
+    expect(within(playground).getByText("[1, 2, 3]은 조건은 만족하지만 결론이 깨지므로 반례입니다.")).toBeInTheDocument();
+
+    await user.click(within(playground).getByRole("button", { name: "[]" }));
+    expect(within(playground).getByText("빈 리스트는 이번 주장의 대상인 비어 있지 않은 리스트가 아니므로 반례로 쓰지 않습니다.")).toBeInTheDocument();
+
+    await user.click(within(playground).getByRole("button", { name: "[3, 2, 1]" }));
+    expect(within(playground).getByText("[3, 2, 1]은 오름차순 정렬 조건을 만족하지 않으므로 반례가 아닙니다.")).toBeInTheDocument();
+  });
+});
+
 describe("MultipleChoiceQuiz", () => {
   afterEach(() => {
     window.localStorage.clear();
@@ -167,6 +185,7 @@ describe("MultipleChoiceQuiz", () => {
             explanation: "합집합은 두 집합의 원소를 모두 모읍니다.",
             conceptTags: ["합집합"],
             questionType: "union",
+            reasonTags: ["합집합과 교집합 혼동"],
           },
           {
             prompt: "A ∩ B는 무엇인가?",
@@ -188,16 +207,44 @@ describe("MultipleChoiceQuiz", () => {
 
     const stored = JSON.parse(window.localStorage.getItem(quizResultsStorageKey) ?? "{}") as Record<
       string,
-      { missedConcepts: string[]; missedQuestionTypes: string[] }
+      { missedConcepts: string[]; missedQuestionTypes: string[]; missedReasonTags: string[] }
     >;
     const result = Object.values(stored)[0];
 
     expect(result.missedConcepts).toEqual(["합집합"]);
     expect(result.missedQuestionTypes).toEqual(["union"]);
+    expect(result.missedReasonTags).toEqual(["합집합과 교집합 혼동"]);
   });
 });
 
 describe("personalized recommendations", () => {
+  it("keeps chapter navigation within the current subject level", () => {
+    expect(getReadyChaptersInSameLevel("graphs").map((chapter) => chapter.slug)).toEqual([
+      "logic",
+      "conditionals",
+      "sets",
+      "functions",
+      "relations",
+      "induction",
+      "counting",
+      "graphs",
+    ]);
+    expect(getChapterNavigation("graphs").next).toBeNull();
+    expect(getReadyChaptersInSameLevel("proof-techniques").map((chapter) => chapter.slug)).toEqual([
+      "proof-techniques",
+      "logical-equivalence",
+      "predicate-logic",
+      "equivalence-relations",
+      "partial-orders",
+      "inclusion-exclusion",
+      "pigeonhole-principle",
+      "recurrences",
+      "trees",
+    ]);
+    expect(getChapterNavigation("proof-techniques").previous).toBeNull();
+    expect(getChapterNavigation("proof-techniques").next?.slug).toBe("logical-equivalence");
+  });
+
   it("prioritizes code-oriented foundation chapters from ready content", () => {
     const discreteMath = roadmapSubjects.find((subject) => subject.id === "discrete-math");
     const readyChapters = discreteMath?.levels
@@ -223,6 +270,34 @@ describe("personalized recommendations", () => {
     expect(recommended[0].trackTags).toContain("cs-foundation");
   });
 
+  it("keeps personalized course recommendations aligned with the Level 2 order", () => {
+    const discreteMath = roadmapSubjects.find((subject) => subject.id === "discrete-math");
+    const readyChapters = discreteMath?.levels
+      .flatMap((level) => level.chapters)
+      .filter((chapter) => chapter.status === "ready") ?? chapters;
+
+    const recommended = getRecommendedChapters(
+      {
+        goal: "course",
+        level: "some-discrete",
+        style: "short",
+      },
+      readyChapters,
+    ).map((chapter) => chapter.slug);
+
+    expect(recommended.slice(8, 17)).toEqual([
+      "proof-techniques",
+      "logical-equivalence",
+      "predicate-logic",
+      "equivalence-relations",
+      "partial-orders",
+      "inclusion-exclusion",
+      "pigeonhole-principle",
+      "recurrences",
+      "trees",
+    ]);
+  });
+
   it("summarizes weak concepts from low quiz scores", () => {
     const discreteMath = roadmapSubjects.find((subject) => subject.id === "discrete-math");
     const readyChapters = discreteMath?.levels
@@ -246,6 +321,7 @@ describe("personalized recommendations", () => {
           concepts: ["조건문", "대우"],
           missedConcepts: ["대우"],
           missedQuestionTypes: ["contrapositive"],
+          missedReasonTags: ["대우와 역 혼동"],
           updatedAt: "2026-06-04T00:00:00.000Z",
         },
       ],
@@ -253,6 +329,8 @@ describe("personalized recommendations", () => {
 
     expect(insights.weakConcepts).toEqual(["대우"]);
     expect(insights.weakQuestionTypes).toEqual(["contrapositive"]);
+    expect(insights.weakReasonTags).toEqual(["대우와 역 혼동"]);
+    expect(insights.reviewReasons[0]).toContain("대우와 역 혼동");
     expect(insights.reviewChapters.map((chapter) => chapter.slug)).toEqual(["conditionals"]);
     expect(insights.coachMessage).toContain("대우");
   });
@@ -299,6 +377,7 @@ describe("personalized recommendations", () => {
           concepts: ["집합"],
           missedConcepts: ["차집합"],
           missedQuestionTypes: ["difference"],
+          missedReasonTags: ["차집합 방향 혼동"],
           updatedAt: "2026-06-04T00:00:00.000Z",
         },
       ],
@@ -307,6 +386,9 @@ describe("personalized recommendations", () => {
     expect(context.profile).toContain("코테");
     expect(context.weakConcepts).toEqual(["차집합"]);
     expect(context.weakQuestionTypes).toEqual(["difference"]);
+    expect(context.weakReasonTags).toEqual(["차집합 방향 혼동"]);
+    expect(context.reviewReasons[0]).toContain("차집합 방향 혼동");
+    expect(context.nextChapterReason).toContain("차집합");
     expect(context.chapterCatalog[0]).toMatchObject({
       slug: "logic",
       subjectId: "discrete-math",

@@ -35,6 +35,7 @@ function questionFromChoices(
   seed: number,
   questionType: string,
   conceptTags: string[],
+  reasonTags: string[],
 ): QuizQuestion {
   const choices = rotateChoices(correct, distractors, seed);
 
@@ -45,6 +46,7 @@ function questionFromChoices(
     explanation,
     questionType,
     conceptTags,
+    reasonTags,
   };
 }
 
@@ -75,6 +77,7 @@ function generateSetReviewQuestion(kind: SetReviewKind, kindIndex: number, varia
       seed,
       "union",
       ["집합 연산", "합집합"],
+      ["합집합과 교집합 혼동"],
     );
   }
 
@@ -87,6 +90,7 @@ function generateSetReviewQuestion(kind: SetReviewKind, kindIndex: number, varia
       seed,
       "intersection",
       ["집합 연산", "교집합"],
+      ["공통 원소만 남기는 조건 혼동"],
     );
   }
 
@@ -99,6 +103,7 @@ function generateSetReviewQuestion(kind: SetReviewKind, kindIndex: number, varia
       seed,
       "difference",
       ["집합 연산", "차집합"],
+      ["차집합 방향 혼동"],
     );
   }
 
@@ -111,6 +116,7 @@ function generateSetReviewQuestion(kind: SetReviewKind, kindIndex: number, varia
       seed,
       "complement",
       ["집합 연산", "여집합"],
+      ["전체집합 기준 누락"],
     );
   }
 
@@ -132,6 +138,7 @@ function generateSetReviewQuestion(kind: SetReviewKind, kindIndex: number, varia
       seed,
       "subset",
       ["부분집합"],
+      ["부분집합 조건 오해"],
     );
   }
 
@@ -149,6 +156,7 @@ function generateSetReviewQuestion(kind: SetReviewKind, kindIndex: number, varia
       seed,
       "set-order",
       ["집합", "순서 무시"],
+      ["집합에서 순서가 중요하다고 오해"],
     );
   }
 
@@ -161,6 +169,7 @@ function generateSetReviewQuestion(kind: SetReviewKind, kindIndex: number, varia
       seed,
       "python-union",
       ["Python set", "합집합"],
+      ["Python set 연산자 의미 혼동"],
     );
   }
 
@@ -172,6 +181,7 @@ function generateSetReviewQuestion(kind: SetReviewKind, kindIndex: number, varia
     seed,
     "python-intersection",
     ["Python set", "교집합"],
+    ["Python set 연산자 의미 혼동"],
   );
 }
 

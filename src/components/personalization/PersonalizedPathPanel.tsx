@@ -5,7 +5,9 @@ import { useEffect, useMemo, useState } from "react";
 import { buildAiLearningContext } from "@/lib/aiLearningContext";
 import {
   aiCoachCacheStorageKey,
+  aiCoachDailyLimit,
   aiCoachFallbackMemo,
+  aiCoachUsageStorageKey,
   type AiCoachRequestPayload,
   type AiCoachResponsePayload,
 } from "@/lib/aiCoach";
@@ -35,6 +37,11 @@ type CachedCoachMemo = {
   contextHash: string;
   memo: string;
   updatedAt: string;
+};
+
+type CoachUsage = {
+  date: string;
+  count: number;
 };
 
 const defaultProfile: LearningProfile = {
@@ -88,6 +95,7 @@ function readQuizResults() {
       concepts: result.concepts?.length ? result.concepts : getConceptTagsForChapter(result.slug),
       missedConcepts: result.missedConcepts ?? [],
       missedQuestionTypes: result.missedQuestionTypes ?? [],
+      missedReasonTags: result.missedReasonTags ?? [],
     }));
   } catch {
     return [];
@@ -141,6 +149,36 @@ function writeCachedCoachMemo(contextHash: string, memo: string) {
   }
 }
 
+function todayKey() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function readCoachUsage() {
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(aiCoachUsageStorageKey) ?? "null") as CoachUsage | null;
+
+    return stored?.date === todayKey() ? stored : { date: todayKey(), count: 0 };
+  } catch {
+    return { date: todayKey(), count: 0 };
+  }
+}
+
+function incrementCoachUsage() {
+  const usage = readCoachUsage();
+  const nextUsage = {
+    date: usage.date,
+    count: usage.count + 1,
+  };
+
+  try {
+    window.localStorage.setItem(aiCoachUsageStorageKey, JSON.stringify(nextUsage));
+  } catch {
+    // 호출 제한 저장 실패는 요청 자체를 막지 않습니다.
+  }
+
+  return nextUsage;
+}
+
 export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPathPanelProps) {
   const [profile, setProfile] = useState<LearningProfile | null>(null);
   const [draftProfile, setDraftProfile] = useState<LearningProfile>(defaultProfile);
@@ -151,6 +189,7 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
   const [aiCoachMemo, setAiCoachMemo] = useState<string | null>(null);
   const [aiCoachSource, setAiCoachSource] = useState<"ai" | "fallback" | "cache" | null>(null);
   const [aiCoachLoading, setAiCoachLoading] = useState(false);
+  const [aiCoachUsageCount, setAiCoachUsageCount] = useState(0);
 
   useEffect(() => {
     const storedProfile = readProfile();
@@ -159,6 +198,7 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
     setCompletedChapters(readCompletedChapters());
     setQuizResults(readQuizResults());
     setUnderstandingChecks(readUnderstandingChecks());
+    setAiCoachUsageCount(readCoachUsage().count);
     setEditing(!storedProfile);
   }, []);
 
@@ -212,10 +252,22 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
       return;
     }
 
+    const usage = readCoachUsage();
+
+    if (usage.count >= aiCoachDailyLimit) {
+      setAiCoachMemo("오늘 AI 코치 호출 한도에 도달했습니다. 저장된 코치 메모와 추천 경로를 기준으로 이어가세요.");
+      setAiCoachSource("fallback");
+      setAiCoachUsageCount(usage.count);
+      return;
+    }
+
     setAiCoachLoading(true);
     setAiCoachSource(null);
 
     try {
+      const nextUsage = incrementCoachUsage();
+      setAiCoachUsageCount(nextUsage.count);
+
       const payload: AiCoachRequestPayload = {
         context: aiLearningContext,
       };
@@ -235,7 +287,9 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
       const memo = result.memo || aiCoachFallbackMemo;
       setAiCoachMemo(memo);
       setAiCoachSource(result.source);
-      writeCachedCoachMemo(aiContextHash, memo);
+      if (result.source === "ai") {
+        writeCachedCoachMemo(aiContextHash, memo);
+      }
     } catch {
       setAiCoachMemo(aiCoachFallbackMemo);
       setAiCoachSource("fallback");
@@ -316,6 +370,9 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
               {insights.weakQuestionTypes.length > 0 ? (
                 <p className="mt-1 text-xs font-bold text-slate-400">유형: {insights.weakQuestionTypes.join(", ")}</p>
               ) : null}
+              {insights.weakReasonTags.length > 0 ? (
+                <p className="mt-1 text-xs font-bold text-slate-400">원인: {insights.weakReasonTags.join(", ")}</p>
+              ) : null}
             </div>
             <div className="rounded-md border border-slate-200 bg-white p-3">
               <p className="text-xs font-black text-slate-500">코치 메모</p>
@@ -326,11 +383,12 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm font-black text-slate-950">AI 코치 메모</p>
-                {aiCoachSource ? (
-                  <p className="mt-1 text-xs font-bold text-slate-400">
-                    {aiCoachSource === "cache" ? "최근 응답 재사용" : aiCoachSource === "ai" ? "AI 생성" : "기본 메모"}
-                  </p>
-                ) : null}
+                <p className="mt-1 text-xs font-bold text-slate-400">
+                  학습 목표, 완료 챕터, 오답 태그만 전송됩니다. 오늘 {aiCoachUsageCount} / {aiCoachDailyLimit}회 사용
+                  {aiCoachSource
+                    ? ` · ${aiCoachSource === "cache" ? "최근 응답 재사용" : aiCoachSource === "ai" ? "AI 생성" : "기본 메모"}`
+                    : ""}
+                </p>
               </div>
               <button
                 type="button"

@@ -10,6 +10,7 @@ export type QuizQuestion = {
   explanation: string;
   conceptTags?: string[];
   questionType?: string;
+  reasonTags?: string[];
 };
 
 function renderInlineCode(text: string) {
@@ -38,6 +39,7 @@ function saveQuizResult(title: string, questions: QuizQuestion[], answers: Recor
     const missedQuestionTypes = Array.from(
       new Set(missedQuestions.map((question) => question.questionType).filter((type): type is string => Boolean(type))),
     );
+    const missedReasonTags = Array.from(new Set(missedQuestions.flatMap((question) => question.reasonTags ?? [])));
     const resultKey = `${slug}:${title}:${questions[0]?.prompt.slice(0, 32) ?? "quiz"}`;
     window.localStorage.setItem(
       quizResultsStorageKey,
@@ -51,6 +53,7 @@ function saveQuizResult(title: string, questions: QuizQuestion[], answers: Recor
           concepts: fallbackConcepts,
           missedConcepts,
           missedQuestionTypes,
+          missedReasonTags,
           updatedAt: new Date().toISOString(),
         },
       }),

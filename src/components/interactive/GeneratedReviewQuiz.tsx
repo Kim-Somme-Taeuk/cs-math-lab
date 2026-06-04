@@ -30,6 +30,7 @@ function saveGeneratedQuizResult(questions: QuizQuestion[], answers: Record<numb
     const missedQuestionTypes = Array.from(
       new Set(missedQuestions.map((question) => question.questionType).filter((type): type is string => Boolean(type))),
     );
+    const missedReasonTags = Array.from(new Set(missedQuestions.flatMap((question) => question.reasonTags ?? [])));
 
     window.localStorage.setItem(
       quizResultsStorageKey,
@@ -43,6 +44,7 @@ function saveGeneratedQuizResult(questions: QuizQuestion[], answers: Record<numb
           concepts: fallbackConcepts,
           missedConcepts,
           missedQuestionTypes,
+          missedReasonTags,
           updatedAt: new Date().toISOString(),
         },
       }),

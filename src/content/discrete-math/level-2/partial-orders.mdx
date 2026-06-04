@@ -1,0 +1,159 @@
+## 왜 배우나
+
+순서는 항상 일렬로 서는 것만 의미하지 않습니다. 선수 과목, 작업 의존성, 빌드 순서처럼 어떤
+것들은 비교할 수 있지만 어떤 것들은 서로 독립적입니다. <strong>부분순서관계</strong>는 이런 구조를 다룹니다.
+
+## 먼저 감 잡기
+
+작업 A가 끝나야 작업 C를 할 수 있고, 작업 B도 끝나야 C를 할 수 있다고 합시다. A와 B 사이에는
+누가 먼저인지 정해져 있지 않습니다. 하지만 A와 C, B와 C 사이에는 순서가 있습니다.
+
+## 핵심 정의
+
+관계 R이 부분순서가 되려면 <strong>세 성질</strong>을 만족해야 합니다.
+
+- 반사성: 모든 x에 대해 xRx
+- 반대칭성: xRy이고 yRx이면 x = y
+- 추이성: xRy이고 yRz이면 xRz
+
+모든 두 원소가 비교 가능하면 <strong>전체순서</strong>입니다. 일부 원소쌍이 비교 불가능해도 순서 구조가 되면 <strong>부분순서</strong>입니다.
+
+하세 도표는 반사적 연결과 추이로 따라오는 연결을 생략하고 핵심 순서만 그림으로 보여줍니다.
+
+예를 들어 `design ≤ build`, `build ≤ deploy`가 있으면 추이성 때문에 `design ≤ deploy`도 따라옵니다.
+하세 도표에서는 이런 <strong>따라오는 연결을 일부러 생략</strong>해서 구조를 덜 복잡하게 봅니다.
+
+## 자주 헷갈리는 지점
+
+<strong>대칭성과 반대칭성은 다릅니다.</strong> 대칭성은 xRy이면 yRx도 있어야 한다는 뜻이고, 반대칭성은 양쪽이
+모두 성립하면 사실상 같은 원소여야 한다는 뜻입니다.
+
+<strong>최소원과 최솟값도 다릅니다.</strong> 최소원은 자기보다 작은 것이 없는 원소이고, 최솟값은 모든 원소보다
+작거나 같은 하나의 원소입니다.
+
+작업 의존성에서는 서로 비교되지 않는 시작 작업이 여러 개 있을 수 있습니다. 이때 최소원은 여러 개일 수
+있지만, 모든 작업보다 먼저 와야 하는 <strong>하나의 최솟값은 없을 수 있습니다</strong>.
+
+<UnderstandingCheck
+  concept="부분순서"
+  prompt="비교 불가능한 원소가 있어도 순서 구조가 될 수 있다는 점이 납득되나요?"
+/>
+
+## 직접 실험하기
+
+작업 의존성을 봅니다.
+
+- `design -> build`
+- `api -> build`
+- `build -> deploy`
+
+`design`과 `api`는 둘 다 `build`보다 먼저 와야 하지만, 서로는 비교할 필요가 없습니다. 그래서
+전체순서가 아니라 부분순서로 보는 편이 자연스럽습니다.
+
+아래 실험에서 작업을 추가하거나 빼면서 <strong>비교 가능한 작업</strong>과 <strong>비교 불가능한 작업</strong>이 어떻게
+달라지는지 확인합니다.
+
+<PartialOrderPlayground />
+
+## 코드로 읽기
+
+상황: 어떤 작업이 다른 작업보다 먼저 끝나야 하는지 확인합니다.
+
+```python
+dependencies = {
+    "build": {"design", "api"},
+    "deploy": {"build"},
+}
+
+def must_before(left, right):
+    to_check = list(dependencies.get(right, set()))
+    seen = set()
+
+    while to_check:
+        task = to_check.pop()
+        if task == left:
+            return True
+        if task in seen:
+            continue
+        seen.add(task)
+        to_check.extend(dependencies.get(task, set()))
+
+    return False
+```
+
+`must_before("design", "deploy")`는 `design -> build -> deploy`를 따라가므로 참입니다. 직접
+의존뿐 아니라 여러 단계를 거친 의존까지 확인할 때 <strong>추이성</strong>이 중요해집니다.
+
+## 전공에서 만나는 장면
+
+- 작업 의존성
+- 선수 과목 관계
+- 빌드 순서
+- DAG
+- 위상 정렬
+
+## 종합 점검
+
+<MultipleChoiceQuiz
+  title="종합 점검"
+  questions={[
+    {
+      prompt: "부분순서관계의 세 성질은?",
+      choices: [
+        "반사성, 반대칭성, 추이성",
+        "반사성, 대칭성, 추이성",
+        "단사성, 전사성, 전단사",
+        "합집합, 교집합, 차집합",
+      ],
+      correctIndex: 0,
+      explanation: "부분순서는 반사성, 반대칭성, 추이성을 만족합니다.",
+      conceptTags: ["부분순서"],
+      questionType: "definition",
+    },
+    {
+      prompt: "전체순서와 부분순서의 차이로 맞는 것은?",
+      choices: [
+        "부분순서에서는 비교 불가능한 원소가 있을 수 있다.",
+        "부분순서는 추이성을 쓰지 않는다.",
+        "전체순서는 반사성이 없다.",
+        "둘은 항상 같은 말이다.",
+      ],
+      correctIndex: 0,
+      explanation: "부분순서는 모든 원소쌍이 비교 가능할 필요가 없습니다.",
+      conceptTags: ["비교 가능성"],
+      questionType: "partial-vs-total",
+    },
+    {
+      prompt: "작업 의존성에서 부분순서가 잘 맞는 이유는?",
+      choices: [
+        "독립적인 작업끼리는 순서를 정하지 않아도 되기 때문이다.",
+        "모든 작업이 반드시 한 줄로 서야 하기 때문이다.",
+        "의존성이 있으면 그래프가 아니기 때문이다.",
+        "순서가 전혀 없기 때문이다.",
+      ],
+      correctIndex: 0,
+      explanation: "의존성이 없는 작업들은 비교 불가능한 상태로 남을 수 있습니다.",
+      conceptTags: ["작업 의존성"],
+      questionType: "cs-connection",
+    },
+    {
+      prompt: "하세 도표가 생략하는 것은?",
+      choices: [
+        "반사적 연결과 추이로 따라오는 연결",
+        "모든 원소 이름",
+        "최소원",
+        "비교 가능한 관계",
+      ],
+      correctIndex: 0,
+      explanation: "하세 도표는 핵심 순서만 남겨 구조를 간단히 보여줍니다.",
+      conceptTags: ["하세 도표"],
+      questionType: "diagram",
+    },
+  ]}
+/>
+
+## 다음으로
+
+<a href="/chapters/inclusion-exclusion" className="inline-flex rounded-md border border-teal-700 bg-white px-5 py-3 text-sm font-black text-slate-950 shadow-sm hover:bg-teal-50">
+  다음 챕터로 가기
+</a>

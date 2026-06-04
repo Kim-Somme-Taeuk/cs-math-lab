@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getChapter, getChapterNavigation, getReadyChapters } from "@/lib/chapters";
+import { getChapter, getChapterNavigation, getReadyChapters, getReadyChaptersInSameLevel } from "@/lib/chapters";
 import { chapterContentLoaders } from "@/lib/content";
 
 const sectionLinks = [
@@ -47,7 +47,7 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
     notFound();
   }
 
-  const readyChapters = getReadyChapters();
+  const readyChapters = getReadyChaptersInSameLevel(slug);
   const { previous, next } = getChapterNavigation(slug);
   const Content = (await loader()).default;
 

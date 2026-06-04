@@ -2,12 +2,22 @@ import type { ReactNode } from "react";
 import type { MDXComponents } from "mdx/types";
 import ConditionalPlayground from "@/components/interactive/ConditionalPlayground";
 import CountingPlayground from "@/components/interactive/CountingPlayground";
+import CounterexamplePlayground from "@/components/interactive/CounterexamplePlayground";
 import FunctionMappingPlayground from "@/components/interactive/FunctionMappingPlayground";
 import GeneratedReviewQuiz from "@/components/interactive/GeneratedReviewQuiz";
 import GraphTraversalPlayground from "@/components/interactive/GraphTraversalPlayground";
 import InductionVisualizer from "@/components/interactive/InductionVisualizer";
+import LogicalEquivalencePlayground from "@/components/interactive/LogicalEquivalencePlayground";
+import {
+  EquivalenceRelationPlayground,
+  InclusionExclusionPlayground,
+  PartialOrderPlayground,
+  PigeonholePlayground,
+  PredicateLogicPlayground,
+  RecurrencePlayground,
+  TreePlayground,
+} from "@/components/interactive/LevelTwoPlaygrounds";
 import MultipleChoiceQuiz from "@/components/interactive/MultipleChoiceQuiz";
-import ProofStrategyPlayground from "@/components/interactive/ProofStrategyPlayground";
 import RelationPlayground from "@/components/interactive/RelationPlayground";
 import TruthTablePlayground from "@/components/interactive/TruthTablePlayground";
 import SetVennPlayground from "@/components/interactive/SetVennPlayground";
@@ -46,12 +56,20 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     },
     ConditionalPlayground,
     CountingPlayground,
+    CounterexamplePlayground,
     FunctionMappingPlayground,
     GeneratedReviewQuiz,
     GraphTraversalPlayground,
     InductionVisualizer,
+    EquivalenceRelationPlayground,
+    InclusionExclusionPlayground,
+    LogicalEquivalencePlayground,
+    PartialOrderPlayground,
+    PigeonholePlayground,
+    PredicateLogicPlayground,
+    RecurrencePlayground,
+    TreePlayground,
     MultipleChoiceQuiz,
-    ProofStrategyPlayground,
     RelationPlayground,
     TruthTablePlayground,
     SetVennPlayground,

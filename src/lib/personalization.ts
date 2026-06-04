@@ -18,6 +18,7 @@ export type QuizResult = {
   concepts: string[];
   missedConcepts?: string[];
   missedQuestionTypes?: string[];
+  missedReasonTags?: string[];
   updatedAt: string;
 };
 
@@ -36,8 +37,11 @@ export type LearningInsights = {
   confusedConceptCount: number;
   weakConcepts: string[];
   weakQuestionTypes: string[];
+  weakReasonTags: string[];
+  reviewReasons: string[];
   reviewChapters: Chapter[];
   nextChapter: Chapter | null;
+  nextChapterReason: string | null;
   coachMessage: string;
 };
 
@@ -47,10 +51,39 @@ export const quizResultsStorageKey = "cs-math-lab:quiz-results";
 export const understandingChecksStorageKey = "cs-math-lab:understanding-checks";
 
 const goalPaths: Record<LearningGoal, string[]> = {
-  "coding-test": ["conditionals", "logic", "counting", "graphs", "proof-techniques", "induction"],
-  course: ["logic", "conditionals", "sets", "functions", "relations", "induction", "proof-techniques"],
+  "coding-test": [
+    "logic",
+    "conditionals",
+    "proof-techniques",
+    "logical-equivalence",
+    "counting",
+    "inclusion-exclusion",
+    "pigeonhole-principle",
+    "graphs",
+    "trees",
+    "recurrences",
+  ],
+  course: [
+    "logic",
+    "conditionals",
+    "sets",
+    "functions",
+    "relations",
+    "induction",
+    "counting",
+    "graphs",
+    "proof-techniques",
+    "logical-equivalence",
+    "predicate-logic",
+    "equivalence-relations",
+    "partial-orders",
+    "inclusion-exclusion",
+    "pigeonhole-principle",
+    "recurrences",
+    "trees",
+  ],
   foundation: ["logic", "conditionals", "sets", "functions", "relations", "induction"],
-  portfolio: ["sets", "functions", "graphs", "counting", "proof-techniques"],
+  portfolio: ["sets", "functions", "relations", "graphs", "trees", "counting", "inclusion-exclusion", "proof-techniques"],
 };
 
 const levelPrefixes: Record<LearningLevel, string[]> = {
@@ -62,8 +95,8 @@ const levelPrefixes: Record<LearningLevel, string[]> = {
 const styleBoosts: Record<LearningStyle, string[]> = {
   short: [],
   examples: ["sets", "functions"],
-  code: ["conditionals", "functions", "proof-techniques"],
-  practice: ["counting", "proof-techniques", "induction"],
+  code: ["conditionals", "functions", "proof-techniques", "logical-equivalence", "predicate-logic"],
+  practice: ["proof-techniques", "counting", "inclusion-exclusion", "pigeonhole-principle", "recurrences", "induction"],
 };
 
 const goalTrackTags: Record<LearningGoal, LearningTrackTag[]> = {
@@ -186,12 +219,15 @@ export function getLearningInsights(
     ]),
   ).slice(0, 4);
   const weakQuestionTypes = Array.from(new Set(weakResults.flatMap((result) => result.missedQuestionTypes ?? []))).slice(0, 4);
+  const weakReasonTags = Array.from(new Set(weakResults.flatMap((result) => result.missedReasonTags ?? []))).slice(0, 4);
   const weakSlugs = new Set([...weakResults.map((result) => result.slug), ...confusedChecks.map((check) => check.slug)]);
   const reviewChapters = readyChapters.filter((chapter) => weakSlugs.has(chapter.slug));
   const recommended = profile
     ? getAdaptiveRecommendedChapters(profile, readyChapters, completedSlugs, quizResults)
     : readyChapters;
   const nextChapter = recommended.find((chapter) => !completedSlugs.includes(chapter.slug)) ?? recommended[0] ?? null;
+  const reviewReasons = buildReviewReasons(weakResults, confusedChecks);
+  const nextChapterReason = nextChapter ? buildNextChapterReason(nextChapter, profile, completedSlugs, weakConcepts) : null;
 
   let coachMessage = "목표와 선호를 설정하면 현재 공개 챕터 안에서 추천 순서를 조정합니다.";
 
@@ -209,10 +245,51 @@ export function getLearningInsights(
     confusedConceptCount: confusedChecks.length,
     weakConcepts,
     weakQuestionTypes,
+    weakReasonTags,
+    reviewReasons,
     reviewChapters,
     nextChapter,
+    nextChapterReason,
     coachMessage,
   };
+}
+
+function buildReviewReasons(weakResults: QuizResult[], confusedChecks: UnderstandingCheckResult[]) {
+  const quizReasons = weakResults.map((result) => {
+    const missed = [
+      ...(result.missedConcepts?.length ? result.missedConcepts : result.concepts),
+      ...(result.missedQuestionTypes ?? []),
+      ...(result.missedReasonTags ?? []),
+    ].slice(0, 3);
+
+    return `${result.slug}: ${missed.join(", ")}에서 흔들림`;
+  });
+  const confusionReasons = confusedChecks.map((check) => `${check.slug}: ${check.concept}을 아직 헷갈림으로 표시`);
+
+  return Array.from(new Set([...quizReasons, ...confusionReasons])).slice(0, 4);
+}
+
+function buildNextChapterReason(
+  nextChapter: Chapter,
+  profile: LearningProfile | null,
+  completedSlugs: string[],
+  weakConcepts: string[],
+) {
+  const missingPrerequisites = (nextChapter.prerequisites ?? []).filter((slug) => !completedSlugs.includes(slug));
+
+  if (weakConcepts.length > 0) {
+    return `${weakConcepts.slice(0, 2).join(", ")} 복습과 연결해 ${nextChapter.title}로 이어갈 수 있습니다.`;
+  }
+
+  if (missingPrerequisites.length > 0) {
+    return `${nextChapter.title}의 선행 챕터 ${missingPrerequisites.join(", ")}를 함께 확인하면 좋습니다.`;
+  }
+
+  if (profile) {
+    return `${getProfileSummary(profile)} 설정과 챕터 태그가 잘 맞는 다음 학습입니다.`;
+  }
+
+  return "아직 완료하지 않은 ready 챕터 중 다음 순서입니다.";
 }
 
 export function getProfileSummary(profile: LearningProfile) {

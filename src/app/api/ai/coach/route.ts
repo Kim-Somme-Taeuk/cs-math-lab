@@ -45,8 +45,9 @@ export async function POST(request: Request) {
   }
 
   const apiKey = process.env.OPENAI_API_KEY;
+  const model = process.env.OPENAI_MODEL;
 
-  if (!apiKey) {
+  if (!apiKey || !model) {
     return fallbackResponse();
   }
 
@@ -58,9 +59,9 @@ export async function POST(request: Request) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: process.env.OPENAI_MODEL ?? "gpt-5.2",
+        model,
         instructions:
-          "You are an AI learning coach for Korean CS students studying math. Use only the provided learning context. Write exactly one concise Korean paragraph. Do not invent completed chapters, scores, or new curriculum. Focus on the next practical study action.",
+          "You are an AI learning coach for Korean CS students studying math. Use only the provided learning context, especially weak concepts, missed reason tags, review reasons, and next chapter reason. Write exactly one concise Korean paragraph. Do not invent completed chapters, scores, or new curriculum. Focus on the next practical study action.",
         input: `학습 컨텍스트:\n${JSON.stringify(body.context)}`,
         max_output_tokens: 160,
       }),

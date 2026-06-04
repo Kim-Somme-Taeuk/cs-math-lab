@@ -15,12 +15,16 @@ export type AiLearningContext = {
   reviewChapterSlugs: string[];
   weakConcepts: string[];
   weakQuestionTypes: string[];
+  weakReasonTags: string[];
+  reviewReasons: string[];
+  nextChapterReason: string | null;
   recentAttempts: Array<{
     slug: string;
     title: string;
     scoreRatio: number;
     missedConcepts: string[];
     missedQuestionTypes: string[];
+    missedReasonTags: string[];
   }>;
   chapterCatalog: Array<{
     slug: string;
@@ -55,12 +59,16 @@ export function buildAiLearningContext({
     reviewChapterSlugs: insights.reviewChapters.map((chapter) => chapter.slug),
     weakConcepts: insights.weakConcepts,
     weakQuestionTypes: insights.weakQuestionTypes,
+    weakReasonTags: insights.weakReasonTags,
+    reviewReasons: insights.reviewReasons,
+    nextChapterReason: insights.nextChapterReason,
     recentAttempts: quizResults.slice(-5).map((result) => ({
       slug: result.slug,
       title: result.title,
       scoreRatio: result.total > 0 ? result.score / result.total : 0,
       missedConcepts: result.missedConcepts?.length ? result.missedConcepts : result.concepts,
       missedQuestionTypes: result.missedQuestionTypes ?? [],
+      missedReasonTags: result.missedReasonTags ?? [],
     })),
     chapterCatalog: readyChapters.map((chapter) => ({
       slug: chapter.slug,

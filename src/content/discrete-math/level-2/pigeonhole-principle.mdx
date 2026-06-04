@@ -1,0 +1,134 @@
+## 왜 배우나
+
+<strong>비둘기집 원리</strong>는 정확히 어느 곳에서 문제가 생기는지는 몰라도, <strong>반드시 어떤 일이 생긴다</strong>고 말할 수 있게 해 줍니다. 해시 충돌, 중복 ID, 압축 한계처럼 "존재할 수밖에 없음"을 설명할 때 유용합니다.
+
+## 먼저 감 잡기
+
+공 5개를 상자 4개에 넣으면 적어도 한 상자에는 <strong>공이 2개 이상</strong> 들어갑니다. 어느 상자인지는
+몰라도, 4개 상자에 하나씩만 넣으면 공 4개밖에 못 넣기 때문입니다.
+
+## 핵심 정의
+
+기본형:
+
+- n+1개 대상을 n개 상자에 넣으면, 적어도 한 상자에는 2개 이상 들어갑니다.
+
+일반화:
+
+- N개 대상을 k개 상자에 넣으면, 적어도 한 상자에는 $\lceil N / k \rceil$개 이상 들어갑니다.
+
+이 값은 "가장 많이 들어간 상자의 정확한 개수"가 아니라 <strong>반드시 보장할 수 있는 최소 하한</strong>입니다.
+실제로는 어떤 상자에 더 많이 들어갈 수도 있습니다.
+
+## 자주 헷갈리는 지점
+
+비둘기집 원리는 *어느 상자인지 찾아준다*가 아닙니다. 어떤 상자인지는 몰라도 그런 상자가 <strong>반드시 존재한다는 보장</strong>입니다. 그래서 구성 방법보다 존재 증명에 가깝습니다.
+
+반례와도 다릅니다. 반례는 주장을 깨는 예시 하나를 찾는 것이고, 비둘기집 원리는 조건이 주어지면
+피할 수 없는 결과를 보이는 것입니다.
+
+해시 테이블에서는 키가 버킷보다 많으면 충돌이 생길 수밖에 없습니다. 어떤 키가 어느 버킷에서
+충돌하는지는 몰라도, <strong>충돌이 존재한다는 사실</strong>은 개수만으로 보장됩니다.
+
+<UnderstandingCheck
+  concept="비둘기집 원리"
+  prompt="정확한 위치는 몰라도 반드시 존재함을 보장한다는 점이 보이나요?"
+/>
+
+## 직접 실험하기
+
+상자 3개에 공 7개를 넣는다고 합시다.
+
+$$
+\lceil 7 / 3 \rceil = 3
+$$
+
+따라서 적어도 한 상자에는 공이 3개 이상 들어갑니다. 2개씩만 넣으면 최대 6개라서 7개를 모두
+넣을 수 없습니다.
+
+아래 실험에서 대상 개수와 상자 개수를 바꿔 보면서, 어느 상자에 몇 개가 들어가는지는 몰라도
+<strong>최소 몇 개 이상은 반드시 보장되는지</strong> 확인합니다.
+
+<PigeonholePlayground />
+
+## 코드로 읽기
+
+상황: 해시 버킷보다 키가 많으면 충돌이 생길 수밖에 없습니다.
+
+```python
+def guaranteed_bucket_load(items, buckets):
+    return (items + buckets - 1) // buckets
+
+min_load = guaranteed_bucket_load(11, 5)
+```
+
+`min_load`는 3입니다. 11개 키를 5개 버킷에 넣으면 어떤 버킷에는 <strong>적어도 3개</strong>가 들어갑니다.
+
+## 전공에서 만나는 장면
+
+- 해시 충돌
+- 중복 ID
+- 압축 한계
+- 생일 문제 맛보기
+- 캐시 버킷
+
+## 종합 점검
+
+<MultipleChoiceQuiz
+  title="종합 점검"
+  questions={[
+    {
+      prompt: "상자 4개에 공 5개를 넣으면 반드시 말할 수 있는 것은?",
+      choices: [
+        "적어도 한 상자에는 공이 2개 이상 있다.",
+        "모든 상자에 공이 2개 있다.",
+        "어떤 상자가 비어 있는지 알 수 있다.",
+        "충돌이 절대 없다.",
+      ],
+      correctIndex: 0,
+      explanation: "5개를 4곳에 넣으면 한 곳은 2개 이상을 피할 수 없습니다.",
+      conceptTags: ["비둘기집 원리"],
+      questionType: "basic",
+    },
+    {
+      prompt: "대상 10개를 상자 3개에 넣으면 적어도 한 상자에 몇 개 이상 들어간다고 보장할 수 있는가?",
+      choices: ["4", "3", "2", "10"],
+      correctIndex: 0,
+      explanation: "$\\lceil 10 / 3 \\rceil = 4$입니다.",
+      conceptTags: ["일반화된 비둘기집 원리"],
+      questionType: "ceil-count",
+    },
+    {
+      prompt: "비둘기집 원리에 대한 설명으로 맞는 것은?",
+      choices: [
+        "정확한 위치를 몰라도 반드시 존재하는 상황을 보인다.",
+        "항상 모든 상자의 개수를 알려 준다.",
+        "반례를 찾는 방법이다.",
+        "집합의 합집합 공식이다.",
+      ],
+      correctIndex: 0,
+      explanation: "비둘기집 원리는 존재 보장에 초점이 있습니다.",
+      conceptTags: ["존재 증명"],
+      questionType: "meaning",
+    },
+    {
+      prompt: "해시 버킷 100개에 서로 다른 키 101개를 넣으면?",
+      choices: [
+        "적어도 한 버킷에는 키가 2개 이상 들어간다.",
+        "모든 버킷이 비어 있다.",
+        "충돌이 불가능하다.",
+        "반드시 한 버킷에 101개가 들어간다.",
+      ],
+      correctIndex: 0,
+      explanation: "키가 버킷보다 많으므로 충돌을 피할 수 없습니다.",
+      conceptTags: ["해시 충돌"],
+      questionType: "cs-connection",
+    },
+  ]}
+/>
+
+## 다음으로
+
+<a href="/chapters/recurrences" className="inline-flex rounded-md border border-teal-700 bg-white px-5 py-3 text-sm font-black text-slate-950 shadow-sm hover:bg-teal-50">
+  다음 챕터로 가기
+</a>

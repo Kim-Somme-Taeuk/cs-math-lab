@@ -74,7 +74,7 @@ export default function TruthTablePlayground() {
   const result = useMemo(() => expression.evaluate(values), [expression, values]);
 
   return (
-    <section aria-label="진리표 실험" className="mt-3 mb-7 rounded-lg border border-slate-200 bg-slate-50 p-3 sm:p-4 lg:min-h-[650px]">
+    <section aria-label="진리표 실험" className="mt-3 mb-7 rounded-lg border border-slate-200 bg-slate-50 p-3 sm:p-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h3 className="m-0 text-lg font-black text-slate-950">논리 조건식 빌더</h3>
@@ -163,18 +163,6 @@ export default function TruthTablePlayground() {
               </button>
             ))}
           </div>
-        </div>
-      </div>
-
-      <div className="mt-4 hidden rounded-lg border border-slate-200 bg-white p-4 sm:block">
-        <p className="text-sm font-bold text-slate-500">현재 값</p>
-        <div className="mt-3 grid gap-2 sm:grid-cols-3">
-          {(Object.keys(values) as Proposition[]).map((key) => (
-            <div key={key} className="rounded-md bg-slate-50 p-3">
-              <p className="text-sm font-bold text-slate-500">{key}</p>
-              <p className="mt-1 text-lg font-black text-slate-950">{values[key] ? "참" : "거짓"}</p>
-            </div>
-          ))}
         </div>
       </div>
 
