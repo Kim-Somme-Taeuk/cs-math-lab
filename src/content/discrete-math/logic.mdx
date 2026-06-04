@@ -38,14 +38,17 @@ Python으로 쓰면 다음처럼 읽을 수 있습니다.
 
 ```python
 is_adult = age >= 19
-has_permission = role == "admin" or role == "editor"
+is_admin = role == "admin"
+is_editor = role == "editor"
+
+has_permission = is_admin or is_editor
 can_access = is_adult and has_permission
 ```
 
-여기서 `age >= 19`, `role == "admin"`, `role == "editor"`는 현재 변수 값이 주어지면
-참 또는 거짓으로 평가되는 작은 판단입니다. `can_access`는 이 판단들을 `and`, `or`로 조합한
-복합 명제처럼 읽을 수 있습니다. TypeScript나 JavaScript에서는 같은 구조를 `&&`, `||`로
-표현하지만, 이 장에서는 수학적 연결을 보기 위해 Python을 먼저 사용합니다.
+여기서 `is_adult`, `is_admin`, `is_editor`는 현재 변수 값이 주어지면 참 또는 거짓으로
+평가되는 작은 판단입니다. `can_access`는 이 판단들을 `and`, `or`로 조합한 복합 명제처럼
+읽을 수 있습니다. TypeScript나 JavaScript에서는 같은 구조를 `&&`, `||`로 표현하지만, 이
+장에서는 수학적 연결을 보기 위해 Python을 먼저 사용합니다.
 
 <MultipleChoiceQuiz
   questions={[
@@ -117,7 +120,11 @@ can_enter_b = is_member and (has_pass or is_guest)
 - 전체 판단: P이고 Q이고 R이 아니다.
 
 ```python
-can_publish = is_logged_in and has_verified_email and not is_suspended
+can_publish = (
+    is_logged_in
+    and has_verified_email
+    and not is_suspended
+)
 ```
 
 초보자는 이 코드를 "글을 쓸 수 있는가?"라고만 읽기 쉽습니다. 하지만 디버깅할 때는
@@ -185,8 +192,16 @@ if is_logged_in and has_admin_role:
 조금 더 복잡한 요구사항도 같은 방식으로 분해할 수 있습니다.
 
 ```python
-has_write_permission = role == "admin" or role == "editor"
-can_write_post = is_logged_in and has_write_permission and not is_suspended
+is_admin = role == "admin"
+is_editor = role == "editor"
+
+has_write_permission = is_admin or is_editor
+
+can_write_post = (
+    is_logged_in
+    and has_write_permission
+    and not is_suspended
+)
 ```
 
 - P: 사용자가 로그인했다.

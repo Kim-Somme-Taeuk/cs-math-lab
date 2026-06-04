@@ -174,7 +174,11 @@ def length_of(text):
     return len(text)
 
 names = ["Ada", "Grace", "Linus"]
-lengths = [length_of(name) for name in names]
+
+lengths = [
+    length_of(name)
+    for name in names
+]
 ```
 
 여기서 `length_of`는 입력 문자열 하나를 길이 하나에 대응시킵니다. 같은 문자열을 넣으면 같은
@@ -185,7 +189,11 @@ lengths = [length_of(name) for name in names]
 
 ```python
 words = {"logic", "sets", "proof"}
-lengths = {len(word) for word in words}
+
+lengths = {
+    len(word)
+    for word in words
+}
 ```
 
 `words`의 각 원소를 길이에 대응시키면 실제 출력들의 집합은 `{4, 5}`입니다. `logic`과 `proof`는
@@ -211,7 +219,9 @@ def name_by_id(user_id):
 TypeScript/JavaScript에서도 같은 관점을 쓸 수 있지만, 언어 문법보다 대응 관계를 먼저 봅니다.
 
 ```ts
-const lengthOf = (text: string) => text.length;
+function lengthOf(text: string) {
+  return text.length;
+}
 ```
 
 이 예시는 문자열을 숫자로 대응시키는 순수한 규칙에 가깝습니다. 반대로 다음처럼 외부 상태를
@@ -220,7 +230,9 @@ const lengthOf = (text: string) => text.length;
 ```ts
 let bonus = 0;
 
-const scoreOf = (base: number) => base + bonus;
+function scoreOf(base: number) {
+  return base + bonus;
+}
 ```
 
 `scoreOf(10)`은 `bonus` 값이 바뀌면 다른 결과를 냅니다. 코드에서는 함수지만, 수학 함수처럼
