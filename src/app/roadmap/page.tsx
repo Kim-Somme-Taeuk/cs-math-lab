@@ -1,208 +1,145 @@
-"use client";
-
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { roadmapSubjects, type ChapterStatus } from "@/lib/chapters";
 
-const statusCopy: Record<ChapterStatus, { label: string; action: string }> = {
-  ready: { label: "완성", action: "열기" },
-  draft: { label: "초안", action: "준비 중" },
-  planned: { label: "예정", action: "예정" },
+const subjectStatusStyles = {
+  active: "bg-teal-50 text-teal-700",
+  planned: "bg-amber-50 text-amber-700",
 };
 
-const statusStyles: Record<
-  ChapterStatus,
-  { item: string; number: string; title: string; badge: string; body: string }
-> = {
-  ready: {
-    item: "border-slate-200 bg-white",
-    number: "bg-slate-100 text-slate-700",
-    title: "text-slate-950",
-    badge: "bg-teal-50 text-teal-700",
-    body: "text-slate-700",
-  },
-  draft: {
-    item: "border-slate-200 bg-slate-100 text-slate-500",
-    number: "bg-slate-200 text-slate-500",
-    title: "text-slate-500",
-    badge: "bg-slate-200 text-slate-500",
-    body: "text-slate-500",
-  },
-  planned: {
-    item: "border-dashed border-slate-300 bg-white text-slate-500",
-    number: "bg-amber-50 text-amber-700",
-    title: "text-slate-600",
-    badge: "bg-amber-50 text-amber-700",
-    body: "text-slate-500",
-  },
+const levelStatusStyles: Record<ChapterStatus, string> = {
+  ready: "bg-teal-50 text-teal-700",
+  draft: "bg-slate-200 text-slate-600",
+  planned: "bg-amber-50 text-amber-700",
 };
+
+type Subject = (typeof roadmapSubjects)[number];
+type Level = Subject["levels"][number];
+
+function countChapters(subject: Subject) {
+  return subject.levels.flatMap((level) => level.chapters).reduce(
+    (counts, chapter) => {
+      counts[chapter.status] += 1;
+      counts.total += 1;
+      return counts;
+    },
+    { ready: 0, draft: 0, planned: 0, total: 0 } satisfies Record<ChapterStatus | "total", number>,
+  );
+}
+
+function levelStatus(level: Level) {
+  if (level.chapters.some((chapter) => chapter.status === "ready")) return "ready";
+  if (level.chapters.some((chapter) => chapter.status === "draft")) return "draft";
+  return "planned";
+}
+
+function statusLabel(status: ChapterStatus) {
+  if (status === "ready") return "공개 중";
+  if (status === "draft") return "준비 중";
+  return "예정";
+}
 
 export default function RoadmapPage() {
-  const [openSubjectIds, setOpenSubjectIds] = useState<string[]>([]);
-
-  useEffect(() => {
-    function scrollToSubject(subjectId: string) {
-      window.requestAnimationFrame(() => {
-        window.requestAnimationFrame(() => {
-          document.getElementById(subjectId)?.scrollIntoView({ block: "start" });
-        });
-      });
-    }
-
-    function syncOpenSubjectWithHash() {
-      const subjectId = window.location.hash.replace("#", "");
-      const subjectExists = roadmapSubjects.some((subject) => subject.id === subjectId);
-
-      if (!subjectExists) {
-        setOpenSubjectIds([]);
-        return;
-      }
-
-      setOpenSubjectIds((current) => (current.includes(subjectId) ? current : [...current, subjectId]));
-      scrollToSubject(subjectId);
-    }
-
-    syncOpenSubjectWithHash();
-    window.addEventListener("hashchange", syncOpenSubjectWithHash);
-
-    return () => window.removeEventListener("hashchange", syncOpenSubjectWithHash);
-  }, []);
-
   return (
     <main className="mx-auto max-w-6xl px-5 py-12">
-      <div className="max-w-3xl">
-        <p className="text-sm font-bold text-teal-700">CS Math Roadmap</p>
-        <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
-          컴공 수학 로드맵
-        </h1>
-        <p className="mt-4 text-lg leading-8 text-slate-700">
-          CS Math Lab은 이산수학에서 시작하지만, 전체 구조는 이산수학, 선형대수,
-          미적분, 확률통계로 확장되도록 설계합니다. 현재는 이산수학 Level 1의 ready
-          챕터만 상세 페이지로 열립니다.
-        </p>
-        <Link
-          href="/chapters/logic"
-          className="mt-6 inline-flex rounded-md bg-slate-950 px-5 py-3 text-sm font-black text-white hover:bg-slate-800"
-        >
-          처음이면 여기서 시작
-        </Link>
-      </div>
+      <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-end">
+        <div className="max-w-3xl">
+          <p className="text-sm font-bold text-teal-700">CS Math Roadmap</p>
+          <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+            컴공 수학 로드맵
+          </h1>
+          <p className="mt-4 text-lg leading-8 text-slate-700">
+            과목별 학습 트랙을 먼저 고르고, 각 과목 페이지에서 Level별 챕터를 확인합니다.
+            현재는 이산수학 Level 1이 실제 공개 범위입니다.
+          </p>
+        </div>
 
-      <div className="mt-10 grid gap-10">
-        {roadmapSubjects.map((subject) => (
-          <details
-            key={subject.id}
-            id={subject.id}
-            open={openSubjectIds.includes(subject.id)}
-            onToggle={(event) => {
-              if (event.currentTarget.open) {
-                setOpenSubjectIds((current) => (current.includes(subject.id) ? current : [...current, subject.id]));
-              } else {
-                setOpenSubjectIds((current) => current.filter((id) => id !== subject.id));
-              }
-            }}
-            className="group scroll-mt-6 rounded-lg border border-slate-200 bg-white"
+        <div className="rounded-lg border border-teal-200 bg-teal-50 p-4">
+          <p className="text-sm font-bold text-teal-700">처음이라면 여기서 시작</p>
+          <p className="mt-1 text-lg font-black text-slate-950">이산수학 Level 1</p>
+          <p className="mt-2 text-sm leading-6 text-slate-700">
+            논리, 집합, 함수, 관계, 그래프까지 컴공 전공의 기초 언어를 먼저 잡습니다.
+          </p>
+          <Link
+            href="/subjects/discrete-math"
+            className="mt-4 inline-flex w-full justify-center rounded-md bg-slate-950 px-4 py-2.5 text-sm font-black text-white hover:bg-slate-800"
           >
-            <summary className="cursor-pointer list-none p-5 marker:hidden">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div className="max-w-3xl">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <h2 id={`${subject.id}-title`} className="text-2xl font-black tracking-tight text-slate-950">
-                      {subject.title}
-                    </h2>
-                    <span
-                      className={`rounded-md px-2.5 py-1 text-xs font-bold ${
-                        subject.status === "active"
-                          ? "bg-teal-50 text-teal-700"
-                          : "bg-amber-50 text-amber-700"
-                      }`}
-                    >
-                      {subject.status === "active" ? "진행 중" : "예정"}
-                    </span>
-                  </div>
-                  <p className="mt-2 leading-7 text-slate-600">{subject.description}</p>
+            이산수학 트랙 보기
+          </Link>
+        </div>
+      </section>
+
+      <section aria-labelledby="subjects-title" className="mt-10">
+        <div>
+          <h2 id="subjects-title" className="text-2xl font-black tracking-tight text-slate-950">
+            대주제
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-slate-600">
+            전체 챕터를 한 화면에 펼치기보다, 과목을 선택한 뒤 해당 과목의 학습 과정을 봅니다.
+          </p>
+        </div>
+
+        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {roadmapSubjects.map((subject) => {
+            const counts = countChapters(subject);
+
+            return (
+              <Link
+                key={subject.id}
+                href={`/subjects/${subject.id}`}
+                className="rounded-lg border border-slate-200 bg-white p-5 transition hover:-translate-y-0.5 hover:border-teal-300 hover:shadow-sm"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="text-xl font-black text-slate-950">{subject.title}</h3>
+                  <span className={`shrink-0 rounded-md px-2 py-1 text-xs font-bold ${subjectStatusStyles[subject.status]}`}>
+                    {subject.status === "active" ? "진행 중" : "예정"}
+                  </span>
                 </div>
-                <span className="rounded-md border border-slate-300 px-3 py-2 text-sm font-bold text-slate-700 group-open:bg-slate-950 group-open:text-white">
-                  <span className="group-open:hidden">펼치기</span>
-                  <span className="hidden group-open:inline">접기</span>
-                </span>
-              </div>
-            </summary>
-
-            <div className="grid gap-4 border-t border-slate-200 p-5">
-              {subject.levels.map((level) => (
-                <details
-                  key={`${subject.id}-${level.level}`}
-                  className="group/level rounded-lg border border-slate-200 bg-slate-50"
-                >
-                  <summary className="cursor-pointer list-none p-4 marker:hidden">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                      <div className="max-w-3xl">
-                        <h3
-                          id={`${subject.id}-level-${level.level}`}
-                          className="text-xl font-black tracking-tight text-slate-900"
-                        >
-                          {level.title}
-                        </h3>
-                        <p className="mt-2 leading-7 text-slate-600">{level.description}</p>
-                      </div>
-                      <span className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-bold text-slate-700 group-open/level:bg-slate-950 group-open/level:text-white">
-                        <span className="group-open/level:hidden">{level.chapters.length}개 챕터 보기</span>
-                        <span className="hidden group-open/level:inline">접기</span>
-                      </span>
-                    </div>
-                  </summary>
-
-                  <ol className="grid gap-4 border-t border-slate-200 p-4">
-                    {level.chapters.map((chapter) => {
-                      const styles = statusStyles[chapter.status];
-                      const copy = statusCopy[chapter.status];
+                <p className="mt-3 min-h-24 text-sm leading-6 text-slate-600">{subject.description}</p>
+                <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+                  <Stat label="Level" value={subject.levels.length} />
+                  <Stat label="공개" value={counts.ready} tone="ready" />
+                  <Stat label="예정" value={counts.planned} tone="planned" />
+                </div>
+                <div className="mt-4 border-t border-slate-200 pt-4">
+                  <p className="text-xs font-black uppercase text-slate-500">Levels</p>
+                  <div className="mt-2 grid gap-2">
+                    {subject.levels.map((level) => {
+                      const status = levelStatus(level);
 
                       return (
-                        <li
-                          key={chapter.slug}
-                          data-testid={`chapter-${chapter.slug}`}
-                          className={`rounded-lg border p-5 ${styles.item}`}
-                        >
-                          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                            <div>
-                              <div className="flex flex-wrap items-center gap-3">
-                                <span className={`rounded-md px-2.5 py-1 text-sm font-bold ${styles.number}`}>
-                                  {chapter.order}
-                                </span>
-                                <h4 className={`text-xl font-bold ${styles.title}`}>{chapter.title}</h4>
-                                <span className={`rounded-md px-2.5 py-1 text-xs font-bold ${styles.badge}`}>
-                                  {copy.label}
-                                </span>
-                              </div>
-                              <p className={`mt-3 leading-7 ${styles.body}`}>{chapter.description}</p>
-                              <p className="mt-2 text-sm font-medium text-slate-500">
-                                CS 연결: {chapter.csConnection}
-                              </p>
-                            </div>
-                            {chapter.status === "ready" ? (
-                              <Link
-                                href={`/chapters/${chapter.slug}`}
-                                className="rounded-md border border-slate-300 px-4 py-2 text-center text-sm font-bold text-slate-800 hover:bg-slate-100"
-                              >
-                                {copy.action}
-                              </Link>
-                            ) : (
-                              <span className="rounded-md border border-slate-300 px-4 py-2 text-center text-sm font-bold text-slate-500">
-                                {copy.action}
-                              </span>
-                            )}
-                          </div>
-                        </li>
+                        <div key={level.level} className="flex items-center justify-between gap-2 text-sm">
+                          <span className="font-bold text-slate-800">{level.title}</span>
+                          <span className={`shrink-0 rounded px-2 py-1 text-xs font-bold ${levelStatusStyles[status]}`}>
+                            {statusLabel(status)}
+                          </span>
+                        </div>
                       );
                     })}
-                  </ol>
-                </details>
-              ))}
-            </div>
-          </details>
-        ))}
-      </div>
+                  </div>
+                </div>
+                <span className="mt-5 inline-flex rounded-md border border-slate-300 px-3 py-2 text-sm font-black text-slate-800">
+                  자세히 보기
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
     </main>
+  );
+}
+
+function Stat({ label, value, tone = "default" }: { label: string; value: number; tone?: "default" | "ready" | "planned" }) {
+  const toneStyles = {
+    default: "bg-slate-50 text-slate-950",
+    ready: "bg-teal-50 text-teal-700",
+    planned: "bg-amber-50 text-amber-700",
+  };
+
+  return (
+    <div className={`rounded-md px-2 py-2 ${toneStyles[tone]}`}>
+      <p className="text-lg font-black">{value}</p>
+      <p className="text-xs font-bold opacity-75">{label}</p>
+    </div>
   );
 }

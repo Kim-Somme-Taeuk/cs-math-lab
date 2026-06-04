@@ -81,7 +81,7 @@ export default function Home() {
           {roadmapSubjects.map((subject) => (
             <Link
               key={subject.id}
-              href={`/roadmap#${subject.id}`}
+              href={`/subjects/${subject.id}`}
               className="rounded-lg border border-slate-200 bg-white p-5 hover:border-teal-500"
             >
               <div className="flex items-start justify-between gap-3">
