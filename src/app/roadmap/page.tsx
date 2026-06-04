@@ -133,7 +133,6 @@ export default function RoadmapPage() {
               {subject.levels.map((level) => (
                 <details
                   key={`${subject.id}-${level.level}`}
-                  open={openSubjectIds.includes(subject.id) && level.level === 1}
                   className="group/level rounded-lg border border-slate-200 bg-slate-50"
                 >
                   <summary className="cursor-pointer list-none p-4 marker:hidden">

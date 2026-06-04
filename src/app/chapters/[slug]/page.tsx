@@ -80,17 +80,21 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
               </Link>
             ) : null}
           </nav>
-          <nav aria-label="챕터 섹션" className="mt-5 flex gap-2 overflow-x-auto pb-1 lg:hidden">
-            {sectionLinks.map((section) => (
-              <a
-                key={section.id}
-                href={`#${section.id}`}
-                className="shrink-0 rounded-full border border-slate-300 bg-slate-50 px-3 py-1.5 text-xs font-black text-slate-700"
-              >
-                {section.label}
-              </a>
-            ))}
-          </nav>
+          <div className="relative mt-5 lg:hidden">
+            <nav aria-label="챕터 섹션 바로가기" className="flex gap-2 overflow-x-auto pb-1 pr-10">
+              {sectionLinks.map((section) => (
+                <a
+                  key={section.id}
+                  href={`#${section.id}`}
+                  className="shrink-0 rounded-full border border-slate-300 bg-slate-50 px-3 py-1.5 text-xs font-black text-slate-700"
+                >
+                  {section.label}
+                </a>
+              ))}
+            </nav>
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-white to-transparent" aria-hidden="true" />
+            <p className="mt-1 text-right text-[11px] font-bold text-slate-400">오른쪽으로 더 보기</p>
+          </div>
           <div className="math-content mt-8">
             <Content />
           </div>

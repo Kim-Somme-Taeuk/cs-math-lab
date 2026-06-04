@@ -7,6 +7,7 @@ test("roadmap visually separates ready and planned chapters", async ({ page }) =
   await expect.poll(() => page.locator("#discrete-math").evaluate((element) => (element as HTMLDetailsElement).open)).toBe(false);
 
   await page.locator("#discrete-math-title").click();
+  await page.locator("#discrete-math-level-1").click();
   const readyCard = page.getByTestId("chapter-logic");
   await expect(readyCard.getByText("완성")).toBeVisible();
 
@@ -35,7 +36,7 @@ test("subject cards open the matching roadmap subject", async ({ page }) => {
         .locator("xpath=ancestor::details[1]")
         .evaluate((element) => (element as HTMLDetailsElement).open),
     )
-    .toBe(true);
+    .toBe(false);
   await expect.poll(() => page.locator("#discrete-math").evaluate((element) => (element as HTMLDetailsElement).open)).toBe(false);
   await expect
     .poll(() => page.locator("#linear-algebra").evaluate((element) => element.getBoundingClientRect().top))
