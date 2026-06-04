@@ -160,7 +160,41 @@ export default function SetVennPlayground() {
             ))}
           </div>
 
-          <div className="grid gap-2 sm:grid-cols-2">
+          <details className="rounded-lg border border-slate-200 bg-white p-3 sm:hidden">
+            <summary className="list-none text-sm font-bold text-slate-700 marker:hidden">숫자별 판정 보기</summary>
+            <div className="mt-3 grid gap-2">
+              {cards.map((card) => {
+                const inA = setA.includes(card.id);
+                const inB = setB.includes(card.id);
+                const active = result.includes(card.id);
+                return (
+                  <div
+                    key={`${card.id}-mobile`}
+                    className={`rounded-md border p-3 ${
+                      active ? "border-teal-500 bg-teal-50" : "border-slate-200 bg-white"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-2xl font-black text-slate-950">{card.value}</p>
+                      <span className={`rounded-md px-2 py-1 text-xs font-black ${active ? "bg-teal-700 text-white" : "bg-slate-100 text-slate-500"}`}>
+                        {active ? "결과" : "제외"}
+                      </span>
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      <span className={`rounded px-2 py-0.5 text-xs font-bold ${inA ? "bg-teal-100 text-teal-800" : "bg-slate-100 text-slate-500"}`}>
+                        A {inA ? "만족" : "아님"}
+                      </span>
+                      <span className={`rounded px-2 py-0.5 text-xs font-bold ${inB ? "bg-indigo-100 text-indigo-800" : "bg-slate-100 text-slate-500"}`}>
+                        B {inB ? "만족" : "아님"}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </details>
+
+          <div className="hidden gap-2 sm:grid sm:grid-cols-2">
             {cards.map((card) => {
               const inA = setA.includes(card.id);
               const inB = setB.includes(card.id);

@@ -38,13 +38,13 @@ describe("TruthTablePlayground", () => {
     render(<TruthTablePlayground />);
 
     const playground = screen.getByRole("region", { name: "진리표 실험" });
-    expect(within(playground).getByText("최종 결과: 거짓")).toBeInTheDocument();
-    await user.click(within(playground).getByRole("button", { name: "P OR NOT Q" }));
-    expect(within(playground).getByText(/P가 참이므로 OR 결과가 참/)).toBeInTheDocument();
+    expect(within(playground).getAllByText("최종 결과: 거짓")[0]).toBeInTheDocument();
+    await user.click(within(playground).getAllByRole("button", { name: "P OR NOT Q" })[0]);
+    expect(within(playground).getAllByText(/P가 참이므로 OR 결과가 참/)[0]).toBeInTheDocument();
 
     await user.click(within(playground).getByRole("button", { name: /명제 Q/ }));
-    await user.click(within(playground).getByRole("button", { name: "P AND Q" }));
-    expect(within(playground).getByText("최종 결과: 참")).toBeInTheDocument();
+    await user.click(within(playground).getAllByRole("button", { name: "P AND Q" })[0]);
+    expect(within(playground).getAllByText("최종 결과: 참")[0]).toBeInTheDocument();
   });
 });
 
@@ -55,7 +55,7 @@ describe("ConditionalPlayground", () => {
 
     const playground = screen.getByRole("region", { name: "조건문 실험" });
     expect(within(playground).getByText(/P가 참인데 Q가 거짓/)).toBeInTheDocument();
-    expect(within(playground).getByText("P 참, Q 거짓")).toBeInTheDocument();
+    expect(within(playground).getAllByText("P 참, Q 거짓")[0]).toBeInTheDocument();
 
     await user.click(within(playground).getByRole("button", { name: /결론 Q/ }));
 

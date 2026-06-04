@@ -95,7 +95,48 @@ export default function ConditionalPlayground() {
           </p>
         </div>
 
-        <div className="min-h-[232px] rounded-lg border border-slate-200 bg-white p-3">
+        <details className="rounded-lg border border-slate-200 bg-white p-3 sm:hidden">
+          <summary className="list-none text-sm font-bold text-slate-700 marker:hidden">네 가지 경우 보기</summary>
+          <div className="mt-3 grid gap-2">
+            {truthTable.map(([rowP, rowQ]) => {
+              const active = rowP === p && rowQ === q;
+              const rowResult = implication(rowP, rowQ);
+              const rowViolation = rowP && !rowQ;
+              return (
+                <div
+                  key={`${String(rowP)}-${String(rowQ)}-mobile`}
+                  className={`rounded-md border p-2.5 ${
+                    rowViolation
+                      ? active
+                        ? "border-rose-500 bg-rose-50 ring-2 ring-rose-200"
+                        : "border-rose-300 bg-rose-50"
+                      : active
+                        ? "border-teal-500 bg-teal-50 ring-2 ring-teal-200"
+                        : "border-slate-200 bg-slate-50"
+                  }`}
+                >
+                  <p className="text-sm font-bold text-slate-700">
+                    P: {formatTruth(rowP)} / Q: {formatTruth(rowQ)}
+                  </p>
+                  <div className="mt-1.5 flex items-center justify-between gap-3">
+                    <span className="text-sm font-bold text-slate-500">P -&gt; Q</span>
+                    <TruthBadge value={rowResult} />
+                  </div>
+                  <p className={`mt-1.5 text-sm ${rowViolation ? "font-black text-rose-700" : "text-slate-600"}`}>
+                    {rowViolation ? "P 참, Q 거짓" : "위반 아님"}
+                  </p>
+                  {active ? (
+                    <p className={`mt-1 text-xs font-black ${rowViolation ? "text-rose-700" : "text-teal-700"}`}>
+                      현재 선택한 경우
+                    </p>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        </details>
+
+        <div className="hidden min-h-[232px] rounded-lg border border-slate-200 bg-white p-3 sm:block">
           <p className="text-sm font-bold text-slate-500">네 가지 경우</p>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             {truthTable.map(([rowP, rowQ]) => {

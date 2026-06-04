@@ -84,7 +84,7 @@ export default function TruthTablePlayground() {
         </div>
       </div>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+      <div className="mt-4 hidden gap-3 sm:grid sm:grid-cols-3">
         {(Object.keys(values) as Proposition[]).map((key) => (
           <button
             key={key}
@@ -101,7 +101,7 @@ export default function TruthTablePlayground() {
         ))}
       </div>
 
-      <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-[0.8fr_1fr_1fr_1.35fr_1.55fr]">
+      <div className="mt-4 hidden gap-2 sm:grid sm:grid-cols-2 lg:grid-cols-[0.8fr_1fr_1fr_1.35fr_1.55fr]">
         {(Object.keys(expressionOptions) as ExpressionKey[]).map((key) => (
           <button
             key={key}
@@ -118,7 +118,55 @@ export default function TruthTablePlayground() {
         ))}
       </div>
 
-      <div className="mt-4 rounded-lg border border-slate-200 bg-white p-4">
+      <div className="mt-4 grid grid-cols-[0.95fr_1.05fr] gap-2 sm:hidden">
+        <div className="rounded-lg border border-slate-200 bg-white p-3">
+          <p className="text-sm font-bold text-slate-500">현재 조건식</p>
+          <p className="mt-2 min-h-12 text-xl font-black leading-tight text-slate-950">{expression.label}</p>
+          <div className="mt-3 flex items-center gap-2">
+            <span className="text-sm font-bold text-slate-500">결과</span>
+            <TruthBadge value={result} />
+          </div>
+          <p className="mt-3 text-sm leading-6 text-slate-700">{expression.explain(values)}</p>
+        </div>
+
+        <div className="rounded-lg border border-slate-200 bg-white p-2.5">
+          <p className="text-sm font-bold text-slate-500">값과 조건식</p>
+          <div className="mt-2 grid grid-cols-3 gap-1.5">
+            {(Object.keys(values) as Proposition[]).map((key) => (
+              <button
+                key={`mobile-${key}`}
+                type="button"
+                onClick={() => setValues((current) => ({ ...current, [key]: !current[key] }))}
+                className={`h-10 rounded-md border text-sm font-black ${
+                  values[key]
+                    ? "border-teal-600 bg-teal-50 text-teal-800"
+                    : "border-rose-300 bg-rose-50 text-rose-700"
+                }`}
+              >
+                {key} {values[key] ? "참" : "거짓"}
+              </button>
+            ))}
+          </div>
+          <div className="mt-2 grid gap-1.5">
+            {(Object.keys(expressionOptions) as ExpressionKey[]).map((key) => (
+              <button
+                key={`mobile-${key}`}
+                type="button"
+                onClick={() => setExpressionKey(key)}
+                className={`min-h-9 rounded-md border px-2 py-1.5 text-left text-sm font-black leading-tight ${
+                  expressionKey === key
+                    ? "border-slate-950 bg-slate-950 text-white"
+                    : "border-slate-300 bg-white text-slate-800"
+                }`}
+              >
+                {expressionOptions[key].label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-4 hidden rounded-lg border border-slate-200 bg-white p-4 sm:block">
         <p className="text-sm font-bold text-slate-500">현재 값</p>
         <div className="mt-3 grid gap-2 sm:grid-cols-3">
           {(Object.keys(values) as Proposition[]).map((key) => (
@@ -131,17 +179,32 @@ export default function TruthTablePlayground() {
       </div>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
-        <div className="h-[270px] rounded-lg border border-slate-200 bg-white p-4">
+        <div className="hidden rounded-lg border border-slate-200 bg-white p-4 sm:block sm:h-[270px]">
           <p className="text-sm font-bold text-slate-500">현재 조건식</p>
-          <p className="mt-2 h-16 text-2xl font-black leading-tight text-slate-950">{expression.label}</p>
+          <p className="mt-2 min-h-12 text-2xl font-black leading-tight text-slate-950 sm:h-16">{expression.label}</p>
           <div className="mt-4 flex items-center gap-3">
             <span className="text-sm font-bold text-slate-500">결과</span>
             <TruthBadge value={result} />
           </div>
-          <p className="mt-4 h-20 overflow-y-auto text-sm leading-6 text-slate-700">{expression.explain(values)}</p>
+          <p className="mt-4 text-sm leading-6 text-slate-700 sm:h-20 sm:overflow-y-auto">{expression.explain(values)}</p>
         </div>
 
-        <div className="h-[270px] rounded-lg border border-slate-200 bg-white p-4">
+        <details className="rounded-lg border border-slate-200 bg-white p-4 sm:hidden">
+          <summary className="list-none text-sm font-bold text-slate-700 marker:hidden">계산 흐름 보기</summary>
+          <div className="mt-3 grid gap-2">
+            <div className="rounded-md bg-slate-50 p-3 text-sm leading-6 text-slate-700">
+              조건식 <strong className="text-slate-950">{expression.label}</strong>에 현재 P, Q, R 값을 넣습니다.
+            </div>
+            <div className="rounded-md bg-slate-50 p-3 text-sm leading-6 text-slate-700">
+              AND는 모두 참인지, OR는 하나라도 참인지, NOT은 값을 뒤집는지 확인합니다.
+            </div>
+            <div className="rounded-md bg-slate-950 p-3 text-sm font-black text-white">
+              최종 결과: {result ? "참" : "거짓"}
+            </div>
+          </div>
+        </details>
+
+        <div className="hidden h-[270px] rounded-lg border border-slate-200 bg-white p-4 sm:block">
           <p className="text-sm font-bold text-slate-500">계산 흐름</p>
           <div className="mt-3 grid h-[210px] grid-rows-[1fr_1fr_auto] gap-2">
             <div className="overflow-y-auto rounded-md bg-slate-50 p-3 text-sm leading-6 text-slate-700">

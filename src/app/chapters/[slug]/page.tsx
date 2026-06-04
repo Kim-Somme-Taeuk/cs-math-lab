@@ -52,9 +52,63 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
   const Content = (await loader()).default;
 
   return (
-    <main className="mx-auto max-w-6xl px-5 py-10">
+    <main className="mx-auto max-w-6xl px-0 py-0 sm:px-5 sm:py-10">
+      <details className="group fixed bottom-4 right-4 z-50 lg:hidden">
+        <summary className="flex h-12 w-12 list-none items-center justify-center rounded-full bg-slate-950/75 text-white shadow-lg shadow-slate-900/20 backdrop-blur marker:hidden">
+          <span className="sr-only">챕터 이동 열기</span>
+          <span className="grid gap-1" aria-hidden="true">
+            <span className="block h-0.5 w-5 rounded-full bg-white" />
+            <span className="block h-0.5 w-5 rounded-full bg-white" />
+            <span className="block h-0.5 w-5 rounded-full bg-white" />
+          </span>
+        </summary>
+        <div className="absolute bottom-14 right-0 w-[min(21rem,calc(100vw-2rem))] overflow-hidden rounded-lg border border-slate-200 bg-white shadow-2xl shadow-slate-900/20">
+          <div className="max-h-[72vh] overflow-y-auto p-4">
+            <h2 className="text-sm font-bold text-slate-500">챕터 안에서</h2>
+            <nav className="mt-3 grid grid-cols-2 gap-1 border-b border-slate-200 pb-4" aria-label="모바일 챕터 섹션">
+              {sectionLinks.map((section) => (
+                <a
+                  key={section.id}
+                  href={`#${section.id}`}
+                  className="rounded-md px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                >
+                  {section.label}
+                </a>
+              ))}
+            </nav>
+            <h2 className="mt-4 text-sm font-bold text-slate-500">챕터 이동</h2>
+            <div className="mt-3 grid gap-1">
+              {readyChapters.map((item) => (
+                <Link
+                  key={item.slug}
+                  href={`/chapters/${item.slug}`}
+                  className={`rounded-md px-3 py-2 text-sm font-semibold ${
+                    item.slug === slug
+                      ? "bg-slate-950 text-white"
+                      : "text-slate-700 hover:bg-slate-100"
+                  }`}
+                >
+                  {item.order}. {item.title}
+                </Link>
+              ))}
+            </div>
+            <div className="mt-4 grid gap-2 border-t border-slate-200 pt-4">
+              {previous ? (
+                <Link className="rounded-md border border-slate-300 px-3 py-2 text-sm font-black text-slate-800" href={`/chapters/${previous.slug}`}>
+                  이전: {previous.shortTitle}
+                </Link>
+              ) : null}
+              {next ? (
+                <Link className="rounded-md bg-slate-950 px-3 py-2 text-sm font-black text-white" href={`/chapters/${next.slug}`}>
+                  다음: {next.shortTitle}
+                </Link>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      </details>
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem]">
-        <article className="min-w-0 rounded-lg border border-slate-200 bg-white p-5 sm:p-8">
+        <article className="min-w-0 border-y border-slate-200 bg-white p-4 sm:rounded-lg sm:border sm:p-8">
           <p className="text-sm font-bold text-teal-700">
             Chapter {String(chapter.order).padStart(2, "0")}
           </p>
@@ -62,45 +116,12 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
             {chapter.title}
           </h1>
           <p className="mt-4 text-lg leading-8 text-slate-700">{chapter.description}</p>
-          <nav aria-label="모바일 챕터 이동" className="mt-5 grid gap-2 sm:grid-cols-2 lg:hidden">
-            {previous ? (
-              <Link
-                className="rounded-md border border-slate-300 bg-white px-4 py-2 text-center text-sm font-black text-slate-800"
-                href={`/chapters/${previous.slug}`}
-              >
-                이전: {previous.shortTitle}
-              </Link>
-            ) : null}
-            {next ? (
-              <Link
-                className="rounded-md bg-slate-950 px-4 py-2 text-center text-sm font-black text-white"
-                href={`/chapters/${next.slug}`}
-              >
-                다음: {next.shortTitle}
-              </Link>
-            ) : null}
-          </nav>
-          <div className="relative mt-5 lg:hidden">
-            <nav aria-label="챕터 섹션 바로가기" className="flex gap-2 overflow-x-auto pb-1 pr-10">
-              {sectionLinks.map((section) => (
-                <a
-                  key={section.id}
-                  href={`#${section.id}`}
-                  className="shrink-0 rounded-full border border-slate-300 bg-slate-50 px-3 py-1.5 text-xs font-black text-slate-700"
-                >
-                  {section.label}
-                </a>
-              ))}
-            </nav>
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-white to-transparent" aria-hidden="true" />
-            <p className="mt-1 text-right text-[11px] font-bold text-slate-400">오른쪽으로 더 보기</p>
-          </div>
           <div className="math-content mt-8">
             <Content />
           </div>
         </article>
 
-        <aside className="h-fit rounded-lg border border-slate-200 bg-white p-5 lg:sticky lg:top-6">
+        <aside className="hidden h-fit rounded-lg border border-slate-200 bg-white p-5 lg:sticky lg:top-6 lg:block">
           <h2 className="text-sm font-bold text-slate-500">챕터 안에서</h2>
           <nav className="mt-3 grid gap-1 border-b border-slate-200 pb-4" aria-label="챕터 섹션">
             {sectionLinks.map((section) => (

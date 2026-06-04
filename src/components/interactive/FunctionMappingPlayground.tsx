@@ -8,16 +8,6 @@ type Mapping = Record<string, MappingTarget[]>;
 const inputs = ["alice", "bob", "chris"];
 const outputs: MappingTarget[] = ["0", "1", "2"];
 
-function formatTargets(targets: MappingTarget[]) {
-  return targets.length > 0 ? targets.join(", ") : "없음";
-}
-
-function targetTone(targets: MappingTarget[]) {
-  if (targets.length === 0) return "bg-rose-50 text-rose-700";
-  if (targets.length > 1) return "bg-rose-50 text-rose-700";
-  return "bg-teal-50 text-teal-800";
-}
-
 function toggleTarget(mapping: Mapping, input: string, target: MappingTarget): Mapping {
   const currentTargets = mapping[input];
   const nextTargets = currentTargets.includes(target)
@@ -103,18 +93,6 @@ export default function FunctionMappingPlayground() {
             ))}
           </div>
 
-          <dl className="mt-2 grid gap-2 sm:grid-cols-3">
-            {inputs.map((input) => (
-              <div key={input} className="rounded-md bg-slate-50 px-3 py-2 text-sm">
-                <dt className="font-black text-slate-950">{input}</dt>
-                <dd className="m-0 mt-1">
-                  <span className={`inline-flex min-w-12 justify-center rounded px-2 py-0.5 text-xs font-black ${targetTone(mapping[input])}`}>
-                    {formatTargets(mapping[input])}
-                  </span>
-                </dd>
-              </div>
-            ))}
-          </dl>
         </div>
 
         <div className="rounded-lg border border-slate-200 bg-white p-3">

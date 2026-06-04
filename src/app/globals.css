@@ -154,8 +154,19 @@ samp {
 }
 
 @media (max-width: 640px) {
-  .math-content > section[aria-label$="실험"] {
-    max-height: 86vh;
-    overflow-y: auto;
+  .math-content > section[aria-label] {
+    font-size: 0.875rem;
+  }
+
+  .math-content > section[aria-label] h3 {
+    font-size: 1rem;
+    line-height: 1.3;
+  }
+
+  .math-content > section[aria-label] p,
+  .math-content > section[aria-label] button,
+  .math-content > section[aria-label] select,
+  .math-content > section[aria-label] input {
+    font-size: 0.875rem;
   }
 }

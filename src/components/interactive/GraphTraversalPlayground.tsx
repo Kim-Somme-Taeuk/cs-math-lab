@@ -99,7 +99,7 @@ export default function GraphTraversalPlayground() {
         같은 그래프라도 큐를 쓰는 BFS와 스택처럼 움직이는 DFS는 방문 순서가 달라질 수 있습니다.
       </p>
 
-      <div className="mt-4 grid gap-2 sm:grid-cols-[1fr_1fr_1fr]">
+      <div className="mt-4 grid grid-cols-3 gap-2">
         {[
           ["bfs", "BFS"],
           ["dfs", "DFS"],
@@ -120,7 +120,7 @@ export default function GraphTraversalPlayground() {
         <select
           value={start}
           onChange={(event) => reset(mode, event.target.value as NodeId)}
-          className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-bold text-slate-800"
+          className="rounded-md border border-slate-300 bg-white px-2 py-2 text-sm font-bold text-slate-800 sm:px-3"
           aria-label="시작 노드"
         >
           {nodes.map((node) => (
@@ -210,28 +210,9 @@ export default function GraphTraversalPlayground() {
           </div>
         </div>
 
-        <div className="flex h-[432px] flex-col rounded-lg border border-slate-200 bg-white p-4">
+        <div className="flex flex-col rounded-lg border border-slate-200 bg-white p-4 sm:h-[432px]">
           <p className="text-sm font-bold text-slate-500">현재 탐색 상태</p>
-          <div className="mt-3 grid h-[306px] gap-3 rounded-md bg-slate-50 p-3">
-            <p className="text-sm font-bold text-slate-700">현재 처리: {step.current ?? "아직 없음"}</p>
-            <p className="text-sm font-bold text-slate-700">
-              {mode === "bfs" ? "queue" : "stack"} = [{step.pending.join(", ")}]
-            </p>
-            <p className="h-12 text-sm leading-6 text-slate-700">
-              {mode === "bfs"
-                ? `최단 간선 수: ${nodes
-                    .filter((node) => step.distances[node] !== undefined)
-                    .map((node) => `${node}:${step.distances[node]}`)
-                    .join(", ")}`
-                : "DFS에서는 가까운 순서보다 한 갈래를 깊게 따라가는 흐름을 봅니다."}
-            </p>
-            <p className="h-12 text-sm leading-6 text-slate-700">
-              {mode === "bfs"
-                ? "BFS는 가중치가 없는 그래프에서 시작점으로부터 가까운 정점부터 방문합니다."
-                : "DFS는 한 갈래를 가능한 깊게 따라간 뒤 돌아옵니다."}
-            </p>
-          </div>
-          <div className="mt-4 flex gap-2">
+          <div className="mt-3 flex gap-2">
             <button
               type="button"
               onClick={() => setStepIndex((current) => Math.min(current + 1, steps.length - 1))}
@@ -246,6 +227,25 @@ export default function GraphTraversalPlayground() {
             >
               초기화
             </button>
+          </div>
+          <div className="mt-3 grid gap-2 rounded-md bg-slate-50 p-2.5 sm:h-[306px] sm:gap-3 sm:p-3">
+            <p className="text-sm font-bold text-slate-700">현재 처리: {step.current ?? "아직 없음"}</p>
+            <p className="text-sm font-bold text-slate-700">
+              {mode === "bfs" ? "queue" : "stack"} = [{step.pending.join(", ")}]
+            </p>
+            <p className="text-sm leading-6 text-slate-700 sm:h-12">
+              {mode === "bfs"
+                ? `최단 간선 수: ${nodes
+                    .filter((node) => step.distances[node] !== undefined)
+                    .map((node) => `${node}:${step.distances[node]}`)
+                    .join(", ")}`
+                : "DFS에서는 가까운 순서보다 한 갈래를 깊게 따라가는 흐름을 봅니다."}
+            </p>
+            <p className="text-sm leading-6 text-slate-700 sm:h-12">
+              {mode === "bfs"
+                ? "BFS는 가중치가 없는 그래프에서 시작점으로부터 가까운 정점부터 방문합니다."
+                : "DFS는 한 갈래를 가능한 깊게 따라간 뒤 돌아옵니다."}
+            </p>
           </div>
         </div>
       </div>
