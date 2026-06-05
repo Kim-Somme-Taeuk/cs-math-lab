@@ -12,6 +12,7 @@ export type LearningTrackTag =
 
 export type Chapter = {
   slug: string;
+  conceptId?: string;
   order: number;
   level: RoadmapLevelId;
   subjectId?: MathSubjectId;
@@ -40,7 +41,7 @@ export type RoadmapSubject = {
   levels: RoadmapLevel[];
 };
 
-type LearningMeta = Pick<Chapter, "subjectId" | "prerequisites" | "conceptTags" | "trackTags">;
+type LearningMeta = Pick<Chapter, "subjectId" | "conceptId" | "prerequisites" | "conceptTags" | "trackTags">;
 
 const learningMetaBySlug: Record<string, LearningMeta> = {
   logic: {
@@ -75,7 +76,7 @@ const learningMetaBySlug: Record<string, LearningMeta> = {
   },
   induction: {
     subjectId: "discrete-math",
-    prerequisites: ["conditionals", "proof-techniques"],
+    prerequisites: ["conditionals"],
     conceptTags: ["귀납법", "기저 사례", "재귀"],
     trackTags: ["cs-foundation", "coding-test", "practice"],
   },
@@ -147,11 +148,23 @@ const learningMetaBySlug: Record<string, LearningMeta> = {
   },
 };
 
-function withLearningMeta(chapters: Chapter[]) {
+function withChapterDefaults(chapters: Chapter[]) {
   return chapters.map((chapter) => ({
     ...chapter,
-    ...learningMetaBySlug[chapter.slug],
+    conceptId: chapter.conceptId ?? `chapter:${chapter.slug}`,
   }));
+}
+
+function withLearningMeta(chapters: Chapter[]) {
+  return withChapterDefaults(chapters.map((chapter) => ({
+    ...chapter,
+    ...learningMetaBySlug[chapter.slug],
+    conceptId: learningMetaBySlug[chapter.slug]?.conceptId ?? chapter.conceptId ?? `chapter:${chapter.slug}`,
+  })));
+}
+
+export function getChapterConceptId(slug: string) {
+  return getChapter(slug)?.conceptId ?? `chapter:${slug}`;
 }
 
 export const chapters: Chapter[] = withLearningMeta([
@@ -330,7 +343,7 @@ const level2Chapters: Chapter[] = withLearningMeta([
   },
 ]);
 
-const level3Chapters: Chapter[] = [
+const level3Chapters: Chapter[] = withChapterDefaults([
   {
     slug: "asymptotic-analysis",
     order: 1,
@@ -421,7 +434,7 @@ const level3Chapters: Chapter[] = [
     csConnection: "라우팅, 추천, 경로 탐색",
     status: "planned",
   },
-];
+]);
 
 export const roadmapLevels: RoadmapLevel[] = [
   {
@@ -445,7 +458,7 @@ export const roadmapLevels: RoadmapLevel[] = [
 ];
 
 function plannedChapters(subjectId: MathSubjectId, level: RoadmapLevelId, titles: string[]): Chapter[] {
-  return titles.map((title, index) => ({
+  return withChapterDefaults(titles.map((title, index) => ({
     slug: `${subjectId}-level-${level}-${index + 1}`,
     order: index + 1,
     level,
@@ -455,7 +468,7 @@ function plannedChapters(subjectId: MathSubjectId, level: RoadmapLevelId, titles
     description: `${title}을 컴공 맥락과 연결해 다룰 예정입니다.`,
     csConnection: "전공 기초, 모델링, 문제 해결",
     status: "planned",
-  }));
+  })));
 }
 
 const plannedSubjectLevels = {

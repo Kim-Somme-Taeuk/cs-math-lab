@@ -12,7 +12,13 @@ import { normalizeCoachMemo, validateAiCoachPayload } from "../src/lib/aiCoach";
 import { chapters, getChapterNavigation, getReadyChaptersInSameLevel, roadmapSubjects } from "../src/lib/chapters";
 import { generateSetReviewQuestions } from "../src/lib/generatedReview";
 import { evaluateLogic } from "../src/lib/logic";
-import { getLearningInsights, getRecommendedChapters, quizResultsStorageKey } from "../src/lib/personalization";
+import {
+  conceptMasteryStorageKey,
+  getLearningInsights,
+  getRecommendedChapters,
+  questionAttemptsStorageKey,
+  quizResultsStorageKey,
+} from "../src/lib/personalization";
 import { evaluateSetOperation } from "../src/lib/setUtils";
 
 describe("logic helpers", () => {
@@ -43,6 +49,8 @@ describe("set helpers", () => {
 
     expect(firstAttempt).toHaveLength(8);
     expect(firstAttempt[0].prompt).toContain("A ∪ B");
+    expect(firstAttempt[0].questionId).toBe("sets:review:union:0");
+    expect(firstAttempt[0].conceptId).toBe("chapter:sets");
     expect(firstAttempt[0].questionType).toBe("union");
     expect(firstAttempt[0].conceptTags).toContain("합집합");
     expect(firstAttempt[0].reasonTags).toContain("합집합과 교집합 혼동");
@@ -169,7 +177,10 @@ describe("MultipleChoiceQuiz", () => {
     await user.click(within(quiz).getByRole("button", { name: "채점하기" }));
 
     expect(within(quiz).getByText("2 / 2 정답")).toBeInTheDocument();
-    expect(within(quiz).getByText("정답입니다.")).toBeInTheDocument();
+    expect(within(quiz).getByText("맞았습니다.")).toBeInTheDocument();
+    expect(within(quiz).queryByText("조건문은 P가 참이고 Q가 거짓일 때만 거짓입니다.")).not.toBeInTheDocument();
+    await user.click(within(quiz).getByRole("button", { name: "해설 보기" }));
+    expect(within(quiz).getByText("조건문은 P가 참이고 Q가 거짓일 때만 거짓입니다.")).toBeInTheDocument();
   });
 
   it("stores missed concepts and question types from wrong answers", async () => {
@@ -214,6 +225,26 @@ describe("MultipleChoiceQuiz", () => {
     expect(result.missedConcepts).toEqual(["합집합"]);
     expect(result.missedQuestionTypes).toEqual(["union"]);
     expect(result.missedReasonTags).toEqual(["합집합과 교집합 혼동"]);
+
+    const attempts = JSON.parse(window.localStorage.getItem(questionAttemptsStorageKey) ?? "{}") as Record<
+      string,
+      { conceptId: string; questionId: string; isCorrect: boolean; concepts: string[]; selectedChoice: string }
+    >;
+    const mastery = JSON.parse(window.localStorage.getItem(conceptMasteryStorageKey) ?? "{}") as Record<
+      string,
+      { conceptId: string; attempts: number; correct: number; masteryScore: number }
+    >;
+
+    expect(Object.values(attempts)).toHaveLength(2);
+    expect(Object.values(attempts)[0]).toMatchObject({
+      conceptId: "chapter:sets",
+      isCorrect: false,
+      concepts: ["합집합"],
+      selectedChoice: "교집합",
+    });
+    expect(Object.values(attempts)[0].questionId).toContain("sets:");
+    expect(mastery["chapter:sets:합집합"]).toMatchObject({ conceptId: "chapter:sets", attempts: 1, correct: 0, masteryScore: 0 });
+    expect(mastery["chapter:sets:교집합"]).toMatchObject({ conceptId: "chapter:sets", attempts: 1, correct: 1, masteryScore: 1 });
   });
 });
 
@@ -315,6 +346,7 @@ describe("personalized recommendations", () => {
       [
         {
           slug: "conditionals",
+          conceptId: "chapter:conditionals",
           title: "연습 문제",
           score: 1,
           total: 3,
@@ -344,6 +376,7 @@ describe("personalized recommendations", () => {
     const insights = getLearningInsights(null, readyChapters, [], [], [
       {
         slug: "proof-techniques",
+        conceptId: "chapter:proof-techniques",
         concept: "대우 증명",
         status: "confused",
         updatedAt: "2026-06-04T00:00:00.000Z",
@@ -371,6 +404,7 @@ describe("personalized recommendations", () => {
       quizResults: [
         {
           slug: "sets",
+          conceptId: "chapter:sets",
           title: "종합 점검",
           score: 3,
           total: 8,
@@ -381,16 +415,30 @@ describe("personalized recommendations", () => {
           updatedAt: "2026-06-04T00:00:00.000Z",
         },
       ],
+      conceptMastery: [
+        {
+          conceptId: "chapter:sets",
+          concept: "차집합",
+          attempts: 3,
+          correct: 1,
+          masteryScore: 0.33,
+          updatedAt: "2026-06-04T00:00:00.000Z",
+        },
+      ],
     });
 
     expect(context.profile).toContain("코테");
     expect(context.weakConcepts).toEqual(["차집합"]);
     expect(context.weakQuestionTypes).toEqual(["difference"]);
     expect(context.weakReasonTags).toEqual(["차집합 방향 혼동"]);
+    expect(context.conceptMastery).toEqual([
+      { conceptId: "chapter:sets", concept: "차집합", masteryScore: 0.33, attempts: 3 },
+    ]);
     expect(context.reviewReasons[0]).toContain("차집합 방향 혼동");
     expect(context.nextChapterReason).toContain("차집합");
     expect(context.chapterCatalog[0]).toMatchObject({
       slug: "logic",
+      conceptId: "chapter:logic",
       subjectId: "discrete-math",
       prerequisites: [],
     });
@@ -406,6 +454,10 @@ describe("personalized recommendations", () => {
         reviewChapterSlugs: [],
         weakConcepts: ["x".repeat(121)],
         weakQuestionTypes: [],
+        weakReasonTags: [],
+        conceptMastery: [],
+        reviewReasons: [],
+        nextChapterReason: null,
         recentAttempts: [],
         chapterCatalog: [],
       },

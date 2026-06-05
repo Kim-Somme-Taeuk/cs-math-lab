@@ -40,6 +40,8 @@ function questionFromChoices(
   const choices = rotateChoices(correct, distractors, seed);
 
   return {
+    questionId: `sets:review:${questionType}:${seed}`,
+    conceptId: "chapter:sets",
     prompt,
     choices,
     correctIndex: choices.indexOf(correct),

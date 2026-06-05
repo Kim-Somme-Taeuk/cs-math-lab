@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { generateSetReviewQuestions } from "@/lib/generatedReview";
-import { getConceptTagsForChapter, quizResultsStorageKey } from "@/lib/personalization";
-import type { QuizQuestion } from "@/components/interactive/MultipleChoiceQuiz";
+import { getQuestionId, saveExplanationFeedback, saveQuizRecord } from "@/lib/learningRecords";
+import { getConceptIdForChapter } from "@/lib/personalization";
 
 function renderInlineCode(text: string) {
   return text.split(/(`[^`]+`)/g).map((part, index) => {
@@ -15,50 +15,13 @@ function renderInlineCode(text: string) {
   });
 }
 
-function saveGeneratedQuizResult(questions: QuizQuestion[], answers: Record<number, number>, score: number) {
-  const slug = window.location.pathname.match(/^\/chapters\/([^/]+)/)?.[1];
-
-  if (!slug) return;
-
-  try {
-    const stored = JSON.parse(window.localStorage.getItem(quizResultsStorageKey) ?? "{}") as Record<string, unknown>;
-    const fallbackConcepts = getConceptTagsForChapter(slug);
-    const missedQuestions = questions.filter((question, index) => answers[index] !== question.correctIndex);
-    const missedConcepts = Array.from(
-      new Set(missedQuestions.flatMap((question) => question.conceptTags ?? fallbackConcepts)),
-    );
-    const missedQuestionTypes = Array.from(
-      new Set(missedQuestions.map((question) => question.questionType).filter((type): type is string => Boolean(type))),
-    );
-    const missedReasonTags = Array.from(new Set(missedQuestions.flatMap((question) => question.reasonTags ?? [])));
-
-    window.localStorage.setItem(
-      quizResultsStorageKey,
-      JSON.stringify({
-        ...stored,
-        [`${slug}:generated-review`]: {
-          slug,
-          title: "종합 점검",
-          score,
-          total: questions.length,
-          concepts: fallbackConcepts,
-          missedConcepts,
-          missedQuestionTypes,
-          missedReasonTags,
-          updatedAt: new Date().toISOString(),
-        },
-      }),
-    );
-  } catch {
-    // 저장 실패가 문제 풀이를 막으면 안 됩니다.
-  }
-}
-
 export default function GeneratedReviewQuiz({ chapter }: { chapter: "sets" }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [variants, setVariants] = useState<number[]>([]);
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [visibleExplanations, setVisibleExplanations] = useState<Record<number, boolean>>({});
+  const [explanationFeedback, setExplanationFeedback] = useState<Record<number, "understood" | "confused">>({});
   const questions = useMemo(() => {
     if (chapter === "sets") return generateSetReviewQuestions(variants);
     return [];
@@ -71,6 +34,12 @@ export default function GeneratedReviewQuiz({ chapter }: { chapter: "sets" }) {
     return total + (answers[index] === question.correctIndex ? 1 : 0);
   }, 0);
   const allAnswered = questions.every((_, index) => answers[index] !== undefined);
+  const slug = "sets";
+  const chapterConceptId = getConceptIdForChapter(slug);
+  const currentQuestionId = getQuestionId(slug, "종합 점검", currentQuestion, currentIndex);
+  const explanationVisible = visibleExplanations[currentIndex] ?? false;
+  const currentFeedback = explanationFeedback[currentIndex];
+  const currentConcept = currentQuestion.conceptTags?.[0] ?? "종합 점검";
 
   function retryCurrentQuestion() {
     setVariants((current) => {
@@ -84,6 +53,23 @@ export default function GeneratedReviewQuiz({ chapter }: { chapter: "sets" }) {
       return next;
     });
     setSubmitted(false);
+    setVisibleExplanations((current) => ({ ...current, [currentIndex]: false }));
+    setExplanationFeedback((current) => {
+      const next = { ...current };
+      delete next[currentIndex];
+      return next;
+    });
+  }
+
+  function saveCurrentExplanationFeedback(status: "understood" | "confused") {
+    setExplanationFeedback((current) => ({ ...current, [currentIndex]: status }));
+    saveExplanationFeedback({
+      slug,
+      conceptId: currentQuestion.conceptId ?? chapterConceptId,
+      questionId: currentQuestionId,
+      concept: currentConcept,
+      status,
+    });
   }
 
   return (
@@ -91,9 +77,6 @@ export default function GeneratedReviewQuiz({ chapter }: { chapter: "sets" }) {
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h3 className="m-0 text-lg font-black text-slate-950">종합 점검</h3>
-          <p className="mt-1 text-sm text-slate-600">
-            문제를 틀리면 같은 유형에서 숫자와 집합이 바뀐 변형 문제를 다시 풀 수 있습니다.
-          </p>
         </div>
         <p className="rounded-md bg-white px-3 py-2 text-sm font-black text-slate-950">
           {submitted ? `${score} / ${questions.length} 정답` : `${answeredCount} / ${questions.length} 응답`}
@@ -120,20 +103,14 @@ export default function GeneratedReviewQuiz({ chapter }: { chapter: "sets" }) {
         <div className="mt-3 grid gap-2 sm:mt-4">
           {currentQuestion.choices.map((choice, choiceIndex) => {
             const checked = selected === choiceIndex;
-            const showCorrect = submitted && choiceIndex === currentQuestion.correctIndex;
-            const showWrong = submitted && checked && !isCorrect;
 
             return (
               <label
                 key={choice}
                 className={`flex cursor-pointer items-start gap-3 rounded-md border p-2.5 text-sm leading-6 sm:p-3 ${
-                  showCorrect
-                    ? "border-teal-500 bg-teal-50 text-teal-950"
-                    : showWrong
-                      ? "border-rose-400 bg-rose-50 text-rose-950"
-                      : checked
-                        ? "border-slate-950 bg-slate-50 text-slate-950"
-                        : "border-slate-200 bg-white text-slate-700 hover:border-slate-400"
+                  checked
+                    ? "border-slate-950 bg-slate-50 text-slate-950"
+                    : "border-slate-200 bg-white text-slate-700 hover:border-slate-400"
                 }`}
               >
                 <input
@@ -142,6 +119,7 @@ export default function GeneratedReviewQuiz({ chapter }: { chapter: "sets" }) {
                   checked={checked}
                   onChange={() => {
                     setSubmitted(false);
+                    setVisibleExplanations({});
                     setAnswers((current) => ({ ...current, [currentIndex]: choiceIndex }));
                   }}
                   className="mt-1 h-4 w-4 accent-slate-950"
@@ -153,22 +131,72 @@ export default function GeneratedReviewQuiz({ chapter }: { chapter: "sets" }) {
         </div>
         {submitted ? (
           <div
-            className={`mt-3 rounded-md p-3 text-sm leading-6 ${
+            className={`mt-3 rounded-md border p-3 text-sm leading-6 ${
               isCorrect ? "bg-teal-50 text-teal-900" : "bg-rose-50 text-rose-900"
             }`}
           >
-            <p>
-              <strong>{isCorrect ? "정답입니다." : "다시 확인해 보세요."}</strong>{" "}
-              {renderInlineCode(currentQuestion.explanation)}
-            </p>
-            {!isCorrect ? (
-              <button
-                type="button"
-                onClick={retryCurrentQuestion}
-                className="mt-3 rounded-md bg-white px-3 py-2 text-sm font-black text-rose-900 hover:bg-rose-100"
-              >
-                비슷한 문제 다시 풀기
-              </button>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <p className="font-black">{isCorrect ? "맞았습니다." : "틀렸습니다."}</p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setVisibleExplanations((current) => ({ ...current, [currentIndex]: !explanationVisible }))}
+                  className="rounded-md bg-white px-3 py-2 text-sm font-black text-slate-800 hover:bg-slate-100"
+                >
+                  {explanationVisible ? "해설 닫기" : "해설 보기"}
+                </button>
+                {!isCorrect ? (
+                  <button
+                    type="button"
+                    onClick={retryCurrentQuestion}
+                    className="rounded-md bg-white px-3 py-2 text-sm font-black text-rose-900 hover:bg-rose-100"
+                  >
+                    비슷한 문제 다시 풀기
+                  </button>
+                ) : null}
+              </div>
+            </div>
+            {explanationVisible ? (
+              <div className="mt-3 rounded-md bg-white p-3 text-slate-800">
+                <p className="font-bold">
+                  정답은 {renderInlineCode(currentQuestion.choices[currentQuestion.correctIndex])}입니다.
+                </p>
+                {!isCorrect && selected !== undefined ? (
+                  <p className="mt-2 text-slate-600">
+                    선택한 답 {renderInlineCode(currentQuestion.choices[selected])}에서 헷갈린 지점을 기준으로 보면 됩니다.
+                  </p>
+                ) : null}
+                <p className="mt-2">{renderInlineCode(currentQuestion.explanation)}</p>
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => saveCurrentExplanationFeedback("understood")}
+                    className={`rounded-md border px-3 py-2 text-sm font-black ${
+                      currentFeedback === "understood"
+                        ? "border-teal-600 bg-teal-50 text-teal-800"
+                        : "border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+                    }`}
+                  >
+                    이해했음
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => saveCurrentExplanationFeedback("confused")}
+                    className={`rounded-md border px-3 py-2 text-sm font-black ${
+                      currentFeedback === "confused"
+                        ? "border-amber-500 bg-amber-50 text-amber-800"
+                        : "border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+                    }`}
+                  >
+                    아직 어려움
+                  </button>
+                </div>
+                {currentFeedback === "confused" ? (
+                  <p className="mt-3 rounded-md bg-amber-50 p-3 text-sm font-bold leading-6 text-amber-900">
+                    더 쉽게 보면, 집합 기호 하나를 먼저 말로 바꾼 뒤 원소를 하나씩 검사하면 됩니다.
+                  </p>
+                ) : null}
+              </div>
             ) : null}
           </div>
         ) : null}
@@ -198,7 +226,7 @@ export default function GeneratedReviewQuiz({ chapter }: { chapter: "sets" }) {
           disabled={!allAnswered}
           onClick={() => {
             setSubmitted(true);
-            saveGeneratedQuizResult(questions, answers, score);
+            saveQuizRecord({ slug, title: "종합 점검", questions, answers });
           }}
           className="rounded-md bg-slate-950 px-5 py-3 text-sm font-black text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"
         >

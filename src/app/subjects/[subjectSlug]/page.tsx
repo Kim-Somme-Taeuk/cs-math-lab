@@ -56,12 +56,12 @@ export default async function SubjectPage({ params }: SubjectPageProps) {
   const startChapter = firstReadyChapter(subject);
 
   return (
-    <main className="mx-auto max-w-6xl px-5 py-12">
+    <main className="mx-auto max-w-6xl px-5 py-6 sm:py-8">
       <Link href="/roadmap" className="text-sm font-bold text-teal-700 hover:text-teal-800">
         로드맵으로 돌아가기
       </Link>
 
-      <section className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-end">
+      <section className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="max-w-3xl">
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">{subject.title}</h1>
@@ -69,41 +69,26 @@ export default async function SubjectPage({ params }: SubjectPageProps) {
               {subject.status === "active" ? "진행 중" : "예정"}
             </span>
           </div>
-          <p className="mt-4 text-lg leading-8 text-slate-700">{subject.description}</p>
         </div>
 
-        <div className="rounded-lg border border-slate-200 bg-white p-4">
-          <p className="text-sm font-bold text-slate-500">추천 시작점</p>
-          {startChapter ? (
-            <>
-              <p className="mt-1 text-lg font-black text-slate-950">{startChapter.title}</p>
-              <p className="mt-2 text-sm leading-6 text-slate-600">{startChapter.csConnection}</p>
+        {startChapter ? (
+          <div className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white p-3 sm:min-w-80">
+            <div>
+              <p className="text-xs font-bold text-slate-500">추천 시작점</p>
+              <p className="text-base font-black text-slate-950">{startChapter.title}</p>
+            </div>
               <Link
                 href={`/chapters/${startChapter.slug}`}
-                className="mt-4 inline-flex w-full justify-center rounded-md bg-slate-950 px-4 py-2.5 text-sm font-black text-white hover:bg-slate-800"
+                className="inline-flex shrink-0 justify-center rounded-md bg-slate-950 px-3 py-2 text-sm font-black text-white hover:bg-slate-800"
               >
-                시작하기
+                시작
               </Link>
-            </>
-          ) : (
-            <>
-              <p className="mt-1 text-lg font-black text-slate-950">아직 준비 중</p>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
-                이 과목의 상세 챕터는 아직 공개되지 않았습니다.
-              </p>
-            </>
-          )}
-        </div>
+          </div>
+        ) : null}
       </section>
 
-      <section aria-labelledby="levels-title" className="mt-10">
-        <div>
-          <h2 id="levels-title" className="text-2xl font-black tracking-tight text-slate-950">
-            Level별 학습 과정
-          </h2>
-        </div>
-
-        <div className="mt-5 grid gap-5">
+      <section className="mt-4">
+        <div className="grid gap-4">
           {subject.levels.map((level) => (
             <LevelSection key={level.level} level={level} />
           ))}

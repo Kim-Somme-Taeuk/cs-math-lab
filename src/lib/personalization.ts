@@ -1,4 +1,4 @@
-import { getChapter, type Chapter, type LearningTrackTag } from "@/lib/chapters";
+import { getChapter, getChapterConceptId, type Chapter, type LearningTrackTag } from "@/lib/chapters";
 
 export type LearningGoal = "coding-test" | "course" | "foundation" | "portfolio";
 export type LearningLevel = "beginner" | "high-school-ok" | "some-discrete";
@@ -12,13 +12,51 @@ export type LearningProfile = {
 
 export type QuizResult = {
   slug: string;
+  conceptId: string;
   title: string;
   score: number;
   total: number;
   concepts: string[];
+  conceptIds?: string[];
   missedConcepts?: string[];
   missedQuestionTypes?: string[];
   missedReasonTags?: string[];
+  updatedAt: string;
+};
+
+export type QuestionAttempt = {
+  id: string;
+  slug: string;
+  conceptId: string;
+  title: string;
+  questionId: string;
+  prompt: string;
+  selectedChoice: string;
+  correctChoice: string;
+  selectedIndex: number;
+  correctIndex: number;
+  isCorrect: boolean;
+  concepts: string[];
+  questionType?: string;
+  reasonTags: string[];
+  createdAt: string;
+};
+
+export type ConceptMastery = {
+  conceptId: string;
+  concept: string;
+  attempts: number;
+  correct: number;
+  masteryScore: number;
+  updatedAt: string;
+};
+
+export type ExplanationFeedback = {
+  slug: string;
+  conceptId: string;
+  questionId: string;
+  concept: string;
+  status: "understood" | "confused";
   updatedAt: string;
 };
 
@@ -26,6 +64,7 @@ export type UnderstandingStatus = "understood" | "confused";
 
 export type UnderstandingCheckResult = {
   slug: string;
+  conceptId: string;
   concept: string;
   status: UnderstandingStatus;
   updatedAt: string;
@@ -48,6 +87,9 @@ export type LearningInsights = {
 export const learningProfileStorageKey = "cs-math-lab:learning-profile";
 export const completedChaptersStorageKey = "cs-math-lab:completed-chapters";
 export const quizResultsStorageKey = "cs-math-lab:quiz-results";
+export const questionAttemptsStorageKey = "cs-math-lab:question-attempts";
+export const conceptMasteryStorageKey = "cs-math-lab:concept-mastery";
+export const explanationFeedbackStorageKey = "cs-math-lab:explanation-feedback";
 export const understandingChecksStorageKey = "cs-math-lab:understanding-checks";
 
 const goalPaths: Record<LearningGoal, string[]> = {
@@ -158,6 +200,10 @@ export function getRecommendedChapters(profile: LearningProfile, readyChapters: 
 
 export function getConceptTagsForChapter(slug: string) {
   return getChapter(slug)?.conceptTags ?? conceptTagsByChapter[slug] ?? [];
+}
+
+export function getConceptIdForChapter(slug: string) {
+  return getChapterConceptId(slug);
 }
 
 function getProfileScore(profile: LearningProfile, chapter: Chapter) {

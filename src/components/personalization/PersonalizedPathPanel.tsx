@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { buildAiLearningContext } from "@/lib/aiLearningContext";
 import {
   aiCoachCacheStorageKey,
@@ -14,7 +14,9 @@ import {
 import type { Chapter } from "@/lib/chapters";
 import {
   completedChaptersStorageKey,
+  conceptMasteryStorageKey,
   getAdaptiveRecommendedChapters,
+  getConceptIdForChapter,
   getConceptTagsForChapter,
   getLearningInsights,
   getProfileSummary,
@@ -25,6 +27,7 @@ import {
   type LearningLevel,
   type LearningProfile,
   type LearningStyle,
+  type ConceptMastery,
   type QuizResult,
   type UnderstandingCheckResult,
 } from "@/lib/personalization";
@@ -70,6 +73,8 @@ const styleOptions: Array<{ value: LearningStyle; label: string }> = [
   { value: "short", label: "짧은 설명" },
 ];
 
+const pathPageSize = 3;
+
 function readProfile() {
   try {
     const stored = window.localStorage.getItem(learningProfileStorageKey);
@@ -92,7 +97,9 @@ function readQuizResults() {
     const stored = JSON.parse(window.localStorage.getItem(quizResultsStorageKey) ?? "{}") as Record<string, QuizResult>;
     return Object.values(stored).map((result) => ({
       ...result,
+      conceptId: result.conceptId ?? getConceptIdForChapter(result.slug),
       concepts: result.concepts?.length ? result.concepts : getConceptTagsForChapter(result.slug),
+      conceptIds: result.conceptIds?.length ? result.conceptIds : [result.conceptId ?? getConceptIdForChapter(result.slug)],
       missedConcepts: result.missedConcepts ?? [],
       missedQuestionTypes: result.missedQuestionTypes ?? [],
       missedReasonTags: result.missedReasonTags ?? [],
@@ -108,7 +115,22 @@ function readUnderstandingChecks() {
       string,
       UnderstandingCheckResult
     >;
-    return Object.values(stored);
+    return Object.values(stored).map((check) => ({
+      ...check,
+      conceptId: check.conceptId ?? getConceptIdForChapter(check.slug),
+    }));
+  } catch {
+    return [];
+  }
+}
+
+function readConceptMastery() {
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(conceptMasteryStorageKey) ?? "{}") as Record<string, ConceptMastery>;
+    return Object.values(stored).map((mastery) => ({
+      ...mastery,
+      conceptId: mastery.conceptId ?? "legacy",
+    }));
   } catch {
     return [];
   }
@@ -185,11 +207,16 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
   const [completedChapters, setCompletedChapters] = useState<string[]>([]);
   const [quizResults, setQuizResults] = useState<QuizResult[]>([]);
   const [understandingChecks, setUnderstandingChecks] = useState<UnderstandingCheckResult[]>([]);
+  const [conceptMastery, setConceptMastery] = useState<ConceptMastery[]>([]);
   const [editing, setEditing] = useState(false);
   const [aiCoachMemo, setAiCoachMemo] = useState<string | null>(null);
   const [aiCoachSource, setAiCoachSource] = useState<"ai" | "fallback" | "cache" | null>(null);
   const [aiCoachLoading, setAiCoachLoading] = useState(false);
   const [aiCoachUsageCount, setAiCoachUsageCount] = useState(0);
+  const [pathPageIndex, setPathPageIndex] = useState(0);
+  const [pathSlideDirection, setPathSlideDirection] = useState<"left" | "right" | "none">("none");
+  const pathViewportRef = useRef<HTMLOListElement>(null);
+  const pathItemRefs = useRef<Array<HTMLLIElement | null>>([]);
 
   useEffect(() => {
     const storedProfile = readProfile();
@@ -198,6 +225,7 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
     setCompletedChapters(readCompletedChapters());
     setQuizResults(readQuizResults());
     setUnderstandingChecks(readUnderstandingChecks());
+    setConceptMastery(readConceptMastery());
     setAiCoachUsageCount(readCoachUsage().count);
     setEditing(!storedProfile);
   }, []);
@@ -212,6 +240,35 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
     return getLearningInsights(profile, readyChapters, completedChapters, quizResults, understandingChecks);
   }, [completedChapters, profile, quizResults, readyChapters, understandingChecks]);
 
+  const pathPageCount = Math.max(1, recommendedChapters.length - pathPageSize + 1);
+  useEffect(() => {
+    setPathPageIndex((current) => Math.min(current, pathPageCount - 1));
+  }, [pathPageCount]);
+
+  useEffect(() => {
+    const lastCompletedSlug = completedChapters.at(-1);
+    const lastCompletedIndex = lastCompletedSlug
+      ? recommendedChapters.findIndex((chapter) => chapter.slug === lastCompletedSlug)
+      : -1;
+
+    if (lastCompletedIndex >= 0) {
+      setPathPageIndex(Math.min(lastCompletedIndex, pathPageCount - 1));
+    }
+  }, [completedChapters, pathPageCount, recommendedChapters]);
+
+  useEffect(() => {
+    const viewport = pathViewportRef.current;
+    const target = pathItemRefs.current[pathPageIndex];
+    const first = pathItemRefs.current[0];
+
+    if (!viewport || !target || !first) return;
+
+    viewport.scrollTo({
+      left: target.offsetLeft - first.offsetLeft,
+      behavior: pathSlideDirection === "none" ? "auto" : "smooth",
+    });
+  }, [pathPageIndex, pathSlideDirection, recommendedChapters]);
+
   const aiLearningContext = useMemo(() => {
     return buildAiLearningContext({
       profile,
@@ -219,8 +276,9 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
       completedSlugs: completedChapters,
       quizResults,
       understandingChecks,
+      conceptMastery,
     });
-  }, [completedChapters, profile, quizResults, readyChapters, understandingChecks]);
+  }, [completedChapters, conceptMastery, profile, quizResults, readyChapters, understandingChecks]);
 
   const aiContextHash = useMemo(() => hashText(JSON.stringify(aiLearningContext)), [aiLearningContext]);
 
@@ -232,6 +290,7 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
     window.localStorage.setItem(learningProfileStorageKey, JSON.stringify(draftProfile));
     setProfile(draftProfile);
     setEditing(false);
+    setPathPageIndex(0);
   }
 
   function toggleCompleted(slug: string) {
@@ -255,7 +314,7 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
     const usage = readCoachUsage();
 
     if (usage.count >= aiCoachDailyLimit) {
-      setAiCoachMemo("오늘 AI 코치 호출 한도에 도달했습니다. 저장된 코치 메모와 추천 경로를 기준으로 이어가세요.");
+      setAiCoachMemo("오늘 한도에 도달했습니다.");
       setAiCoachSource("fallback");
       setAiCoachUsageCount(usage.count);
       return;
@@ -299,14 +358,11 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
   }
 
   return (
-    <section className="mt-8 rounded-lg border border-teal-200 bg-teal-50/50 p-4 sm:p-5">
+    <section className="mt-4 rounded-lg border border-teal-200 bg-teal-50/50 p-3 sm:p-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-sm font-bold text-teal-700">개인화 추천</p>
           <h2 className="mt-1 text-2xl font-black tracking-tight text-slate-950">내 학습 경로</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-700">
-            목표와 선호를 브라우저에 저장하고, 현재 공개된 챕터 안에서 추천 순서를 조정합니다.
-          </p>
         </div>
         {profile && !editing ? (
           <button
@@ -320,7 +376,7 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
       </div>
 
       {editing ? (
-        <div className="mt-4 grid gap-3 lg:grid-cols-3">
+        <div className="mt-3 grid gap-3 lg:grid-cols-3">
           <OptionGroup
             label="목표"
             options={goalOptions}
@@ -350,11 +406,11 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
           </div>
         </div>
       ) : (
-        <div className="mt-4">
+        <div className="mt-3">
           {profile ? (
             <p className="rounded-md bg-white px-3 py-2 text-sm font-bold text-slate-700">{getProfileSummary(profile)}</p>
           ) : null}
-          <div className="mt-3 grid gap-3 lg:grid-cols-[1fr_1fr_1.2fr]">
+          <div className="mt-2 grid gap-2 lg:grid-cols-2">
             <div className="rounded-md border border-slate-200 bg-white p-3">
               <p className="text-xs font-black text-slate-500">학습 상태</p>
               <p className="mt-2 text-sm font-bold text-slate-800">
@@ -365,7 +421,7 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
             <div className="rounded-md border border-slate-200 bg-white p-3">
               <p className="text-xs font-black text-slate-500">최근 약점</p>
               <p className="mt-2 text-sm font-bold text-slate-800">
-                {insights.weakConcepts.length > 0 ? insights.weakConcepts.join(", ") : "아직 뚜렷한 약점 기록 없음"}
+                {insights.weakConcepts.length > 0 ? insights.weakConcepts.join(", ") : "없음"}
               </p>
               {insights.weakQuestionTypes.length > 0 ? (
                 <p className="mt-1 text-xs font-bold text-slate-400">유형: {insights.weakQuestionTypes.join(", ")}</p>
@@ -374,35 +430,37 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
                 <p className="mt-1 text-xs font-bold text-slate-400">원인: {insights.weakReasonTags.join(", ")}</p>
               ) : null}
             </div>
-            <div className="rounded-md border border-slate-200 bg-white p-3">
-              <p className="text-xs font-black text-slate-500">코치 메모</p>
-              <p className="mt-2 text-sm leading-6 text-slate-700">{insights.coachMessage}</p>
-            </div>
           </div>
-          <div className="mt-3 rounded-md border border-slate-200 bg-white p-3">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-2 rounded-md border border-slate-200 bg-white p-3">
+            <div className="flex items-center justify-between gap-2">
               <div>
                 <p className="text-sm font-black text-slate-950">AI 코치 메모</p>
-                <p className="mt-1 text-xs font-bold text-slate-400">
-                  학습 목표, 완료 챕터, 오답 태그만 전송됩니다. 오늘 {aiCoachUsageCount} / {aiCoachDailyLimit}회 사용
-                  {aiCoachSource
-                    ? ` · ${aiCoachSource === "cache" ? "최근 응답 재사용" : aiCoachSource === "ai" ? "AI 생성" : "기본 메모"}`
-                    : ""}
-                </p>
+                {aiCoachSource ? (
+                  <p className="mt-1 hidden text-xs font-bold text-slate-400 sm:block">
+                    {aiCoachSource === "cache" ? "최근 응답 재사용" : aiCoachSource === "ai" ? "AI 생성" : "기본 메모"}
+                  </p>
+                ) : null}
               </div>
-              <button
-                type="button"
-                onClick={generateAiCoachMemo}
-                disabled={aiCoachLoading}
-                className="rounded-md bg-slate-950 px-4 py-2.5 text-sm font-black text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"
-              >
-                {aiCoachLoading ? "생성 중" : "AI 코치 메모 생성"}
-              </button>
+              <div className="flex shrink-0 items-center gap-2">
+                <p className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-black text-slate-500">
+                  {aiCoachUsageCount}/{aiCoachDailyLimit}
+                </p>
+                <button
+                  type="button"
+                  onClick={generateAiCoachMemo}
+                  disabled={aiCoachLoading}
+                  className="rounded-md bg-slate-950 px-3 py-2 text-xs font-black text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300 sm:text-sm"
+                >
+                  {aiCoachLoading ? "생성 중" : "메모 생성"}
+                </button>
+              </div>
             </div>
-            {aiCoachMemo ? <p className="mt-3 text-sm leading-6 text-slate-700">{aiCoachMemo}</p> : null}
+            {aiCoachMemo ? (
+              <p className="mt-2 rounded-md bg-slate-50 px-3 py-2 text-sm leading-6 text-slate-700">{aiCoachMemo}</p>
+            ) : null}
           </div>
           {insights.reviewChapters.length > 0 ? (
-            <div className="mt-3 rounded-md border border-amber-200 bg-amber-50 p-3">
+            <div className="mt-2 rounded-md border border-amber-200 bg-amber-50 p-3">
               <p className="text-sm font-black text-amber-800">복습 추천</p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {insights.reviewChapters.map((chapter) => (
@@ -417,45 +475,105 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
               </div>
             </div>
           ) : null}
-          <ol className="mt-3 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-            {recommendedChapters.map((chapter, index) => {
-              const completed = completedChapters.includes(chapter.slug);
+          <div className="mt-2 rounded-md border border-slate-200 bg-white p-2.5 sm:p-3">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-black text-slate-950">추천 경로</p>
+              </div>
+            </div>
+            <div className="relative mt-2">
+              <button
+                type="button"
+                aria-label="이전 추천 경로"
+                onClick={() => {
+                  setPathSlideDirection("right");
+                  setPathPageIndex((current) => Math.max(0, current - 1));
+                }}
+                disabled={pathPageIndex === 0}
+                className="absolute left-1 top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-slate-950/40 text-base font-black text-white shadow-sm backdrop-blur hover:bg-slate-950/60 disabled:cursor-not-allowed disabled:bg-slate-950/10 disabled:text-white/40 sm:flex"
+              >
+                &lt;
+              </button>
+              <ol
+                ref={pathViewportRef}
+                className="flex touch-pan-x snap-x snap-mandatory gap-3 overflow-x-auto px-0 scroll-smooth [scrollbar-width:none] sm:overflow-hidden sm:px-8 [&::-webkit-scrollbar]:hidden"
+              >
+                {recommendedChapters.map((chapter, index) => {
+                  const completed = completedChapters.includes(chapter.slug);
 
-              return (
-                <li key={chapter.slug} className="rounded-md border border-slate-200 bg-white p-3">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-xs font-black text-teal-700">추천 {index + 1}</p>
-                      <h3 className="mt-1 text-base font-black text-slate-950">{chapter.title}</h3>
-                      <p className="mt-1 text-xs font-bold text-slate-400">{chapter.csConnection}</p>
-                    </div>
-                    <span
-                      className={`shrink-0 rounded-md px-2 py-1 text-xs font-bold ${
-                        completed ? "bg-teal-100 text-teal-800" : "bg-slate-100 text-slate-500"
-                      }`}
+                  return (
+                    <li
+                      key={chapter.slug}
+                      ref={(element) => {
+                        pathItemRefs.current[index] = element;
+                      }}
+                      className="relative shrink-0 basis-[46%] snap-start rounded-md border border-slate-200 bg-white p-2 pb-10 sm:basis-[calc((100%_-_1.5rem)/3)] sm:p-3"
                     >
-                      {completed ? "완료" : "진행 전"}
-                    </span>
-                  </div>
-                  <div className="mt-3 grid grid-cols-[1fr_auto] gap-2">
-                    <Link
-                      href={`/chapters/${chapter.slug}`}
-                      className="rounded-md bg-slate-950 px-3 py-2 text-center text-sm font-black text-white hover:bg-slate-800"
-                    >
-                      학습하기
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={() => toggleCompleted(chapter.slug)}
-                      className="rounded-md border border-slate-300 px-3 py-2 text-sm font-black text-slate-700 hover:bg-slate-100"
-                    >
-                      {completed ? "해제" : "완료"}
-                    </button>
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
+                      <Link
+                        href={`/chapters/${chapter.slug}`}
+                        className="absolute inset-0 rounded-md sm:hidden"
+                        aria-label={`${chapter.title} 학습하기`}
+                      />
+                      <div className="flex items-center justify-between gap-2 sm:items-start">
+                        <div className="min-w-0">
+                          <p className="text-[11px] font-black text-teal-700 sm:text-xs">추천 {index + 1}</p>
+                          <h3 className="mt-0.5 line-clamp-2 text-sm font-black leading-5 text-slate-950 sm:truncate sm:text-base">
+                            {chapter.title}
+                          </h3>
+                          <p className="mt-1 hidden text-xs font-bold text-slate-400 sm:block">{chapter.csConnection}</p>
+                        </div>
+                        <span
+                          className={`hidden shrink-0 rounded-md px-2 py-1 text-xs font-bold sm:block ${
+                            completed ? "bg-teal-100 text-teal-800" : "bg-slate-100 text-slate-500"
+                          }`}
+                        >
+                          {completed ? "완료" : "진행 전"}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => toggleCompleted(chapter.slug)}
+                        className={`absolute bottom-2 right-2 z-10 flex h-7 min-w-12 appearance-none items-center justify-center rounded-full border border-transparent px-3 text-center text-[11px] font-black leading-none sm:hidden ${
+                          completed ? "bg-teal-100 text-teal-800" : "bg-slate-100 text-slate-600"
+                        }`}
+                      >
+                        {completed ? "완료" : "체크"}
+                      </button>
+                      <div className="mt-2 hidden items-center justify-end gap-2 sm:grid sm:grid-cols-[1fr_auto] sm:mt-3">
+                        <Link
+                          href={`/chapters/${chapter.slug}`}
+                          className="flex h-9 items-center justify-center rounded-md bg-slate-950 px-3 text-center text-[13px] font-black leading-none text-white hover:bg-slate-800"
+                        >
+                          학습
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => toggleCompleted(chapter.slug)}
+                          className={`flex h-9 min-w-14 appearance-none items-center justify-center rounded-md border border-slate-300 px-3 text-center text-[12px] font-black leading-none hover:bg-slate-100 ${
+                            completed ? "bg-white text-slate-700" : "bg-white text-slate-600"
+                          }`}
+                        >
+                          {completed ? "완료" : "체크"}
+                        </button>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ol>
+              <button
+                type="button"
+                aria-label="다음 추천 경로"
+                onClick={() => {
+                  setPathSlideDirection("left");
+                  setPathPageIndex((current) => Math.min(pathPageCount - 1, current + 1));
+                }}
+                disabled={pathPageIndex >= pathPageCount - 1}
+                className="absolute right-1 top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-slate-950/40 text-base font-black text-white shadow-sm backdrop-blur hover:bg-slate-950/60 disabled:cursor-not-allowed disabled:bg-slate-950/10 disabled:text-white/40 sm:flex"
+              >
+                &gt;
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </section>

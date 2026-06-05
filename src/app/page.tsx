@@ -8,19 +8,14 @@ export default function Home() {
   return (
     <main>
       <section className="border-b border-slate-200 bg-white">
-        <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 lg:grid-cols-[1.35fr_0.65fr] lg:items-center">
+        <div className="mx-auto grid max-w-6xl gap-8 px-5 py-12 lg:grid-cols-[1.35fr_0.65fr] lg:items-center">
           <div>
             <p className="mb-4 text-sm font-bold text-teal-700">컴공생을 위한 수학 학습 실험실</p>
             <h1 className="max-w-3xl text-3xl font-black tracking-tight text-slate-950 sm:text-4xl lg:text-[2.85rem] lg:leading-tight">
               수학 개념을 전공 맥락과
               <br className="hidden sm:block" /> 직접 연결합니다.
             </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-700">
-              CS Math Lab은 이산수학, 선형대수, 미적분, 확률통계를 컴공 전공 맥락과
-              연결해 학습하는 정적 웹사이트입니다. 현재는 이산수학 입문 챕터부터
-              순차적으로 공개합니다.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 href="/chapters/logic"
                 className="rounded-md bg-slate-950 px-5 py-3 text-sm font-bold text-white hover:bg-slate-800"
@@ -69,15 +64,12 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-5 py-12">
+      <section className="mx-auto max-w-6xl px-5 py-10">
         <div className="max-w-3xl">
           <p className="text-sm font-bold text-teal-700">Math Subjects</p>
           <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">대주제별 학습 구조</h2>
-          <p className="mt-3 leading-7 text-slate-600">
-            각 대주제 안에서 Level을 나누고, Level별 챕터를 차례로 공개합니다.
-          </p>
         </div>
-        <div className="mt-6 grid gap-4 md:grid-cols-4">
+        <div className="mt-4 grid gap-4 md:grid-cols-4">
           {roadmapSubjects.map((subject) => (
             <Link
               key={subject.id}
@@ -102,18 +94,6 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-6xl gap-5 px-5 pb-12 md:grid-cols-3">
-        {[
-          ["왜 배우는가", "정의부터 외우기보다 자료구조, 알고리즘, 조건문과의 연결을 먼저 봅니다."],
-          ["직접 조작한다", "진리표와 집합 연산을 바꿔 보며 결과가 어떻게 달라지는지 확인합니다."],
-          ["확장 가능하다", "MDX 콘텐츠와 React 컴포넌트를 분리해 여러 수학 대주제로 넓힐 수 있습니다."],
-        ].map(([title, body]) => (
-          <div key={title} className="rounded-lg border border-slate-200 bg-white p-5">
-            <h2 className="text-lg font-bold text-slate-950">{title}</h2>
-            <p className="mt-3 text-sm leading-6 text-slate-600">{body}</p>
-          </div>
-        ))}
-      </section>
     </main>
   );
 }

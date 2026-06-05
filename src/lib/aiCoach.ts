@@ -1,7 +1,7 @@
 import type { AiLearningContext } from "@/lib/aiLearningContext";
 
 export const aiCoachFallbackMemo =
-  "지금은 저장된 학습 기록을 기준으로 약한 개념을 짧게 복습하고, 추천 경로의 다음 챕터를 이어가는 것이 좋습니다.";
+  "약한 개념을 복습한 뒤 다음 챕터로 이어가세요.";
 
 export const aiCoachCacheStorageKey = "cs-math-lab:ai-coach-cache";
 export const aiCoachUsageStorageKey = "cs-math-lab:ai-coach-usage";
@@ -35,6 +35,8 @@ function isRecentAttempt(value: unknown) {
   return (
     typeof value.slug === "string" &&
     value.slug.length <= maxTextLength &&
+    typeof value.conceptId === "string" &&
+    value.conceptId.length <= maxTextLength &&
     typeof value.title === "string" &&
     value.title.length <= maxTextLength &&
     typeof value.scoreRatio === "number" &&
@@ -52,6 +54,8 @@ function isCatalogChapter(value: unknown) {
   return (
     typeof value.slug === "string" &&
     value.slug.length <= maxTextLength &&
+    typeof value.conceptId === "string" &&
+    value.conceptId.length <= maxTextLength &&
     typeof value.title === "string" &&
     value.title.length <= maxTextLength &&
     (typeof value.subjectId === "string" || value.subjectId === null) &&
@@ -61,6 +65,23 @@ function isCatalogChapter(value: unknown) {
     isStringArray(value.prerequisites) &&
     isStringArray(value.conceptTags) &&
     isStringArray(value.trackTags)
+  );
+}
+
+function isConceptMastery(value: unknown) {
+  if (!isRecord(value)) return false;
+
+  return (
+    typeof value.concept === "string" &&
+    value.concept.length <= maxTextLength &&
+    typeof value.conceptId === "string" &&
+    value.conceptId.length <= maxTextLength &&
+    typeof value.masteryScore === "number" &&
+    value.masteryScore >= 0 &&
+    value.masteryScore <= 1 &&
+    typeof value.attempts === "number" &&
+    value.attempts >= 0 &&
+    value.attempts <= 1000
   );
 }
 
@@ -83,6 +104,9 @@ export function validateAiCoachPayload(value: unknown): value is AiCoachRequestP
     isStringArray(context.weakConcepts) &&
     isStringArray(context.weakQuestionTypes) &&
     isStringArray(context.weakReasonTags) &&
+    Array.isArray(context.conceptMastery) &&
+    context.conceptMastery.length <= 8 &&
+    context.conceptMastery.every(isConceptMastery) &&
     isStringArray(context.reviewReasons) &&
     (typeof context.nextChapterReason === "string" || context.nextChapterReason === null) &&
     (context.nextChapterReason === null || context.nextChapterReason.length <= maxTextLength * 2) &&

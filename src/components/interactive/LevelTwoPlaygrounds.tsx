@@ -597,9 +597,15 @@ export function TreePlayground() {
           <p className="text-sm font-bold text-slate-500">판정과 순회</p>
           <div className="mt-3 grid gap-2">
           <ResultCard label="트리 판정" value={isTree ? "연결되어 있고 사이클이 없습니다." : extraEdge === "cycle" ? "사이클이 생겨 트리가 아닙니다." : "연결이 끊겨 하나의 트리가 아닙니다."} good={isTree} />
-          <ResultCard label="전위 순회" value={preorder.join(" → ")} />
-          <ResultCard label="중위 순회" value={inorder.join(" → ")} />
-          <ResultCard label="후위 순회" value={postorder.join(" → ")} />
+          {isTree ? (
+            <>
+              <ResultCard label="전위 순회" value={preorder.join(" → ")} />
+              <ResultCard label="중위 순회" value={inorder.join(" → ")} />
+              <ResultCard label="후위 순회" value={postorder.join(" → ")} />
+            </>
+          ) : (
+            <ResultCard label="순회" value="트리가 아니므로 기본 트리에서만 확인합니다." good={false} />
+          )}
           </div>
         </div>
       </div>

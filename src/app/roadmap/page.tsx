@@ -50,43 +50,28 @@ export default function RoadmapPage() {
     .filter((chapter) => chapter.status === "ready");
 
   return (
-    <main className="mx-auto max-w-6xl px-5 py-12">
-      <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-end">
-        <div className="max-w-3xl">
-          <p className="text-sm font-bold text-teal-700">CS Math Roadmap</p>
-          <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
-            컴공 수학 로드맵
-          </h1>
-          <p className="mt-4 text-lg leading-8 text-slate-700">
-            과목별 학습 트랙을 고르고, Level별 챕터를 확인합니다.
-          </p>
-        </div>
+    <main className="mx-auto max-w-6xl px-5 py-6 sm:py-8">
+      <section className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">컴공 수학 로드맵</h1>
 
-        <div className="rounded-lg border border-teal-200 bg-teal-50 p-4">
-          <p className="text-sm font-bold text-teal-700">처음이라면 여기서 시작</p>
-          <p className="mt-1 text-lg font-black text-slate-950">이산수학 Level 1</p>
-          <p className="mt-2 text-sm leading-6 text-slate-700">
-            논리, 집합, 함수, 관계, 그래프까지 컴공 전공의 기초 언어를 먼저 잡습니다.
-          </p>
+        <div className="flex items-center justify-between gap-3 rounded-lg border border-teal-200 bg-teal-50 p-3 sm:min-w-80">
+          <div>
+            <p className="text-xs font-bold text-teal-700">처음이라면</p>
+            <p className="text-base font-black text-slate-950">이산수학 Level 1</p>
+          </div>
           <Link
             href="/subjects/discrete-math"
-            className="mt-4 inline-flex w-full justify-center rounded-md bg-slate-950 px-4 py-2.5 text-sm font-black text-white hover:bg-slate-800"
+            className="inline-flex shrink-0 justify-center rounded-md bg-slate-950 px-3 py-2 text-sm font-black text-white hover:bg-slate-800"
           >
-            이산수학 트랙 보기
+            시작
           </Link>
         </div>
       </section>
 
       <PersonalizedPathPanel readyChapters={readyChapters} />
 
-      <section aria-labelledby="subjects-title" className="mt-10">
-        <div>
-          <h2 id="subjects-title" className="text-2xl font-black tracking-tight text-slate-950">
-            대주제
-          </h2>
-        </div>
-
-        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="mt-4">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {roadmapSubjects.map((subject) => {
             const counts = countChapters(subject);
 
@@ -94,7 +79,7 @@ export default function RoadmapPage() {
               <Link
                 key={subject.id}
                 href={`/subjects/${subject.id}`}
-                className="rounded-lg border border-slate-200 bg-white p-5 transition hover:-translate-y-0.5 hover:border-teal-300 hover:shadow-sm"
+                className="rounded-lg border border-slate-200 bg-white p-4 transition hover:-translate-y-0.5 hover:border-teal-300 hover:shadow-sm"
               >
                 <div className="flex items-start justify-between gap-3">
                   <h3 className="text-xl font-black text-slate-950">{subject.title}</h3>
@@ -102,15 +87,15 @@ export default function RoadmapPage() {
                     {subject.status === "active" ? "진행 중" : "예정"}
                   </span>
                 </div>
-                <p className="mt-3 text-sm leading-6 text-slate-600">
+                <p className="mt-2 text-sm leading-5 text-slate-600">
                   {subjectCardDescriptions[subject.id] ?? subject.description}
                 </p>
-                <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+                <div className="mt-3 grid grid-cols-3 gap-2 text-center">
                   <Stat label="Level" value={subject.levels.length} />
                   <Stat label="공개" value={counts.ready} tone="ready" />
                   <Stat label="예정" value={counts.planned} tone="planned" />
                 </div>
-                <div className="mt-4 border-t border-slate-200 pt-4">
+                <div className="mt-3 border-t border-slate-200 pt-3">
                   <p className="text-xs font-black uppercase text-slate-500">Levels</p>
                   <div className="mt-2 grid gap-2">
                     {subject.levels.map((level) => {
@@ -127,7 +112,7 @@ export default function RoadmapPage() {
                     })}
                   </div>
                 </div>
-                <span className="mt-5 inline-flex rounded-md border border-slate-300 px-3 py-2 text-sm font-black text-slate-800">
+                <span className="mt-3 inline-flex rounded-md border border-slate-300 px-3 py-2 text-sm font-black text-slate-800">
                   자세히 보기
                 </span>
               </Link>
@@ -135,6 +120,7 @@ export default function RoadmapPage() {
           })}
         </div>
       </section>
+
     </main>
   );
 }

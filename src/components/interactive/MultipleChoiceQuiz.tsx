@@ -1,13 +1,17 @@
 "use client";
 
 import { useId, useMemo, useState } from "react";
-import { getConceptTagsForChapter, quizResultsStorageKey } from "@/lib/personalization";
+import { getCurrentChapterSlug, getQuestionId, saveExplanationFeedback, saveQuizRecord } from "@/lib/learningRecords";
+import { getConceptIdForChapter, getConceptTagsForChapter } from "@/lib/personalization";
 
 export type QuizQuestion = {
+  questionId?: string;
+  conceptId?: string;
   prompt: string;
   choices: [string, string, string, string];
   correctIndex: number;
   explanation: string;
+  simpleExplanation?: string;
   conceptTags?: string[];
   questionType?: string;
   reasonTags?: string[];
@@ -23,51 +27,13 @@ function renderInlineCode(text: string) {
   });
 }
 
-function saveQuizResult(title: string, questions: QuizQuestion[], answers: Record<number, number>, score: number) {
-  const match = window.location.pathname.match(/^\/chapters\/([^/]+)/);
-
-  if (!match) return;
-
-  try {
-    const stored = JSON.parse(window.localStorage.getItem(quizResultsStorageKey) ?? "{}") as Record<string, unknown>;
-    const slug = match[1];
-    const fallbackConcepts = getConceptTagsForChapter(slug);
-    const missedQuestions = questions.filter((question, index) => answers[index] !== question.correctIndex);
-    const missedConcepts = Array.from(
-      new Set(missedQuestions.flatMap((question) => question.conceptTags ?? fallbackConcepts)),
-    );
-    const missedQuestionTypes = Array.from(
-      new Set(missedQuestions.map((question) => question.questionType).filter((type): type is string => Boolean(type))),
-    );
-    const missedReasonTags = Array.from(new Set(missedQuestions.flatMap((question) => question.reasonTags ?? [])));
-    const resultKey = `${slug}:${title}:${questions[0]?.prompt.slice(0, 32) ?? "quiz"}`;
-    window.localStorage.setItem(
-      quizResultsStorageKey,
-      JSON.stringify({
-        ...stored,
-        [resultKey]: {
-          slug,
-          title,
-          score,
-          total: questions.length,
-          concepts: fallbackConcepts,
-          missedConcepts,
-          missedQuestionTypes,
-          missedReasonTags,
-          updatedAt: new Date().toISOString(),
-        },
-      }),
-    );
-  } catch {
-    // 학습 상태 저장 실패가 문제 풀이 흐름을 막으면 안 됩니다.
-  }
-}
-
 export default function MultipleChoiceQuiz({ questions, title = "연습 문제" }: { questions: QuizQuestion[]; title?: string }) {
   const quizId = useId();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [visibleExplanations, setVisibleExplanations] = useState<Record<number, boolean>>({});
+  const [explanationFeedback, setExplanationFeedback] = useState<Record<number, "understood" | "confused">>({});
   const currentQuestion = questions[currentIndex];
   const selected = answers[currentIndex];
   const isCorrect = selected === currentQuestion.correctIndex;
@@ -83,15 +49,31 @@ export default function MultipleChoiceQuiz({ questions, title = "연습 문제" 
   );
 
   const allAnswered = questions.every((_, index) => answers[index] !== undefined);
+  const slug = getCurrentChapterSlug() ?? "unknown";
+  const chapterConceptId = getConceptIdForChapter(slug);
+  const fallbackConcepts = getConceptTagsForChapter(slug);
+  const currentConceptId = currentQuestion.conceptId ?? chapterConceptId;
+  const currentConcept = (currentQuestion.conceptTags ?? fallbackConcepts)[0] ?? "문제 해설";
+  const currentQuestionId = getQuestionId(slug, title, currentQuestion, currentIndex);
+  const explanationVisible = visibleExplanations[currentIndex] ?? false;
+  const currentFeedback = explanationFeedback[currentIndex];
+
+  function saveCurrentExplanationFeedback(status: "understood" | "confused") {
+    setExplanationFeedback((current) => ({ ...current, [currentIndex]: status }));
+    saveExplanationFeedback({
+      slug,
+      conceptId: currentConceptId,
+      questionId: currentQuestionId,
+      concept: currentConcept,
+      status,
+    });
+  }
 
   return (
     <section aria-label="문제 풀기" className="mt-3 mb-6 rounded-lg border border-slate-200 bg-slate-50 p-3 sm:p-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h3 className="m-0 text-lg font-black text-slate-950">{title}</h3>
-          <p className="mt-1 text-sm text-slate-600">
-            {paged ? "문제를 순서대로 넘기며 답을 고른 뒤 채점합니다." : "답을 고른 뒤 채점하면 바로 해설을 확인할 수 있습니다."}
-          </p>
         </div>
         {paged || submitted ? (
           <p className="rounded-md bg-white px-3 py-2 text-sm font-black text-slate-950">
@@ -122,20 +104,14 @@ export default function MultipleChoiceQuiz({ questions, title = "연습 문제" 
         <div className="mt-3 grid gap-2 sm:mt-4">
           {currentQuestion.choices.map((choice, choiceIndex) => {
             const checked = selected === choiceIndex;
-            const showCorrect = submitted && choiceIndex === currentQuestion.correctIndex;
-            const showWrong = submitted && checked && !isCorrect;
 
             return (
               <label
                 key={choice}
                 className={`flex cursor-pointer items-start gap-3 rounded-md border p-2.5 text-sm leading-6 sm:p-3 ${
-                  showCorrect
-                    ? "border-teal-500 bg-teal-50 text-teal-950"
-                    : showWrong
-                      ? "border-rose-400 bg-rose-50 text-rose-950"
-                      : checked
-                        ? "border-slate-950 bg-slate-50 text-slate-950"
-                        : "border-slate-200 bg-white text-slate-700 hover:border-slate-400"
+                  checked
+                    ? "border-slate-950 bg-slate-50 text-slate-950"
+                    : "border-slate-200 bg-white text-slate-700 hover:border-slate-400"
                 }`}
               >
                 <input
@@ -144,6 +120,7 @@ export default function MultipleChoiceQuiz({ questions, title = "연습 문제" 
                   checked={checked}
                   onChange={() => {
                     setSubmitted(false);
+                    setVisibleExplanations({});
                     setAnswers((current) => ({ ...current, [currentIndex]: choiceIndex }));
                   }}
                   className="mt-1 h-4 w-4 accent-slate-950"
@@ -154,14 +131,64 @@ export default function MultipleChoiceQuiz({ questions, title = "연습 문제" 
           })}
         </div>
         {submitted ? (
-          <p
-            className={`mt-3 rounded-md p-3 text-sm leading-6 ${
+          <div
+            className={`mt-3 rounded-md border p-3 text-sm leading-6 ${
               isCorrect ? "bg-teal-50 text-teal-900" : "bg-rose-50 text-rose-900"
             }`}
           >
-            <strong>{isCorrect ? "정답입니다." : "다시 확인해 보세요."}</strong>{" "}
-            {renderInlineCode(currentQuestion.explanation)}
-          </p>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <p className="font-black">{isCorrect ? "맞았습니다." : "틀렸습니다."}</p>
+              <button
+                type="button"
+                onClick={() => setVisibleExplanations((current) => ({ ...current, [currentIndex]: !explanationVisible }))}
+                className="rounded-md bg-white px-3 py-2 text-sm font-black text-slate-800 hover:bg-slate-100"
+              >
+                {explanationVisible ? "해설 닫기" : "해설 보기"}
+              </button>
+            </div>
+            {explanationVisible ? (
+              <div className="mt-3 rounded-md bg-white p-3 text-slate-800">
+                <p className="font-bold">
+                  정답은 {renderInlineCode(currentQuestion.choices[currentQuestion.correctIndex])}입니다.
+                </p>
+                {!isCorrect && selected !== undefined ? (
+                  <p className="mt-2 text-slate-600">
+                    선택한 답 {renderInlineCode(currentQuestion.choices[selected])}에서 헷갈린 지점을 기준으로 보면 됩니다.
+                  </p>
+                ) : null}
+                <p className="mt-2">{renderInlineCode(currentQuestion.explanation)}</p>
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => saveCurrentExplanationFeedback("understood")}
+                    className={`rounded-md border px-3 py-2 text-sm font-black ${
+                      currentFeedback === "understood"
+                        ? "border-teal-600 bg-teal-50 text-teal-800"
+                        : "border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+                    }`}
+                  >
+                    이해했음
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => saveCurrentExplanationFeedback("confused")}
+                    className={`rounded-md border px-3 py-2 text-sm font-black ${
+                      currentFeedback === "confused"
+                        ? "border-amber-500 bg-amber-50 text-amber-800"
+                        : "border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+                    }`}
+                  >
+                    아직 어려움
+                  </button>
+                </div>
+                {currentFeedback === "confused" ? (
+                  <p className="mt-3 rounded-md bg-amber-50 p-3 text-sm font-bold leading-6 text-amber-900">
+                    더 쉽게 보면, 문제에서 요구하는 개념 하나를 먼저 잡고 선택지를 지워 나가면 됩니다.
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
         ) : null}
       </fieldset>
 
@@ -191,7 +218,7 @@ export default function MultipleChoiceQuiz({ questions, title = "연습 문제" 
           disabled={!allAnswered}
           onClick={() => {
             setSubmitted(true);
-            saveQuizResult(title, questions, answers, score);
+            saveQuizRecord({ slug, title, questions, answers });
           }}
           className="rounded-md bg-slate-950 px-5 py-3 text-sm font-black text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"
         >

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import {
   understandingChecksStorageKey,
+  getConceptIdForChapter,
   type UnderstandingCheckResult,
   type UnderstandingStatus,
 } from "@/lib/personalization";
@@ -32,19 +33,22 @@ export default function UnderstandingCheck({ concept, prompt }: UnderstandingChe
 
   useEffect(() => {
     const slug = getChapterSlug();
-    const stored = readChecks()[`${slug}:${concept}`];
+    const conceptId = getConceptIdForChapter(slug);
+    const stored = readChecks()[`${slug}:${conceptId}:${concept}`] ?? readChecks()[`${slug}:${concept}`];
     setStatus(stored?.status ?? null);
   }, [concept]);
 
   function saveStatus(nextStatus: UnderstandingStatus) {
     const slug = getChapterSlug();
+    const conceptId = getConceptIdForChapter(slug);
     const checks = readChecks();
     window.localStorage.setItem(
       understandingChecksStorageKey,
       JSON.stringify({
         ...checks,
-        [`${slug}:${concept}`]: {
+        [`${slug}:${conceptId}:${concept}`]: {
           slug,
+          conceptId,
           concept,
           status: nextStatus,
           updatedAt: new Date().toISOString(),
