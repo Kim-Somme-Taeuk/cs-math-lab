@@ -133,10 +133,16 @@ describe("CounterexamplePlayground", () => {
     const playground = screen.getByRole("region", { name: "반례 찾기 실험" });
     expect(within(playground).getByText("[1, 2, 3]은 조건은 만족하지만 결론이 깨지므로 반례입니다.")).toBeInTheDocument();
 
-    await user.click(within(playground).getByRole("button", { name: "[]" }));
+    await user.click(within(playground).getByRole("button", { name: "길이 0" }));
     expect(within(playground).getByText("빈 리스트는 이번 주장의 대상인 비어 있지 않은 리스트가 아니므로 반례로 쓰지 않습니다.")).toBeInTheDocument();
 
-    await user.click(within(playground).getByRole("button", { name: "[3, 2, 1]" }));
+    await user.click(within(playground).getByRole("button", { name: "길이 3" }));
+    await user.clear(within(playground).getByLabelText("1번째"));
+    await user.type(within(playground).getByLabelText("1번째"), "3");
+    await user.clear(within(playground).getByLabelText("2번째"));
+    await user.type(within(playground).getByLabelText("2번째"), "2");
+    await user.clear(within(playground).getByLabelText("3번째"));
+    await user.type(within(playground).getByLabelText("3번째"), "1");
     expect(within(playground).getByText("[3, 2, 1]은 오름차순 정렬 조건을 만족하지 않으므로 반례가 아닙니다.")).toBeInTheDocument();
   });
 });

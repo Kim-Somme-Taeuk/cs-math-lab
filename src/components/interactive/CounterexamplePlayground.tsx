@@ -2,19 +2,6 @@
 
 import { useState } from "react";
 
-type Example = {
-  id: string;
-  values: number[];
-  label: string;
-};
-
-const examples: Example[] = [
-  { id: "single", values: [1], label: "[1]" },
-  { id: "ascending", values: [1, 2, 3], label: "[1, 2, 3]" },
-  { id: "descending", values: [3, 2, 1], label: "[3, 2, 1]" },
-  { id: "empty", values: [], label: "[]" },
-];
-
 function isAscending(values: number[]) {
   return values.every((value, index) => index === 0 || values[index - 1] <= value);
 }
@@ -26,32 +13,38 @@ function lastIsMin(values: number[]) {
   return values.every((value) => last <= value);
 }
 
-function explain(example: Example) {
-  const assumes = example.values.length > 0 && isAscending(example.values);
-  const conclusion = lastIsMin(example.values);
+function formatList(values: number[]) {
+  return `[${values.join(", ")}]`;
+}
+
+function explain(values: number[]) {
+  const assumes = values.length > 0 && isAscending(values);
+  const conclusion = lastIsMin(values);
   const counterexample = assumes && !conclusion;
 
   if (counterexample) {
-    return `${example.label}은 조건은 만족하지만 결론이 깨지므로 반례입니다.`;
+    return `${formatList(values)}은 조건은 만족하지만 결론이 깨지므로 반례입니다.`;
   }
 
-  if (example.values.length === 0) {
+  if (values.length === 0) {
     return "빈 리스트는 이번 주장의 대상인 비어 있지 않은 리스트가 아니므로 반례로 쓰지 않습니다.";
   }
 
   if (!assumes) {
-    return `${example.label}은 오름차순 정렬 조건을 만족하지 않으므로 반례가 아닙니다.`;
+    return `${formatList(values)}은 오름차순 정렬 조건을 만족하지 않으므로 반례가 아닙니다.`;
   }
 
-  return `${example.label}은 조건과 결론이 모두 참이라서 반례가 아닙니다.`;
+  return `${formatList(values)}은 조건과 결론이 모두 참이라서 반례가 아닙니다.`;
 }
 
 export default function CounterexamplePlayground() {
-  const [selectedId, setSelectedId] = useState("ascending");
-  const selected = examples.find((example) => example.id === selectedId) ?? examples[1];
-  const assumes = selected.values.length > 0 && isAscending(selected.values);
-  const conclusion = lastIsMin(selected.values);
+  const [values, setValues] = useState([1, 2, 3]);
+  const assumes = values.length > 0 && isAscending(values);
+  const conclusion = lastIsMin(values);
   const counterexample = assumes && !conclusion;
+  const updateValue = (index: number, nextValue: number) => {
+    setValues((current) => current.map((value, valueIndex) => (valueIndex === index ? nextValue : value)));
+  };
 
   return (
     <section aria-label="반례 찾기 실험" className="mt-3 mb-7 rounded-lg border border-slate-200 bg-slate-50 p-3 sm:p-4">
@@ -64,23 +57,40 @@ export default function CounterexamplePlayground() {
 
       <div className="mt-4 grid gap-3 lg:grid-cols-[0.8fr_1.2fr]">
         <div className="rounded-lg border border-slate-200 bg-white p-3">
-          <p className="text-sm font-bold text-slate-500">예시 선택</p>
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            {examples.map((example) => (
+          <p className="text-sm font-bold text-slate-500">리스트 구성</p>
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            {[0, 1, 2].map((index) => (
+              <label key={index} className="grid gap-1 rounded-md border border-slate-200 bg-slate-50 p-2 text-sm font-bold text-slate-700">
+                {index + 1}번째
+                <input
+                  type="number"
+                  min="0"
+                  max="9"
+                  value={values[index] ?? 0}
+                  disabled={index >= values.length}
+                  onChange={(event) => updateValue(index, Number(event.target.value))}
+                  className="w-full rounded border border-slate-300 bg-white px-2 py-1 text-sm font-black text-slate-950 disabled:bg-slate-100 disabled:text-slate-300"
+                />
+              </label>
+            ))}
+          </div>
+          <div className="mt-3 grid grid-cols-4 gap-2">
+            {[0, 1, 2, 3].map((length) => (
               <button
-                key={example.id}
+                key={length}
                 type="button"
-                onClick={() => setSelectedId(example.id)}
+                onClick={() => setValues([1, 2, 3].slice(0, length))}
                 className={`rounded-md border px-3 py-2 text-sm font-black ${
-                  selected.id === example.id
+                  values.length === length
                     ? "border-slate-950 bg-slate-950 text-white"
                     : "border-slate-200 bg-white text-slate-700 hover:border-slate-400"
                 }`}
               >
-                {example.label}
+                길이 {length}
               </button>
             ))}
           </div>
+          <p className="mt-3 rounded-md bg-slate-50 p-3 text-sm font-black text-slate-950">{formatList(values)}</p>
         </div>
 
         <div className="min-h-[178px] rounded-lg border border-slate-200 bg-white p-3">
@@ -95,7 +105,7 @@ export default function CounterexamplePlayground() {
               counterexample ? "bg-teal-50 text-teal-900" : "bg-slate-50 text-slate-700"
             }`}
           >
-            {explain(selected)}
+            {explain(values)}
           </p>
         </div>
       </div>
