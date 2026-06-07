@@ -129,6 +129,8 @@ test("multiple choice quiz scores submitted answers", async ({ page }) => {
     "같은 원소를 가지므로 같은 집합으로 볼 수 있다.",
     "합집합",
     "교집합",
+    "필요한 권한이 모두 부여되어 있다.",
+    "이미 처리한 대상을 빠르게 확인하기 위해",
   ];
 
   for (const [index, answer] of correctAnswers.entries()) {
@@ -139,6 +141,6 @@ test("multiple choice quiz scores submitted answers", async ({ page }) => {
   }
 
   await quiz.getByRole("button", { name: "채점하기" }).click();
-  await expect(quiz.getByText("8 / 8 정답")).toBeVisible();
+  await expect(quiz.getByText("10 / 10 정답")).toBeVisible();
   await expect(quiz.getByText("맞았습니다.")).toBeVisible();
 });
