@@ -42,6 +42,8 @@ export function getQuestionId(slug: string, title: string, question: QuizQuestio
   return `${slug}:${title}:${question.questionType ?? "question"}:${index}:${question.prompt.slice(0, 36)}`;
 }
 
+// Persist one quiz submission as three learning signals:
+// quiz summary, per-question attempts, and concept-level mastery.
 export function saveQuizRecord({ slug, title, questions, answers }: SaveQuizRecordInput) {
   const chapterConceptId = getConceptIdForChapter(slug);
   const fallbackConcepts = getConceptTagsForChapter(slug);

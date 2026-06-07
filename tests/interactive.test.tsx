@@ -1,5 +1,7 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import ConditionalPlayground from "../src/components/interactive/ConditionalPlayground";
 import CountingPlayground from "../src/components/interactive/CountingPlayground";
@@ -9,7 +11,12 @@ import SetVennPlayground from "../src/components/interactive/SetVennPlayground";
 import TruthTablePlayground from "../src/components/interactive/TruthTablePlayground";
 import { buildAiLearningContext } from "../src/lib/aiLearningContext";
 import { normalizeCoachMemo, validateAiCoachPayload } from "../src/lib/aiCoach";
-import { chapters, getChapterNavigation, getReadyChaptersInSameLevel, roadmapSubjects } from "../src/lib/chapters";
+import {
+  getChapterNavigation,
+  getReadyChaptersBySubjectAndLevel,
+  getReadyChaptersInSameLevel,
+  roadmapSubjects,
+} from "../src/lib/chapters";
 import { generateSetReviewQuestions } from "../src/lib/generatedReview";
 import { evaluateLogic } from "../src/lib/logic";
 import {
@@ -19,6 +26,7 @@ import {
   questionAttemptsStorageKey,
   quizResultsStorageKey,
 } from "../src/lib/personalization";
+import { getSupplementalReviewQuestions, reviewQuestionCount } from "../src/lib/reviewQuestions";
 import { evaluateSetOperation } from "../src/lib/setUtils";
 
 describe("logic helpers", () => {
@@ -57,6 +65,50 @@ describe("set helpers", () => {
     expect(secondAttempt[0].prompt).toContain("A ∪ B");
     expect(secondAttempt[0].prompt).not.toBe(firstAttempt[0].prompt);
     expect(firstAttempt[0].choices[firstAttempt[0].correctIndex]).toMatch(/^\{ /);
+  });
+});
+
+function reviewQuestionCountInMdx(slug: string) {
+  const contentRoot = join(process.cwd(), "src", "content", "discrete-math");
+  const paths = [
+    join(contentRoot, "level-1", `${slug}.mdx`),
+    join(contentRoot, "level-2", `${slug}.mdx`),
+    join(contentRoot, "level-3", `${slug}.mdx`),
+  ];
+  const path = paths.find((candidate) => existsSync(candidate));
+
+  if (!path) return 0;
+
+  const text = readFileSync(path, "utf8");
+  const reviewStart = text.indexOf('title="종합 점검"');
+
+  if (reviewStart < 0) return 0;
+
+  const reviewEnd = text.indexOf("]}", reviewStart);
+  const reviewBlock = reviewEnd >= 0 ? text.slice(reviewStart, reviewEnd) : text.slice(reviewStart);
+  return reviewBlock.match(/prompt:/g)?.length ?? 0;
+}
+
+describe("review question counts", () => {
+  it("keeps every ready chapter review quiz at ten questions", () => {
+    const readyChapters = roadmapSubjects
+      .flatMap((subject) => subject.levels)
+      .flatMap((level) => level.chapters)
+      .filter((chapter) => chapter.status === "ready");
+
+    for (const chapter of readyChapters) {
+      const existingCount =
+        chapter.slug === "sets" ? generateSetReviewQuestions().length : reviewQuestionCountInMdx(chapter.slug);
+      const supplementalCount = getSupplementalReviewQuestions(chapter.slug).length;
+
+      expect(existingCount, `${chapter.slug} should not define more than ${reviewQuestionCount} review questions`).toBeLessThanOrEqual(
+        reviewQuestionCount,
+      );
+      expect(
+        Math.min(existingCount + supplementalCount, reviewQuestionCount),
+        `${chapter.slug} should render ${reviewQuestionCount} review questions`,
+      ).toBe(reviewQuestionCount);
+    }
   });
 });
 
@@ -286,7 +338,7 @@ describe("personalized recommendations", () => {
     const discreteMath = roadmapSubjects.find((subject) => subject.id === "discrete-math");
     const readyChapters = discreteMath?.levels
       .flatMap((level) => level.chapters)
-      .filter((chapter) => chapter.status === "ready") ?? chapters;
+      .filter((chapter) => chapter.status === "ready") ?? getReadyChaptersBySubjectAndLevel("discrete-math", 1);
 
     const recommended = getRecommendedChapters(
       {
@@ -311,7 +363,7 @@ describe("personalized recommendations", () => {
     const discreteMath = roadmapSubjects.find((subject) => subject.id === "discrete-math");
     const readyChapters = discreteMath?.levels
       .flatMap((level) => level.chapters)
-      .filter((chapter) => chapter.status === "ready") ?? chapters;
+      .filter((chapter) => chapter.status === "ready") ?? getReadyChaptersBySubjectAndLevel("discrete-math", 1);
 
     const recommended = getRecommendedChapters(
       {
@@ -339,7 +391,7 @@ describe("personalized recommendations", () => {
     const discreteMath = roadmapSubjects.find((subject) => subject.id === "discrete-math");
     const readyChapters = discreteMath?.levels
       .flatMap((level) => level.chapters)
-      .filter((chapter) => chapter.status === "ready") ?? chapters;
+      .filter((chapter) => chapter.status === "ready") ?? getReadyChaptersBySubjectAndLevel("discrete-math", 1);
 
     const insights = getLearningInsights(
       {
@@ -377,7 +429,7 @@ describe("personalized recommendations", () => {
     const discreteMath = roadmapSubjects.find((subject) => subject.id === "discrete-math");
     const readyChapters = discreteMath?.levels
       .flatMap((level) => level.chapters)
-      .filter((chapter) => chapter.status === "ready") ?? chapters;
+      .filter((chapter) => chapter.status === "ready") ?? getReadyChaptersBySubjectAndLevel("discrete-math", 1);
 
     const insights = getLearningInsights(null, readyChapters, [], [], [
       {
@@ -397,7 +449,7 @@ describe("personalized recommendations", () => {
     const discreteMath = roadmapSubjects.find((subject) => subject.id === "discrete-math");
     const readyChapters = discreteMath?.levels
       .flatMap((level) => level.chapters)
-      .filter((chapter) => chapter.status === "ready") ?? chapters;
+      .filter((chapter) => chapter.status === "ready") ?? getReadyChaptersBySubjectAndLevel("discrete-math", 1);
 
     const context = buildAiLearningContext({
       profile: {

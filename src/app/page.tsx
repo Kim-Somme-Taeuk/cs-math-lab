@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { chapters, roadmapSubjects } from "@/lib/chapters";
+import { ReadyChapterLevelCarousel } from "@/components/home/ReadyChapterLevelCarousel";
+import { roadmapSubjects } from "@/lib/chapters";
 
-const readyChapters = chapters.filter((chapter) => chapter.status === "ready");
 const activeSubject = roadmapSubjects.find((subject) => subject.status === "active");
 
 export default function Home() {
@@ -30,37 +30,9 @@ export default function Home() {
               </Link>
             </div>
           </div>
-          <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="text-sm font-bold text-slate-500">현재 공개 중</p>
-                <h2 className="mt-1 text-xl font-black text-slate-950">{activeSubject?.title} Level 1</h2>
-              </div>
-              <span className="rounded-md bg-teal-50 px-2.5 py-1 text-xs font-bold text-teal-700">
-                {readyChapters.length}개 챕터
-              </span>
-            </div>
-            <div className="mt-4 grid grid-cols-2 gap-2">
-              {readyChapters.map((chapter) => (
-                <Link
-                  key={chapter.slug}
-                  href={`/chapters/${chapter.slug}`}
-                  className="rounded-md border border-slate-200 bg-white px-3 py-2 hover:border-teal-500"
-                >
-                  <p className="text-xs font-bold text-teal-700">
-                    {String(chapter.order).padStart(2, "0")}
-                  </p>
-                  <h2 className="mt-0.5 text-sm font-bold text-slate-950">{chapter.title}</h2>
-                </Link>
-              ))}
-            </div>
-            <Link
-              href="/roadmap"
-              className="mt-4 inline-flex w-full justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800 hover:bg-slate-100"
-            >
-              전체 로드맵 보기
-            </Link>
-          </div>
+          {activeSubject ? (
+            <ReadyChapterLevelCarousel subjectTitle={activeSubject.title} levels={activeSubject.levels} />
+          ) : null}
         </div>
       </section>
 

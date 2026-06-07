@@ -15,7 +15,7 @@ test("subject page visually separates ready and planned chapters", async ({ page
   const readyCard = page.getByRole("link", { name: /명제와 논리/ });
   await expect(readyCard.getByText("공개 중")).toBeVisible();
 
-  const plannedCard = page.locator("li").filter({ hasText: "알고리즘 분석과 점근 표기" }).locator("div").first();
+  const plannedCard = page.locator("li").filter({ hasText: "이산확률" }).locator("div").first();
   await expect(plannedCard.getByText("예정").first()).toBeVisible();
 
   const readyClassName = await readyCard.evaluate((element) => element.className);
@@ -33,6 +33,43 @@ test("subject cards open the matching roadmap subject", async ({ page }) => {
   await expect(page).toHaveURL(/\/subjects\/linear-algebra$/);
   await expect(page.getByRole("heading", { name: "선형대수" })).toBeVisible();
   await expect(page.getByText("Level 1. 벡터와 행렬 입문")).toBeVisible();
+});
+
+test("home ready chapters switch by discrete math level", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page.getByText("Level 1. 입문")).toBeVisible();
+  await expect(page.getByRole("link", { name: /명제와 논리/ })).toBeVisible();
+
+  await page.getByRole("button", { name: "다음 레벨" }).click();
+  await expect(page.getByText("Level 2. 핵심 확장")).toBeVisible();
+  await expect(page.getByRole("link", { name: /증명 기법/ })).toBeVisible();
+
+  await page.getByRole("button", { name: "다음 레벨" }).click();
+  await expect(page.getByText("Level 3. 컴공 응용")).toBeVisible();
+  await expect(page.getByRole("link", { name: /점근적 분석/ })).toBeVisible();
+});
+
+test("asymptotic analysis chapter is available", async ({ page }) => {
+  await page.goto("/chapters/asymptotic-analysis");
+
+  await expect(page.getByRole("heading", { name: "점근적 분석" })).toBeVisible();
+  await expect(page.getByText("코드를 보고 성장률을 읽는 법")).toBeVisible();
+  await expect(page.getByRole("region", { name: "문제 풀기" }).last()).toBeVisible();
+
+  const hasHorizontalOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+  expect(hasHorizontalOverflow).toBe(false);
+});
+
+test("recursion and recurrences chapter is available", async ({ page }) => {
+  await page.goto("/chapters/recursion-recurrences");
+
+  await expect(page.getByRole("heading", { name: "재귀와 점화식 심화" })).toBeVisible();
+  await expect(page.getByText("재귀 코드를 보면 점화식으로 바꿀 수 있다")).toBeVisible();
+  await expect(page.getByRole("region", { name: "재귀 코드 추적" })).toBeVisible();
+
+  const hasHorizontalOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+  expect(hasHorizontalOverflow).toBe(false);
 });
 
 test("logic interaction updates basic operators and stays within mobile width", async ({ page }) => {

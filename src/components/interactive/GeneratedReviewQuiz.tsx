@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { generateSetReviewQuestions } from "@/lib/generatedReview";
 import { getQuestionId, saveExplanationFeedback, saveQuizRecord } from "@/lib/learningRecords";
 import { getConceptIdForChapter } from "@/lib/personalization";
+import { normalizeReviewQuestions } from "@/lib/reviewQuestions";
 
 function renderInlineCode(text: string) {
   return text.split(/(`[^`]+`)/g).map((part, index) => {
@@ -26,14 +27,15 @@ export default function GeneratedReviewQuiz({ chapter }: { chapter: "sets" }) {
     if (chapter === "sets") return generateSetReviewQuestions(variants);
     return [];
   }, [chapter, variants]);
-  const currentQuestion = questions[currentIndex];
+  const normalizedQuestions = useMemo(() => normalizeReviewQuestions(chapter, "종합 점검", questions), [chapter, questions]);
+  const currentQuestion = normalizedQuestions[currentIndex];
   const selected = answers[currentIndex];
   const isCorrect = selected === currentQuestion.correctIndex;
-  const answeredCount = questions.filter((_, index) => answers[index] !== undefined).length;
-  const score = questions.reduce((total, question, index) => {
+  const answeredCount = normalizedQuestions.filter((_, index) => answers[index] !== undefined).length;
+  const score = normalizedQuestions.reduce((total, question, index) => {
     return total + (answers[index] === question.correctIndex ? 1 : 0);
   }, 0);
-  const allAnswered = questions.every((_, index) => answers[index] !== undefined);
+  const allAnswered = normalizedQuestions.every((_, index) => answers[index] !== undefined);
   const slug = "sets";
   const chapterConceptId = getConceptIdForChapter(slug);
   const currentQuestionId = getQuestionId(slug, "종합 점검", currentQuestion, currentIndex);
@@ -79,12 +81,12 @@ export default function GeneratedReviewQuiz({ chapter }: { chapter: "sets" }) {
           <h3 className="m-0 text-lg font-black text-slate-950">종합 점검</h3>
         </div>
         <p className="rounded-md bg-white px-3 py-2 text-sm font-black text-slate-950">
-          {submitted ? `${score} / ${questions.length} 정답` : `${answeredCount} / ${questions.length} 응답`}
+          {submitted ? `${score} / ${normalizedQuestions.length} 정답` : `${answeredCount} / ${normalizedQuestions.length} 응답`}
         </p>
       </div>
 
       <div className="mt-4 flex gap-1.5" aria-label="문제 진행 상황">
-        {questions.map((_, index) => (
+        {normalizedQuestions.map((_, index) => (
           <button
             key={index}
             type="button"
@@ -98,7 +100,7 @@ export default function GeneratedReviewQuiz({ chapter }: { chapter: "sets" }) {
       </div>
 
       <fieldset className="mt-4 rounded-lg border border-slate-200 bg-white p-3 sm:p-4">
-        <legend className="px-1 text-sm font-bold text-slate-500">문제 {currentIndex + 1} / {questions.length}</legend>
+        <legend className="px-1 text-sm font-bold text-slate-500">문제 {currentIndex + 1} / {normalizedQuestions.length}</legend>
         <p className="mt-2 font-bold leading-7 text-slate-950">{renderInlineCode(currentQuestion.prompt)}</p>
         <div className="mt-3 grid gap-2 sm:mt-4">
           {currentQuestion.choices.map((choice, choiceIndex) => {
@@ -214,8 +216,8 @@ export default function GeneratedReviewQuiz({ chapter }: { chapter: "sets" }) {
           </button>
           <button
             type="button"
-            disabled={currentIndex === questions.length - 1}
-            onClick={() => setCurrentIndex((current) => Math.min(questions.length - 1, current + 1))}
+            disabled={currentIndex === normalizedQuestions.length - 1}
+            onClick={() => setCurrentIndex((current) => Math.min(normalizedQuestions.length - 1, current + 1))}
             className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-300"
           >
             다음
@@ -226,7 +228,7 @@ export default function GeneratedReviewQuiz({ chapter }: { chapter: "sets" }) {
           disabled={!allAnswered}
           onClick={() => {
             setSubmitted(true);
-            saveQuizRecord({ slug, title: "종합 점검", questions, answers });
+            saveQuizRecord({ slug, title: "종합 점검", questions: normalizedQuestions, answers });
           }}
           className="rounded-md bg-slate-950 px-5 py-3 text-sm font-black text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"
         >

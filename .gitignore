@@ -16,6 +16,7 @@ build/
 *.pem
 AGENTS.md
 mise.toml
+.codex/
 
 # debug logs
 npm-debug.log*

@@ -146,6 +146,60 @@ const learningMetaBySlug: Record<string, LearningMeta> = {
     conceptTags: ["트리", "재귀 구조"],
     trackTags: ["cs-foundation", "coding-test", "practice"],
   },
+  "asymptotic-analysis": {
+    subjectId: "discrete-math",
+    prerequisites: ["recurrences", "graphs"],
+    conceptTags: ["점근 표기", "알고리즘 분석", "성능"],
+    trackTags: ["cs-foundation", "coding-test", "practice"],
+  },
+  "recursion-recurrences": {
+    subjectId: "discrete-math",
+    prerequisites: ["recurrences", "induction"],
+    conceptTags: ["재귀", "점화식", "분할 정복"],
+    trackTags: ["coding-test", "practice", "code"],
+  },
+  "discrete-probability": {
+    subjectId: "discrete-math",
+    prerequisites: ["counting"],
+    conceptTags: ["이산확률", "사건", "경우의 수"],
+    trackTags: ["cs-foundation", "data-analysis", "practice"],
+  },
+  "number-theory": {
+    subjectId: "discrete-math",
+    prerequisites: ["sets"],
+    conceptTags: ["정수론", "약수", "배수"],
+    trackTags: ["cs-foundation", "coding-test"],
+  },
+  "modular-arithmetic": {
+    subjectId: "discrete-math",
+    prerequisites: ["number-theory"],
+    conceptTags: ["모듈러 연산", "나머지", "순환"],
+    trackTags: ["coding-test", "code"],
+  },
+  "euclidean-algorithm": {
+    subjectId: "discrete-math",
+    prerequisites: ["number-theory", "modular-arithmetic"],
+    conceptTags: ["유클리드 호제법", "최대공약수"],
+    trackTags: ["coding-test", "practice", "code"],
+  },
+  "boolean-algebra": {
+    subjectId: "discrete-math",
+    prerequisites: ["logic", "logical-equivalence"],
+    conceptTags: ["부울 대수", "논리 연산", "조건식 최적화"],
+    trackTags: ["cs-foundation", "code"],
+  },
+  "dag-topological-sort": {
+    subjectId: "discrete-math",
+    prerequisites: ["graphs", "partial-orders"],
+    conceptTags: ["DAG", "위상 정렬", "의존성"],
+    trackTags: ["cs-foundation", "coding-test", "practice"],
+  },
+  "shortest-paths": {
+    subjectId: "discrete-math",
+    prerequisites: ["graphs"],
+    conceptTags: ["최단 경로", "그래프", "비용"],
+    trackTags: ["coding-test", "practice"],
+  },
 };
 
 function withChapterDefaults(chapters: Chapter[]) {
@@ -167,7 +221,7 @@ export function getChapterConceptId(slug: string) {
   return getChapter(slug)?.conceptId ?? `chapter:${slug}`;
 }
 
-export const chapters: Chapter[] = withLearningMeta([
+const discreteMathLevel1Chapters: Chapter[] = withLearningMeta([
   {
     slug: "logic",
     order: 1,
@@ -250,7 +304,7 @@ export const chapters: Chapter[] = withLearningMeta([
   },
 ]);
 
-const level2Chapters: Chapter[] = withLearningMeta([
+const discreteMathLevel2Chapters: Chapter[] = withLearningMeta([
   {
     slug: "proof-techniques",
     order: 1,
@@ -343,26 +397,26 @@ const level2Chapters: Chapter[] = withLearningMeta([
   },
 ]);
 
-const level3Chapters: Chapter[] = withChapterDefaults([
+const discreteMathLevel3Chapters: Chapter[] = withLearningMeta([
   {
     slug: "asymptotic-analysis",
     order: 1,
     level: 3,
-    title: "알고리즘 분석과 점근 표기",
-    shortTitle: "점근 표기",
-    description: "입력 크기에 따른 실행 시간 증가를 큰 흐름으로 비교합니다.",
+    title: "점근적 분석",
+    shortTitle: "점근 분석",
+    description: "입력 크기에 따른 실행 시간 증가를 Big-O 관점으로 비교합니다.",
     csConnection: "Big-O, 성능 분석",
-    status: "planned",
+    status: "ready",
   },
   {
     slug: "recursion-recurrences",
     order: 2,
     level: 3,
-    title: "재귀와 점화식 풀이",
+    title: "재귀와 점화식 심화",
     shortTitle: "재귀 점화식",
     description: "재귀 코드의 실행 구조를 점화식으로 해석합니다.",
     csConnection: "분할 정복, 재귀 성능",
-    status: "planned",
+    status: "ready",
   },
   {
     slug: "discrete-probability",
@@ -398,8 +452,8 @@ const level3Chapters: Chapter[] = withChapterDefaults([
     slug: "euclidean-algorithm",
     order: 6,
     level: 3,
-    title: "유클리드 호제법",
-    shortTitle: "호제법",
+    title: "유클리드 알고리즘",
+    shortTitle: "유클리드",
     description: "최대공약수를 빠르게 구하는 반복 구조를 배웁니다.",
     csConnection: "정수 알고리즘, 암호 기초",
     status: "planned",
@@ -436,24 +490,24 @@ const level3Chapters: Chapter[] = withChapterDefaults([
   },
 ]);
 
-export const roadmapLevels: RoadmapLevel[] = [
+export const discreteMathLevels: RoadmapLevel[] = [
   {
     level: 1,
     title: "Level 1. 입문",
     description: "현재 MVP 범위입니다. 컴공 전공 학습에 필요한 이산수학 첫 도구를 다룹니다.",
-    chapters,
+    chapters: discreteMathLevel1Chapters,
   },
   {
     level: 2,
     title: "Level 2. 핵심 확장",
-    description: "입문 이후 증명, 논리, 관계, 세기 원리를 더 깊게 확장할 예정입니다.",
-    chapters: level2Chapters,
+    description: "입문 이후 증명, 논리, 관계, 세기 원리를 더 깊게 확장합니다.",
+    chapters: discreteMathLevel2Chapters,
   },
   {
     level: 3,
     title: "Level 3. 컴공 응용",
     description: "알고리즘, 그래프, 정수론처럼 전공 과목과 직접 맞닿는 주제로 확장할 예정입니다.",
-    chapters: level3Chapters,
+    chapters: discreteMathLevel3Chapters,
   },
 ];
 
@@ -627,7 +681,7 @@ export const roadmapSubjects: RoadmapSubject[] = [
     title: "이산수학",
     description: "논리, 집합, 함수, 관계, 그래프처럼 컴공 기초와 직접 맞닿는 수학입니다.",
     status: "active",
-    levels: roadmapLevels,
+    levels: discreteMathLevels,
   },
   {
     id: "linear-algebra",
@@ -664,6 +718,17 @@ export function getReadyChapters() {
     .flatMap((subject) => subject.levels)
     .flatMap((level) => level.chapters)
     .filter((chapter) => chapter.status === "ready");
+}
+
+export function getChaptersBySubjectAndLevel(subjectId: MathSubjectId, level: RoadmapLevelId) {
+  return roadmapSubjects
+    .find((subject) => subject.id === subjectId)
+    ?.levels.find((roadmapLevel) => roadmapLevel.level === level)
+    ?.chapters ?? [];
+}
+
+export function getReadyChaptersBySubjectAndLevel(subjectId: MathSubjectId, level: RoadmapLevelId) {
+  return getChaptersBySubjectAndLevel(subjectId, level).filter((chapter) => chapter.status === "ready");
 }
 
 export function getReadyChaptersInSameLevel(slug: string) {

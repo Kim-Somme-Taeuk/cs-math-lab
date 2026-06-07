@@ -1,5 +1,8 @@
 import type { ComponentType } from "react";
 
+// Chapter pages use this map to turn a route slug like "logic" into the
+// corresponding MDX module. A ready chapter needs both metadata in
+// chapters.ts and a loader here, otherwise /chapters/[slug] returns 404.
 export const chapterContentLoaders: Record<string, () => Promise<{ default: ComponentType }>> = {
   logic: () => import("@/content/discrete-math/level-1/logic.mdx"),
   conditionals: () => import("@/content/discrete-math/level-1/conditionals.mdx"),
@@ -18,4 +21,6 @@ export const chapterContentLoaders: Record<string, () => Promise<{ default: Comp
   "pigeonhole-principle": () => import("@/content/discrete-math/level-2/pigeonhole-principle.mdx"),
   recurrences: () => import("@/content/discrete-math/level-2/recurrences.mdx"),
   trees: () => import("@/content/discrete-math/level-2/trees.mdx"),
+  "asymptotic-analysis": () => import("@/content/discrete-math/level-3/asymptotic-analysis.mdx"),
+  "recursion-recurrences": () => import("@/content/discrete-math/level-3/recursion-recurrences.mdx"),
 };

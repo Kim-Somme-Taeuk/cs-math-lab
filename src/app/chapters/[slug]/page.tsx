@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ChapterSlugProvider } from "@/components/interactive/ChapterSlugProvider";
 import { getChapter, getChapterNavigation, getReadyChapters, getReadyChaptersInSameLevel } from "@/lib/chapters";
 import { chapterContentLoaders } from "@/lib/content";
 
@@ -110,14 +111,16 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem]">
         <article className="min-w-0 border-y border-slate-200 bg-white p-4 sm:rounded-lg sm:border sm:p-8">
           <p className="text-sm font-bold text-teal-700">
-            Chapter {String(chapter.order).padStart(2, "0")}
+            Level {chapter.level}-{chapter.order}
           </p>
           <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
             {chapter.title}
           </h1>
           <p className="mt-4 text-lg leading-8 text-slate-700">{chapter.description}</p>
           <div className="math-content mt-8">
-            <Content />
+            <ChapterSlugProvider slug={slug}>
+              <Content />
+            </ChapterSlugProvider>
           </div>
         </article>
 
