@@ -76,16 +76,16 @@ local_output_change = jacobian @ input_change
 <MultipleChoiceQuiz
   title="종합 점검"
   questions={[
-    { prompt: "그래디언트는 무엇을 나타내나?", choices: ["스칼라 함수가 가장 빠르게 증가하는 방향", "항상 회전 행렬", "특이값", "문자열"], correctIndex: 0, explanation: "그래디언트는 방향 벡터입니다.", conceptTags: ["그래디언트"], questionType: "definition", reasonTags: ["증가 방향"] },
-    { prompt: "손실을 줄이려면 보통 어느 방향으로 움직이나?", choices: ["그래디언트의 반대 방향", "항상 같은 방향", "무작위 방향만", "회전축 방향만"], correctIndex: 0, explanation: "경사하강법은 감소 방향으로 움직입니다.", conceptTags: ["최적화"], questionType: "descent", reasonTags: ["반대 방향"] },
-    { prompt: "야코비안은 무엇인가?", choices: ["벡터 함수의 국소 변화율을 모은 행렬", "항상 대각 행렬", "PCA 결과", "해시 테이블"], correctIndex: 0, explanation: "야코비안은 입력 변화와 출력 변화의 선형 근사입니다.", conceptTags: ["야코비안"], questionType: "definition", reasonTags: ["변화율 행렬"] },
-    { prompt: "국소 선형 근사는 어떤 뜻인가?", choices: ["한 점 근처에서 함수를 선형변환처럼 보는 것", "전체 함수가 항상 선형이라는 뜻", "행렬을 쓰지 않는 것", "오차가 항상 0이라는 뜻"], correctIndex: 0, explanation: "근사는 근처에서만 유효할 수 있습니다.", conceptTags: ["국소 선형화"], questionType: "local", reasonTags: ["근처"] },
-    { prompt: "야코비안 곱 `J dx`는 무엇을 근사하나?", choices: ["작은 입력 변화에 따른 출력 변화", "이미지 압축률", "정렬 결과", "해시 충돌"], correctIndex: 0, explanation: "야코비안은 변화 전달을 선형적으로 근사합니다.", conceptTags: ["야코비안"], questionType: "matrix-product", reasonTags: ["변화 전달"] },
-    { prompt: "그래디언트를 경로 전체로 보면 왜 문제인가?", choices: ["현재 위치의 방향 정보라는 점을 놓친다.", "항상 정확해서 문제없다.", "야코비안과 같아진다.", "회전이 된다."], correctIndex: 0, explanation: "그래디언트는 위치마다 달라질 수 있습니다.", conceptTags: ["오해"], questionType: "pitfall", reasonTags: ["현재 위치"] },
+    { prompt: "그래디언트는 무엇을 나타내나?", choices: ["항상 회전 행렬", "스칼라 함수가 가장 빠르게 증가하는 방향", "특이값", "문자열"], correctIndex: 1, explanation: "그래디언트는 방향 벡터입니다.", conceptTags: ["그래디언트"], questionType: "definition", reasonTags: ["증가 방향"] },
+    { prompt: "손실을 줄이려면 보통 어느 방향으로 움직이나?", choices: ["항상 같은 방향", "무작위 방향만", "그래디언트의 반대 방향", "회전축 방향만"], correctIndex: 2, explanation: "경사하강법은 감소 방향으로 움직입니다.", conceptTags: ["최적화"], questionType: "descent", reasonTags: ["반대 방향"] },
+    { prompt: "야코비안은 무엇인가?", choices: ["항상 대각 행렬", "PCA 결과", "해시 테이블", "벡터 함수의 국소 변화율을 모은 행렬"], correctIndex: 3, explanation: "야코비안은 입력 변화와 출력 변화의 선형 근사입니다.", conceptTags: ["야코비안"], questionType: "definition", reasonTags: ["변화율 행렬"] },
+    { prompt: "국소 선형 근사는 어떤 뜻인가?", choices: ["전체 함수가 항상 선형이라는 뜻", "한 점 근처에서 함수를 선형변환처럼 보는 것", "행렬을 쓰지 않는 것", "오차가 항상 0이라는 뜻"], correctIndex: 1, explanation: "근사는 근처에서만 유효할 수 있습니다.", conceptTags: ["국소 선형화"], questionType: "local", reasonTags: ["근처"] },
+    { prompt: "야코비안 곱 `J dx`는 무엇을 근사하나?", choices: ["이미지 압축률", "정렬 결과", "작은 입력 변화에 따른 출력 변화", "해시 충돌"], correctIndex: 2, explanation: "야코비안은 변화 전달을 선형적으로 근사합니다.", conceptTags: ["야코비안"], questionType: "matrix-product", reasonTags: ["변화 전달"] },
+    { prompt: "그래디언트를 경로 전체로 보면 왜 문제인가?", choices: ["항상 정확해서 문제없다.", "야코비안과 같아진다.", "회전이 된다.", "현재 위치의 방향 정보라는 점을 놓친다."], correctIndex: 3, explanation: "그래디언트는 위치마다 달라질 수 있습니다.", conceptTags: ["오해"], questionType: "pitfall", reasonTags: ["현재 위치"] },
     { prompt: "물리 시뮬레이션에서 야코비안이 쓰이는 감각은?", choices: ["상태 변화가 출력에 미치는 민감도", "문자열 번역", "파일 압축", "정수 나눗셈"], correctIndex: 0, explanation: "야코비안은 복잡한 시스템의 변화 민감도를 봅니다.", conceptTags: ["시뮬레이션"], questionType: "application", reasonTags: ["민감도"] },
-    { prompt: "ML에서 그래디언트가 중요한 이유는?", choices: ["파라미터를 어떻게 바꿀지 알려 주기 때문", "데이터를 회전만 하기 때문", "행렬을 없애기 때문", "조건수를 항상 1로 만들기 때문"], correctIndex: 0, explanation: "학습은 손실을 줄이는 방향 탐색입니다.", conceptTags: ["ML"], questionType: "ml", reasonTags: ["학습 방향"] },
-    { prompt: "비선형 함수와 선형대수가 연결되는 지점은?", choices: ["작은 범위에서 선형 근사로 읽을 수 있어서", "비선형 함수는 항상 행렬이라서", "미분이 필요 없어서", "출력이 항상 0이라서"], correctIndex: 0, explanation: "미분은 국소 선형화 관점을 제공합니다.", conceptTags: ["선형 근사"], questionType: "connection", reasonTags: ["국소"] },
-    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["다변수해석학 심화와 자동미분 내부 구현", "그래디언트 감각", "야코비안 감각", "최적화 연결"], correctIndex: 0, explanation: "응용에 필요한 변화 방향 감각에 집중합니다.", conceptTags: ["범위 조절"], questionType: "scope", reasonTags: ["심화 제외"] },
+    { prompt: "ML에서 그래디언트가 중요한 이유는?", choices: ["데이터를 회전만 하기 때문", "행렬을 없애기 때문", "파라미터를 어떻게 바꿀지 알려 주기 때문", "조건수를 항상 1로 만들기 때문"], correctIndex: 2, explanation: "학습은 손실을 줄이는 방향 탐색입니다.", conceptTags: ["ML"], questionType: "ml", reasonTags: ["학습 방향"] },
+    { prompt: "비선형 함수와 선형대수가 연결되는 지점은?", choices: ["비선형 함수는 항상 행렬이라서", "미분이 필요 없어서", "출력이 항상 0이라서", "작은 범위에서 선형 근사로 읽을 수 있어서"], correctIndex: 3, explanation: "미분은 국소 선형화 관점을 제공합니다.", conceptTags: ["선형 근사"], questionType: "connection", reasonTags: ["국소"] },
+    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["그래디언트 감각", "다변수해석학 심화와 자동미분 내부 구현", "야코비안 감각", "최적화 연결"], correctIndex: 1, explanation: "응용에 필요한 변화 방향 감각에 집중합니다.", conceptTags: ["범위 조절"], questionType: "scope", reasonTags: ["심화 제외"] },
   ]}
 />
 

@@ -75,16 +75,16 @@ approx = U[:, :k] @ np.diag(singular_values[:k]) @ Vt[:k, :]
 <MultipleChoiceQuiz
   title="종합 점검"
   questions={[
-    { prompt: "SVD는 행렬을 어떻게 읽게 해 주나?", choices: ["방향과 강도의 분해", "문자열 정렬", "확률 합", "조건문"], correctIndex: 0, explanation: "SVD는 행렬의 중요한 방향 구조를 보여 줍니다.", conceptTags: ["SVD"], questionType: "definition", reasonTags: ["분해"] },
-    { prompt: "특이값이 큰 방향은?", choices: ["행렬이 강하게 살리는 방향", "항상 버릴 방향", "문자열 방향", "해시 방향"], correctIndex: 0, explanation: "큰 특이값은 큰 영향력을 뜻합니다.", conceptTags: ["특이값"], questionType: "singular-value", reasonTags: ["강도"] },
-    { prompt: "저랭크 근사는 무엇인가?", choices: ["중요한 성분 몇 개로 행렬을 근사하기", "행렬을 무조건 0으로 만들기", "차원을 항상 늘리기", "정렬만 하기"], correctIndex: 0, explanation: "큰 성분만 남겨 단순한 행렬로 근사합니다.", conceptTags: ["저랭크 근사"], questionType: "low-rank", reasonTags: ["근사"] },
-    { prompt: "이미지 압축에서 SVD가 쓰이는 이유는?", choices: ["큰 특이값만 남겨도 주요 구조를 보존할 수 있어서", "픽셀을 무작위로 바꿔서", "회전을 금지해서", "항상 손실이 없어서"], correctIndex: 0, explanation: "중요한 성분을 남기면 근사 이미지가 됩니다.", conceptTags: ["이미지 압축"], questionType: "application", reasonTags: ["주요 구조"] },
-    { prompt: "추천 시스템에서 SVD 감각은?", choices: ["사용자-아이템 행렬의 잠재 요인을 찾는 것", "그래픽스 투영만", "해시 충돌만", "문장 토큰화만"], correctIndex: 0, explanation: "행렬의 숨은 구조를 낮은 차원 요인으로 봅니다.", conceptTags: ["추천 시스템"], questionType: "recommender", reasonTags: ["잠재 요인"] },
-    { prompt: "SVD와 PCA의 연결은?", choices: ["둘 다 중요한 방향을 찾는 관점과 연결된다.", "완전히 무관하다.", "PCA는 행렬을 쓰지 않는다.", "SVD는 데이터에 못 쓴다."], correctIndex: 0, explanation: "PCA 계산과 해석에 SVD가 자주 쓰입니다.", conceptTags: ["PCA"], questionType: "connection", reasonTags: ["주요 방향"] },
+    { prompt: "SVD는 행렬을 어떻게 읽게 해 주나?", choices: ["문자열 정렬", "방향과 강도의 분해", "확률 합", "조건문"], correctIndex: 1, explanation: "SVD는 행렬의 중요한 방향 구조를 보여 줍니다.", conceptTags: ["SVD"], questionType: "definition", reasonTags: ["분해"] },
+    { prompt: "특이값이 큰 방향은?", choices: ["항상 버릴 방향", "문자열 방향", "행렬이 강하게 살리는 방향", "해시 방향"], correctIndex: 2, explanation: "큰 특이값은 큰 영향력을 뜻합니다.", conceptTags: ["특이값"], questionType: "singular-value", reasonTags: ["강도"] },
+    { prompt: "저랭크 근사는 무엇인가?", choices: ["행렬을 무조건 0으로 만들기", "차원을 항상 늘리기", "정렬만 하기", "중요한 성분 몇 개로 행렬을 근사하기"], correctIndex: 3, explanation: "큰 성분만 남겨 단순한 행렬로 근사합니다.", conceptTags: ["저랭크 근사"], questionType: "low-rank", reasonTags: ["근사"] },
+    { prompt: "이미지 압축에서 SVD가 쓰이는 이유는?", choices: ["픽셀을 무작위로 바꿔서", "큰 특이값만 남겨도 주요 구조를 보존할 수 있어서", "회전을 금지해서", "항상 손실이 없어서"], correctIndex: 1, explanation: "중요한 성분을 남기면 근사 이미지가 됩니다.", conceptTags: ["이미지 압축"], questionType: "application", reasonTags: ["주요 구조"] },
+    { prompt: "추천 시스템에서 SVD 감각은?", choices: ["그래픽스 투영만", "해시 충돌만", "사용자-아이템 행렬의 잠재 요인을 찾는 것", "문장 토큰화만"], correctIndex: 2, explanation: "행렬의 숨은 구조를 낮은 차원 요인으로 봅니다.", conceptTags: ["추천 시스템"], questionType: "recommender", reasonTags: ["잠재 요인"] },
+    { prompt: "SVD와 PCA의 연결은?", choices: ["완전히 무관하다.", "PCA는 행렬을 쓰지 않는다.", "SVD는 데이터에 못 쓴다.", "둘 다 중요한 방향을 찾는 관점과 연결된다."], correctIndex: 3, explanation: "PCA 계산과 해석에 SVD가 자주 쓰입니다.", conceptTags: ["PCA"], questionType: "connection", reasonTags: ["주요 방향"] },
     { prompt: "작은 특이값을 버릴 때 주의할 점은?", choices: ["목표에 필요한 정보가 사라질 수 있다.", "항상 정확해진다.", "원본과 항상 같다.", "행렬이 커진다."], correctIndex: 0, explanation: "저랭크 근사는 정보 손실을 동반할 수 있습니다.", conceptTags: ["정보 손실"], questionType: "limitation", reasonTags: ["작은 성분"] },
-    { prompt: "SVD를 계산 공식으로만 외우면 놓치는 것은?", choices: ["행렬 구조 해석", "문자열 길이", "조건문", "CSS"], correctIndex: 0, explanation: "응용에서는 방향과 강도 해석이 중요합니다.", conceptTags: ["해석"], questionType: "pitfall", reasonTags: ["구조"] },
-    { prompt: "SVD가 거의 모든 행렬에 유용한 이유는?", choices: ["정방행렬이 아니어도 분해 관점을 줄 수 있어서", "항상 대각화와 같아서", "벡터가 필요 없어서", "확률을 삭제해서"], correctIndex: 0, explanation: "SVD는 매우 넓은 행렬에 적용되는 강력한 도구입니다.", conceptTags: ["행렬 분해"], questionType: "generality", reasonTags: ["넓은 적용"] },
-    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["SVD 계산 알고리즘과 엄밀 증명", "특이값 감각", "저랭크 근사", "응용 연결"], correctIndex: 0, explanation: "여기서는 맛보기와 응용 감각만 봅니다.", conceptTags: ["범위 조절"], questionType: "scope", reasonTags: ["증명 제외"] },
+    { prompt: "SVD를 계산 공식으로만 외우면 놓치는 것은?", choices: ["문자열 길이", "조건문", "행렬 구조 해석", "CSS"], correctIndex: 2, explanation: "응용에서는 방향과 강도 해석이 중요합니다.", conceptTags: ["해석"], questionType: "pitfall", reasonTags: ["구조"] },
+    { prompt: "SVD가 거의 모든 행렬에 유용한 이유는?", choices: ["항상 대각화와 같아서", "벡터가 필요 없어서", "확률을 삭제해서", "정방행렬이 아니어도 분해 관점을 줄 수 있어서"], correctIndex: 3, explanation: "SVD는 매우 넓은 행렬에 적용되는 강력한 도구입니다.", conceptTags: ["행렬 분해"], questionType: "generality", reasonTags: ["넓은 적용"] },
+    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["특이값 감각", "SVD 계산 알고리즘과 엄밀 증명", "저랭크 근사", "응용 연결"], correctIndex: 1, explanation: "여기서는 맛보기와 응용 감각만 봅니다.", conceptTags: ["범위 조절"], questionType: "scope", reasonTags: ["증명 제외"] },
   ]}
 />
 

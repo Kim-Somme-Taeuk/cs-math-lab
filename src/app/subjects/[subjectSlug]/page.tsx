@@ -183,6 +183,8 @@ function ChapterVisual({ chapter }: { chapter: Chapter }) {
         <LevelOneVisual slug={chapter.slug} stroke={stroke} fill={fill} softFill={softFill} text={text} />
       ) : chapter.level === 2 && chapter.subjectId === "discrete-math" ? (
         <LevelTwoVisual slug={chapter.slug} stroke={stroke} fill={fill} softFill={softFill} text={text} />
+      ) : chapter.subjectId === "linear-algebra" ? (
+        <LinearAlgebraVisual slug={chapter.slug} level={chapter.level} stroke={stroke} fill={fill} softFill={softFill} text={text} />
       ) : (
         <PlannedVisual order={chapter.order} stroke={stroke} fill={fill} softFill={softFill} text={text} />
       )}
@@ -352,6 +354,44 @@ function LevelTwoVisual({
   return <MiniTreeVisual text={text} />;
 }
 
+function LinearAlgebraVisual({
+  slug,
+  level,
+  stroke,
+  fill,
+  softFill,
+  text,
+}: {
+  slug: string;
+  level: number;
+  stroke: string;
+  fill: string;
+  softFill: string;
+  text: string;
+}) {
+  if (level === 2) {
+    if (slug.includes("determinants") || slug.includes("rank") || slug.includes("systems")) {
+      return <MiniMatrixGridVisual stroke={stroke} fill={fill} text={text} />;
+    }
+
+    if (slug.includes("orthogonality") || slug.includes("least-squares")) {
+      return <MiniProjectionVisual text={text} />;
+    }
+
+    return <MiniVectorSpanVisual stroke={stroke} fill={fill} softFill={softFill} text={text} />;
+  }
+
+  if (slug.includes("coordinate") || slug.includes("affine") || slug.includes("graphics") || slug.includes("rotation")) {
+    return <MiniTransformAxesVisual text={text} />;
+  }
+
+  if (slug.includes("pca") || slug.includes("svd") || slug.includes("factorization")) {
+    return <MiniDataAxesVisual fill={fill} text={text} />;
+  }
+
+  return <MiniLayerVisual stroke={stroke} fill={fill} text={text} />;
+}
+
 function MiniGraphVisual({ text }: { text: string }) {
   return (
     <div className={`flex h-full items-center justify-center ${text}`}>
@@ -367,6 +407,92 @@ function MiniGraphVisual({ text }: { text: string }) {
           <circle cx="42" cy="39" r="5" />
         </g>
       </svg>
+    </div>
+  );
+}
+
+function MiniVectorSpanVisual({ stroke, fill, softFill, text }: { stroke: string; fill: string; softFill: string; text: string }) {
+  return (
+    <div className={`relative h-full ${text}`}>
+      <span className={`absolute left-4 top-6 h-px w-20 ${fill}`} />
+      <span className={`absolute left-12 top-3 h-9 w-px ${fill}`} />
+      <span className={`absolute left-12 top-6 h-3 w-3 rounded-full ${fill}`} />
+      <span className={`absolute left-20 top-3 h-7 w-7 rounded border ${stroke} ${softFill}`} />
+    </div>
+  );
+}
+
+function MiniMatrixGridVisual({ stroke, fill, text }: { stroke: string; fill: string; text: string }) {
+  return (
+    <div className={`flex h-full items-center justify-center gap-1 ${text}`}>
+      {Array.from({ length: 9 }).map((_, index) => (
+        <span key={index} className={`h-3 w-3 rounded-sm border ${stroke} ${index % 2 === 0 ? fill : "bg-white"}`} />
+      ))}
+    </div>
+  );
+}
+
+function MiniProjectionVisual({ text }: { text: string }) {
+  return (
+    <div className={`flex h-full items-center justify-center ${text}`}>
+      <svg aria-hidden="true" viewBox="0 0 112 56" className="h-14 w-28">
+        <g fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2.2">
+          <path d="M22 42 H90" opacity="0.45" />
+          <path d="M36 18 L64 42" />
+          <path d="M36 18 L36 42" strokeDasharray="3 3" opacity="0.65" />
+        </g>
+        <g fill="currentColor">
+          <circle cx="36" cy="18" r="4.5" />
+          <circle cx="36" cy="42" r="4.5" />
+          <circle cx="64" cy="42" r="4.5" />
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+function MiniTransformAxesVisual({ text }: { text: string }) {
+  return (
+    <div className={`flex h-full items-center justify-center ${text}`}>
+      <svg aria-hidden="true" viewBox="0 0 112 56" className="h-14 w-28">
+        <g fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2.4">
+          <path d="M32 42 L78 42" />
+          <path d="M32 42 L32 11" />
+          <path d="M58 42 L88 22" opacity="0.75" />
+          <path d="M58 42 L48 16" opacity="0.75" />
+        </g>
+        <g fill="currentColor">
+          <circle cx="32" cy="42" r="4" />
+          <circle cx="58" cy="42" r="4" />
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+function MiniDataAxesVisual({ fill, text }: { fill: string; text: string }) {
+  return (
+    <div className={`relative h-full ${text}`}>
+      <span className={`absolute left-6 top-8 h-2 w-2 rounded-full ${fill}`} />
+      <span className={`absolute left-10 top-6 h-2 w-2 rounded-full ${fill}`} />
+      <span className={`absolute left-14 top-7 h-2 w-2 rounded-full ${fill}`} />
+      <span className={`absolute left-20 top-4 h-2 w-2 rounded-full ${fill}`} />
+      <span className={`absolute left-28 top-5 h-2 w-2 rounded-full ${fill}`} />
+      <span className="absolute left-7 top-8 h-0.5 w-24 rotate-[-16deg] rounded bg-current opacity-75" />
+    </div>
+  );
+}
+
+function MiniLayerVisual({ stroke, fill, text }: { stroke: string; fill: string; text: string }) {
+  return (
+    <div className={`flex h-full items-center justify-center gap-2 ${text}`}>
+      {[0, 1, 2].map((column) => (
+        <div key={column} className="grid gap-1">
+          {Array.from({ length: column === 1 ? 3 : 2 }).map((_, index) => (
+            <span key={index} className={`h-2.5 w-2.5 rounded-full border ${stroke} ${column === 1 ? fill : "bg-white"}`} />
+          ))}
+        </div>
+      ))}
     </div>
   );
 }

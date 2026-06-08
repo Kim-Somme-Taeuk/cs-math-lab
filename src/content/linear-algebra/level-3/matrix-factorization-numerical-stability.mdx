@@ -75,16 +75,16 @@ q, r = np.linalg.qr(A)
 <MultipleChoiceQuiz
   title="종합 점검"
   questions={[
-    { prompt: "실무에서 역행렬 직접 계산을 피하는 대표 이유는?", choices: ["비용과 수치 오차", "행렬이 없어서", "항상 불가능해서", "문자열 때문"], correctIndex: 0, explanation: "역행렬을 만드는 것은 비싸고 불안정할 수 있습니다.", conceptTags: ["역행렬"], questionType: "inverse", reasonTags: ["오차/비용"] },
-    { prompt: "행렬 분해는 무엇인가?", choices: ["행렬을 계산하기 쉬운 구조의 곱으로 나누기", "행렬을 삭제하기", "좌표를 금지하기", "확률로 바꾸기"], correctIndex: 0, explanation: "분해는 계산 구조를 좋게 만드는 도구입니다.", conceptTags: ["행렬 분해"], questionType: "definition", reasonTags: ["구조"] },
-    { prompt: "LU 분해 감각은?", choices: ["삼각 구조로 선형시스템을 풀기 쉽게 만들기", "회전만 표현하기", "이미지만 압축하기", "조건문 만들기"], correctIndex: 0, explanation: "LU는 solve를 효율적으로 만드는 분해입니다.", conceptTags: ["LU"], questionType: "lu", reasonTags: ["삼각"] },
-    { prompt: "QR 분해가 자주 연결되는 곳은?", choices: ["최소제곱과 안정적인 계산", "해시 충돌", "문자열 정렬", "그래프 BFS"], correctIndex: 0, explanation: "QR은 직교 구조를 활용해 계산을 안정적으로 합니다.", conceptTags: ["QR"], questionType: "qr", reasonTags: ["직교"] },
-    { prompt: "조건수는 어떤 감각인가?", choices: ["입력 흔들림이 출력에서 얼마나 커질 수 있는지", "배열 길이", "각도 단위", "문장 길이"], correctIndex: 0, explanation: "조건이 나쁘면 작은 오차가 크게 증폭될 수 있습니다.", conceptTags: ["조건수"], questionType: "condition-number", reasonTags: ["민감도"] },
-    { prompt: "부동소수점 계산에서 주의할 점은?", choices: ["반올림 오차가 누적될 수 있다.", "항상 정확한 실수다.", "오차가 절대 없다.", "행렬 곱이 불가능하다."], correctIndex: 0, explanation: "컴퓨터 숫자는 유한 정밀도입니다.", conceptTags: ["부동소수점"], questionType: "floating-point", reasonTags: ["반올림"] },
+    { prompt: "실무에서 역행렬 직접 계산을 피하는 대표 이유는?", choices: ["행렬이 없어서", "비용과 수치 오차", "항상 불가능해서", "문자열 때문"], correctIndex: 1, explanation: "역행렬을 만드는 것은 비싸고 불안정할 수 있습니다.", conceptTags: ["역행렬"], questionType: "inverse", reasonTags: ["오차/비용"] },
+    { prompt: "행렬 분해는 무엇인가?", choices: ["행렬을 삭제하기", "좌표를 금지하기", "행렬을 계산하기 쉬운 구조의 곱으로 나누기", "확률로 바꾸기"], correctIndex: 2, explanation: "분해는 계산 구조를 좋게 만드는 도구입니다.", conceptTags: ["행렬 분해"], questionType: "definition", reasonTags: ["구조"] },
+    { prompt: "LU 분해 감각은?", choices: ["회전만 표현하기", "이미지만 압축하기", "조건문 만들기", "삼각 구조로 선형시스템을 풀기 쉽게 만들기"], correctIndex: 3, explanation: "LU는 solve를 효율적으로 만드는 분해입니다.", conceptTags: ["LU"], questionType: "lu", reasonTags: ["삼각"] },
+    { prompt: "QR 분해가 자주 연결되는 곳은?", choices: ["해시 충돌", "최소제곱과 안정적인 계산", "문자열 정렬", "그래프 BFS"], correctIndex: 1, explanation: "QR은 직교 구조를 활용해 계산을 안정적으로 합니다.", conceptTags: ["QR"], questionType: "qr", reasonTags: ["직교"] },
+    { prompt: "조건수는 어떤 감각인가?", choices: ["배열 길이", "각도 단위", "입력 흔들림이 출력에서 얼마나 커질 수 있는지", "문장 길이"], correctIndex: 2, explanation: "조건이 나쁘면 작은 오차가 크게 증폭될 수 있습니다.", conceptTags: ["조건수"], questionType: "condition-number", reasonTags: ["민감도"] },
+    { prompt: "부동소수점 계산에서 주의할 점은?", choices: ["항상 정확한 실수다.", "오차가 절대 없다.", "행렬 곱이 불가능하다.", "반올림 오차가 누적될 수 있다."], correctIndex: 3, explanation: "컴퓨터 숫자는 유한 정밀도입니다.", conceptTags: ["부동소수점"], questionType: "floating-point", reasonTags: ["반올림"] },
     { prompt: "`np.linalg.solve(A, b)`는 어떤 의도인가?", choices: ["Ax=b를 안정적으로 풀기", "A의 inverse를 출력만 하기", "PCA 시각화", "회전 보간"], correctIndex: 0, explanation: "solve는 선형시스템 풀이용 API입니다.", conceptTags: ["solve"], questionType: "api", reasonTags: ["선형시스템"] },
-    { prompt: "수치적으로 불안정한 문제에서는?", choices: ["작은 입력 오차가 결과를 크게 바꿀 수 있다.", "항상 결과가 정확하다.", "계산이 필요 없다.", "벡터가 사라진다."], correctIndex: 0, explanation: "민감한 문제는 결과 신뢰도를 조심해야 합니다.", conceptTags: ["수치 안정성"], questionType: "instability", reasonTags: ["오차 증폭"] },
-    { prompt: "행렬 분해가 실무 도구인 이유는?", choices: ["계산을 안정적이고 재사용 가능하게 만들기 위해", "증명만 하기 위해", "행렬을 숨기기 위해", "확률을 금지하기 위해"], correctIndex: 0, explanation: "분해는 반복 풀이와 큰 계산에서 유용합니다.", conceptTags: ["분해"], questionType: "practice", reasonTags: ["재사용"] },
-    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["분해 알고리즘 세부 증명", "LU 맛보기", "QR 맛보기", "조건수 감각"], correctIndex: 0, explanation: "Level 3에서는 수치계산 감각을 잡습니다.", conceptTags: ["범위 조절"], questionType: "scope", reasonTags: ["증명 제외"] },
+    { prompt: "수치적으로 불안정한 문제에서는?", choices: ["항상 결과가 정확하다.", "계산이 필요 없다.", "작은 입력 오차가 결과를 크게 바꿀 수 있다.", "벡터가 사라진다."], correctIndex: 2, explanation: "민감한 문제는 결과 신뢰도를 조심해야 합니다.", conceptTags: ["수치 안정성"], questionType: "instability", reasonTags: ["오차 증폭"] },
+    { prompt: "행렬 분해가 실무 도구인 이유는?", choices: ["증명만 하기 위해", "행렬을 숨기기 위해", "확률을 금지하기 위해", "계산을 안정적이고 재사용 가능하게 만들기 위해"], correctIndex: 3, explanation: "분해는 반복 풀이와 큰 계산에서 유용합니다.", conceptTags: ["분해"], questionType: "practice", reasonTags: ["재사용"] },
+    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["LU 맛보기", "분해 알고리즘 세부 증명", "QR 맛보기", "조건수 감각"], correctIndex: 1, explanation: "Level 3에서는 수치계산 감각을 잡습니다.", conceptTags: ["범위 조절"], questionType: "scope", reasonTags: ["증명 제외"] },
   ]}
 />
 

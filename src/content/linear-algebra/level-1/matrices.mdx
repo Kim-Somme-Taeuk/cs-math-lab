@@ -120,8 +120,8 @@ dataset = [
   questions={[
     {
       prompt: "행렬에서 행은?",
-      choices: ["가로줄", "세로줄", "대각선", "항상 첫 번째 숫자"],
-      correctIndex: 0,
+      choices: ["세로줄", "가로줄", "대각선", "항상 첫 번째 숫자"],
+      correctIndex: 1,
       explanation: "행은 가로 방향 줄입니다.",
       conceptTags: ["행"],
       questionType: "row-column",
@@ -129,8 +129,8 @@ dataset = [
     },
     {
       prompt: "행렬에서 열은?",
-      choices: ["세로줄", "가로줄", "마지막 숫자", "행렬의 크기"],
-      correctIndex: 0,
+      choices: ["가로줄", "마지막 숫자", "세로줄", "행렬의 크기"],
+      correctIndex: 2,
       explanation: "열은 세로 방향 줄입니다.",
       conceptTags: ["열"],
       questionType: "row-column",
@@ -138,8 +138,8 @@ dataset = [
     },
     {
       prompt: "3 x 2 행렬은?",
-      choices: ["3행 2열", "2행 3열", "3열 2행만 가능", "항상 정사각형"],
-      correctIndex: 0,
+      choices: ["2행 3열", "3열 2행만 가능", "항상 정사각형", "3행 2열"],
+      correctIndex: 3,
       explanation: "m x n 행렬은 m행 n열입니다.",
       conceptTags: ["행렬 크기"],
       questionType: "matrix-shape",
@@ -147,8 +147,8 @@ dataset = [
     },
     {
       prompt: "행렬을 데이터 관점에서 읽는 설명으로 맞는 것은?",
-      choices: ["행마다 샘플, 열마다 특징을 둘 수 있다.", "항상 숫자 하나만 저장한다.", "행렬은 이미지만 저장한다.", "열은 절대 의미가 없다."],
-      correctIndex: 0,
+      choices: ["항상 숫자 하나만 저장한다.", "행마다 샘플, 열마다 특징을 둘 수 있다.", "행렬은 이미지만 저장한다.", "열은 절대 의미가 없다."],
+      correctIndex: 1,
       explanation: "표 데이터에서는 행을 샘플, 열을 특징으로 두는 표현이 흔합니다.",
       conceptTags: ["데이터 행렬"],
       questionType: "data-matrix",
@@ -156,8 +156,8 @@ dataset = [
     },
     {
       prompt: "벡터 여러 개를 같은 길이로 쌓으면?",
-      choices: ["행렬로 볼 수 있다.", "항상 스칼라가 된다.", "내적이 사라진다.", "차원이 0이 된다."],
-      correctIndex: 0,
+      choices: ["항상 스칼라가 된다.", "내적이 사라진다.", "행렬로 볼 수 있다.", "차원이 0이 된다."],
+      correctIndex: 2,
       explanation: "같은 길이의 벡터들을 행이나 열로 쌓아 행렬을 만들 수 있습니다.",
       conceptTags: ["벡터 묶음"],
       questionType: "vectors-to-matrix",
@@ -165,8 +165,8 @@ dataset = [
     },
     {
       prompt: "이미지와 행렬의 연결로 맞는 것은?",
-      choices: ["픽셀 값을 격자로 놓은 숫자 데이터로 볼 수 있다.", "이미지는 절대 숫자가 아니다.", "이미지는 항상 1차원이다.", "행렬은 색을 표현할 수 없다."],
-      correctIndex: 0,
+      choices: ["이미지는 절대 숫자가 아니다.", "이미지는 항상 1차원이다.", "행렬은 색을 표현할 수 없다.", "픽셀 값을 격자로 놓은 숫자 데이터로 볼 수 있다."],
+      correctIndex: 3,
       explanation: "이미지는 픽셀 값이 격자로 배치된 데이터로 볼 수 있습니다.",
       conceptTags: ["이미지", "행렬"],
       questionType: "image-matrix",
@@ -183,8 +183,8 @@ dataset = [
     },
     {
       prompt: "행렬을 변환 규칙으로 보는 관점은 뒤에서 무엇과 연결되는가?",
-      choices: ["선형변환", "문자열 정렬", "HTML 렌더링", "파일 압축"],
-      correctIndex: 0,
+      choices: ["문자열 정렬", "HTML 렌더링", "선형변환", "파일 압축"],
+      correctIndex: 2,
       explanation: "행렬은 벡터를 다른 벡터로 보내는 선형변환을 표현할 수 있습니다.",
       conceptTags: ["선형변환"],
       questionType: "matrix-as-transform",
@@ -192,8 +192,8 @@ dataset = [
     },
     {
       prompt: "이 장에서 깊게 다루지 않는 것은?",
-      choices: ["행렬식", "행과 열", "숫자 표", "이미지 연결"],
-      correctIndex: 0,
+      choices: ["행과 열", "숫자 표", "이미지 연결", "행렬식"],
+      correctIndex: 3,
       explanation: "행렬식은 이후 주제이고, 여기서는 행렬을 읽는 관점에 집중합니다.",
       conceptTags: ["범위 조절"],
       questionType: "scope-boundary",
@@ -201,8 +201,8 @@ dataset = [
     },
     {
       prompt: "코드에서 행렬과 가장 가까운 표현은?",
-      choices: ["2차원 리스트나 배열", "if문 하나", "문자열 하나", "불리언 하나"],
-      correctIndex: 0,
+      choices: ["if문 하나", "2차원 리스트나 배열", "문자열 하나", "불리언 하나"],
+      correctIndex: 1,
       explanation: "행렬은 리스트 안에 리스트가 있는 2차원 배열로 자주 표현합니다.",
       conceptTags: ["코드 표현"],
       questionType: "code-matrix",

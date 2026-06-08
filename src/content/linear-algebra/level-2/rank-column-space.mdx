@@ -82,16 +82,16 @@ can_reach_b = b in column_space_of_A
 <MultipleChoiceQuiz
   title="종합 점검"
   questions={[
-    { prompt: "열공간은?", choices: ["열벡터들이 만드는 모든 선형결합", "행 이름 목록", "대각선 숫자", "항상 0"], correctIndex: 0, explanation: "열공간은 열벡터들의 span입니다.", conceptTags: ["열공간"], questionType: "column-space", reasonTags: ["열벡터 span"] },
-    { prompt: "랭크는?", choices: ["실제 독립 방향 수", "행렬의 숫자 개수", "항상 열 개수", "항상 행 개수"], correctIndex: 0, explanation: "랭크는 열공간의 독립 방향 수입니다.", conceptTags: ["랭크"], questionType: "rank-meaning", reasonTags: ["독립 방향"] },
-    { prompt: "열 [1,0], [2,0]의 독립 방향 수는?", choices: ["1", "2", "0", "3"], correctIndex: 0, explanation: "두 열은 같은 직선 위라 한 방향만 줍니다.", conceptTags: ["랭크"], questionType: "dependent-columns", reasonTags: ["중복 방향"] },
-    { prompt: "열 [1,0], [0,1]의 독립 방향 수는?", choices: ["2", "1", "0", "3"], correctIndex: 0, explanation: "서로 다른 두 축 방향입니다.", conceptTags: ["랭크"], questionType: "independent-columns", reasonTags: ["두 방향"] },
-    { prompt: "Ax=b가 풀리려면 b는?", choices: ["A의 열공간 안에 있어야 한다.", "항상 열공간 밖이어야 한다.", "항상 0이어야 한다.", "문자열이어야 한다."], correctIndex: 0, explanation: "Ax는 A 열들의 선형결합이므로 b가 그 공간 안에 있어야 합니다.", conceptTags: ["해 존재성"], questionType: "solution-existence", reasonTags: ["b in column space"] },
-    { prompt: "열이 많아도 랭크가 작을 수 있는 이유는?", choices: ["중복된 열이 있을 수 있기 때문", "행렬이 너무 커서", "항상 오류라서", "열공간이 없어서"], correctIndex: 0, explanation: "중복 방향은 랭크를 늘리지 못합니다.", conceptTags: ["중복 정보"], questionType: "redundant-columns", reasonTags: ["종속"] },
+    { prompt: "열공간은?", choices: ["행 이름 목록", "열벡터들이 만드는 모든 선형결합", "대각선 숫자", "항상 0"], correctIndex: 1, explanation: "열공간은 열벡터들의 span입니다.", conceptTags: ["열공간"], questionType: "column-space", reasonTags: ["열벡터 span"] },
+    { prompt: "랭크는?", choices: ["행렬의 숫자 개수", "항상 열 개수", "실제 독립 방향 수", "항상 행 개수"], correctIndex: 2, explanation: "랭크는 열공간의 독립 방향 수입니다.", conceptTags: ["랭크"], questionType: "rank-meaning", reasonTags: ["독립 방향"] },
+    { prompt: "열 [1,0], [2,0]의 독립 방향 수는?", choices: ["2", "0", "3", "1"], correctIndex: 3, explanation: "두 열은 같은 직선 위라 한 방향만 줍니다.", conceptTags: ["랭크"], questionType: "dependent-columns", reasonTags: ["중복 방향"] },
+    { prompt: "열 [1,0], [0,1]의 독립 방향 수는?", choices: ["1", "2", "0", "3"], correctIndex: 1, explanation: "서로 다른 두 축 방향입니다.", conceptTags: ["랭크"], questionType: "independent-columns", reasonTags: ["두 방향"] },
+    { prompt: "Ax=b가 풀리려면 b는?", choices: ["항상 열공간 밖이어야 한다.", "항상 0이어야 한다.", "A의 열공간 안에 있어야 한다.", "문자열이어야 한다."], correctIndex: 2, explanation: "Ax는 A 열들의 선형결합이므로 b가 그 공간 안에 있어야 합니다.", conceptTags: ["해 존재성"], questionType: "solution-existence", reasonTags: ["b in column space"] },
+    { prompt: "열이 많아도 랭크가 작을 수 있는 이유는?", choices: ["행렬이 너무 커서", "항상 오류라서", "열공간이 없어서", "중복된 열이 있을 수 있기 때문"], correctIndex: 3, explanation: "중복 방향은 랭크를 늘리지 못합니다.", conceptTags: ["중복 정보"], questionType: "redundant-columns", reasonTags: ["종속"] },
     { prompt: "랭크가 낮다는 감각은?", choices: ["정보가 일부 방향으로만 살아 있다.", "정보가 무한히 많다.", "항상 완전 복원 가능", "항상 문자열"], correctIndex: 0, explanation: "낮은 랭크는 정보 손실이나 차원 축소 감각과 연결됩니다.", conceptTags: ["정보 손실"], questionType: "low-rank", reasonTags: ["방향 감소"] },
-    { prompt: "차원 축소와 연결되는 개념은?", choices: ["낮은 랭크 구조", "HTML 태그", "파일 경로", "CSS 여백"], correctIndex: 0, explanation: "데이터가 실제로 적은 방향에 놓이면 낮은 랭크로 볼 수 있습니다.", conceptTags: ["차원 축소"], questionType: "dimension-reduction", reasonTags: ["유효 방향"] },
-    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["랭크-널리티 정리 엄밀 증명", "열공간", "랭크 감각", "해 존재성"], correctIndex: 0, explanation: "정리 증명보다 해석에 집중합니다.", conceptTags: ["범위 조절"], questionType: "scope-boundary", reasonTags: ["과확장 방지"] },
-    { prompt: "랭크가 판단하게 해 주는 것은?", choices: ["행렬이 실제로 살린 독립 방향 수", "색상 밝기", "문자열 길이", "버튼 위치"], correctIndex: 0, explanation: "랭크는 살아 있는 정보 방향 수를 판단합니다.", conceptTags: ["랭크"], questionType: "judgment", reasonTags: ["독립 방향 수"] },
+    { prompt: "차원 축소와 연결되는 개념은?", choices: ["HTML 태그", "파일 경로", "낮은 랭크 구조", "CSS 여백"], correctIndex: 2, explanation: "데이터가 실제로 적은 방향에 놓이면 낮은 랭크로 볼 수 있습니다.", conceptTags: ["차원 축소"], questionType: "dimension-reduction", reasonTags: ["유효 방향"] },
+    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["열공간", "랭크 감각", "해 존재성", "랭크-널리티 정리 엄밀 증명"], correctIndex: 3, explanation: "정리 증명보다 해석에 집중합니다.", conceptTags: ["범위 조절"], questionType: "scope-boundary", reasonTags: ["과확장 방지"] },
+    { prompt: "랭크가 판단하게 해 주는 것은?", choices: ["색상 밝기", "행렬이 실제로 살린 독립 방향 수", "문자열 길이", "버튼 위치"], correctIndex: 1, explanation: "랭크는 살아 있는 정보 방향 수를 판단합니다.", conceptTags: ["랭크"], questionType: "judgment", reasonTags: ["독립 방향 수"] },
   ]}
 />
 

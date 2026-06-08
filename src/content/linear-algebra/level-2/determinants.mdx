@@ -79,16 +79,16 @@ if abs(det) < 1e-9:
 <MultipleChoiceQuiz
   title="종합 점검"
   questions={[
-    { prompt: "2D 행렬식의 핵심 직관은?", choices: ["면적을 몇 배로 바꾸는지", "행 이름", "열 이름", "문자열 개수"], correctIndex: 0, explanation: "2D 행렬식은 면적 스케일과 연결됩니다.", conceptTags: ["행렬식"], questionType: "area-scale", reasonTags: ["면적"] },
-    { prompt: "행렬식이 0이면?", choices: ["공간이 납작해져 정보가 사라지는 감각", "항상 완벽히 되돌릴 수 있음", "면적이 두 배", "방향만 바뀜"], correctIndex: 0, explanation: "면적/부피가 0으로 눌리면 입력 구분 정보가 사라질 수 있습니다.", conceptTags: ["정보 손실"], questionType: "zero-det", reasonTags: ["납작해짐"] },
-    { prompt: "행렬식이 0이 아닌 정사각 행렬은 보통?", choices: ["역행렬 존재 감각", "항상 정보 손실", "항상 랭크 0", "항상 문자열"], correctIndex: 0, explanation: "0이 아니면 되돌릴 수 있는 변환 감각과 연결됩니다.", conceptTags: ["역행렬"], questionType: "invertible", reasonTags: ["det nonzero"] },
-    { prompt: "행렬식 절댓값은?", choices: ["면적/부피 배율", "방향 이름", "행 개수", "열공간 이름"], correctIndex: 0, explanation: "절댓값은 스케일 배율을 나타냅니다.", conceptTags: ["행렬식"], questionType: "absolute-value", reasonTags: ["배율"] },
-    { prompt: "행렬식 부호는 맛보기로 무엇과 연결되나?", choices: ["방향 뒤집힘", "항상 차원 수", "파일 크기", "문자열 길이"], correctIndex: 0, explanation: "부호는 방향이 뒤집혔는지의 감각과 연결됩니다.", conceptTags: ["방향"], questionType: "orientation", reasonTags: ["부호"] },
-    { prompt: "행렬식이 0인 변환을 되돌리기 어려운 이유는?", choices: ["서로 다른 입력이 같은 출력으로 갈 수 있기 때문", "숫자가 작아서", "행이 없어서", "항상 3D라서"], correctIndex: 0, explanation: "정보가 합쳐지면 원래 입력을 구분할 수 없습니다.", conceptTags: ["정보 손실"], questionType: "non-invertible", reasonTags: ["입력 구분 불가"] },
+    { prompt: "2D 행렬식의 핵심 직관은?", choices: ["행 이름", "면적을 몇 배로 바꾸는지", "열 이름", "문자열 개수"], correctIndex: 1, explanation: "2D 행렬식은 면적 스케일과 연결됩니다.", conceptTags: ["행렬식"], questionType: "area-scale", reasonTags: ["면적"] },
+    { prompt: "행렬식이 0이면?", choices: ["항상 완벽히 되돌릴 수 있음", "면적이 두 배", "공간이 납작해져 정보가 사라지는 감각", "방향만 바뀜"], correctIndex: 2, explanation: "면적/부피가 0으로 눌리면 입력 구분 정보가 사라질 수 있습니다.", conceptTags: ["정보 손실"], questionType: "zero-det", reasonTags: ["납작해짐"] },
+    { prompt: "행렬식이 0이 아닌 정사각 행렬은 보통?", choices: ["항상 정보 손실", "항상 랭크 0", "항상 문자열", "역행렬 존재 감각"], correctIndex: 3, explanation: "0이 아니면 되돌릴 수 있는 변환 감각과 연결됩니다.", conceptTags: ["역행렬"], questionType: "invertible", reasonTags: ["det nonzero"] },
+    { prompt: "행렬식 절댓값은?", choices: ["방향 이름", "면적/부피 배율", "행 개수", "열공간 이름"], correctIndex: 1, explanation: "절댓값은 스케일 배율을 나타냅니다.", conceptTags: ["행렬식"], questionType: "absolute-value", reasonTags: ["배율"] },
+    { prompt: "행렬식 부호는 맛보기로 무엇과 연결되나?", choices: ["항상 차원 수", "파일 크기", "방향 뒤집힘", "문자열 길이"], correctIndex: 2, explanation: "부호는 방향이 뒤집혔는지의 감각과 연결됩니다.", conceptTags: ["방향"], questionType: "orientation", reasonTags: ["부호"] },
+    { prompt: "행렬식이 0인 변환을 되돌리기 어려운 이유는?", choices: ["숫자가 작아서", "행이 없어서", "항상 3D라서", "서로 다른 입력이 같은 출력으로 갈 수 있기 때문"], correctIndex: 3, explanation: "정보가 합쳐지면 원래 입력을 구분할 수 없습니다.", conceptTags: ["정보 손실"], questionType: "non-invertible", reasonTags: ["입력 구분 불가"] },
     { prompt: "2x2 행렬식 공식은?", choices: ["ad - bc", "ab + cd", "a + d", "bc - ad만 가능"], correctIndex: 0, explanation: "[[a,b],[c,d]]의 행렬식은 ad-bc입니다.", conceptTags: ["2x2 행렬식"], questionType: "formula-small", reasonTags: ["작은 예시"] },
-    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["큰 행렬 행렬식 계산 훈련", "면적 스케일", "정보 손실", "역행렬 연결"], correctIndex: 0, explanation: "Level 2에서는 계산 반복보다 해석에 집중합니다.", conceptTags: ["범위 조절"], questionType: "scope-boundary", reasonTags: ["계산 노가다 제외"] },
-    { prompt: "그래픽스에서 행렬식이 알려주는 것은?", choices: ["변환이 면적/부피를 어떻게 바꾸는지", "텍스트 색상 이름", "HTTP 요청 수", "파일명 길이"], correctIndex: 0, explanation: "그래픽스 변환에서 공간 스케일 변화 해석에 쓸 수 있습니다.", conceptTags: ["그래픽스"], questionType: "graphics-context", reasonTags: ["공간 스케일"] },
-    { prompt: "행렬식이 판단하게 해 주는 것은?", choices: ["공간이 눌려 정보가 사라지는지", "문자열이 비었는지", "버튼이 눌렸는지", "CSS가 적용됐는지"], correctIndex: 0, explanation: "행렬식은 변환의 정보 손실과 되돌림 가능성을 판단하게 해 줍니다.", conceptTags: ["행렬식"], questionType: "judgment", reasonTags: ["정보 손실 판단"] },
+    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["면적 스케일", "정보 손실", "큰 행렬 행렬식 계산 훈련", "역행렬 연결"], correctIndex: 2, explanation: "Level 2에서는 계산 반복보다 해석에 집중합니다.", conceptTags: ["범위 조절"], questionType: "scope-boundary", reasonTags: ["계산 노가다 제외"] },
+    { prompt: "그래픽스에서 행렬식이 알려주는 것은?", choices: ["텍스트 색상 이름", "HTTP 요청 수", "파일명 길이", "변환이 면적/부피를 어떻게 바꾸는지"], correctIndex: 3, explanation: "그래픽스 변환에서 공간 스케일 변화 해석에 쓸 수 있습니다.", conceptTags: ["그래픽스"], questionType: "graphics-context", reasonTags: ["공간 스케일"] },
+    { prompt: "행렬식이 판단하게 해 주는 것은?", choices: ["문자열이 비었는지", "공간이 눌려 정보가 사라지는지", "버튼이 눌렸는지", "CSS가 적용됐는지"], correctIndex: 1, explanation: "행렬식은 변환의 정보 손실과 되돌림 가능성을 판단하게 해 줍니다.", conceptTags: ["행렬식"], questionType: "judgment", reasonTags: ["정보 손실 판단"] },
   ]}
 />
 

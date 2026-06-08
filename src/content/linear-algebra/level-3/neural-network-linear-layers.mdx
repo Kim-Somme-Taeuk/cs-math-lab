@@ -79,16 +79,16 @@ hidden = relu(output)
 <MultipleChoiceQuiz
   title="종합 점검"
   questions={[
-    { prompt: "선형 계층의 기본 식은?", choices: ["y = Wx + b", "y = det(W)", "y = x^2만", "y = 정렬(x)"], correctIndex: 0, explanation: "가중치 행렬과 bias가 기본 구조입니다.", conceptTags: ["선형 계층"], questionType: "formula", reasonTags: ["Wx+b"] },
-    { prompt: "가중치 행렬 W는 무엇을 하나?", choices: ["입력 특징을 섞어 출력 특징을 만든다.", "항상 입력을 삭제한다.", "확률만 계산한다.", "문자열만 만든다."], correctIndex: 0, explanation: "W는 특징 공간 사이의 변환입니다.", conceptTags: ["가중치 행렬"], questionType: "weight", reasonTags: ["특징 변환"] },
-    { prompt: "bias는 어떤 감각인가?", choices: ["출력 공간에서 기준점을 옮기는 성분", "항상 0", "회전축", "특이값"], correctIndex: 0, explanation: "bias는 선형변환 뒤에 더해지는 이동입니다.", conceptTags: ["bias"], questionType: "bias", reasonTags: ["이동"] },
-    { prompt: "배치 행렬곱을 쓰는 이유는?", choices: ["여러 샘플을 한 번에 처리하기 위해", "샘플을 하나만 쓰기 위해", "행렬을 금지하기 위해", "항상 느리게 하기 위해"], correctIndex: 0, explanation: "배치 처리는 큰 행렬 곱으로 병렬화됩니다.", conceptTags: ["배치"], questionType: "batch", reasonTags: ["병렬 처리"] },
-    { prompt: "비선형 활성화가 필요한 이유는?", choices: ["선형층만 쌓으면 하나의 선형변환으로 합쳐질 수 있어서", "행렬 곱을 없애기 위해", "bias를 금지하기 위해", "입력을 문자열로 만들기 위해"], correctIndex: 0, explanation: "비선형성이 모델 표현력을 키웁니다.", conceptTags: ["활성화"], questionType: "nonlinearity", reasonTags: ["표현력"] },
-    { prompt: "입력 벡터는 무엇이 될 수 있나?", choices: ["픽셀, 임베딩, feature", "항상 각도 하나", "조건수만", "파일명만"], correctIndex: 0, explanation: "신경망 입력은 다양한 데이터를 벡터화한 것입니다.", conceptTags: ["입력 벡터"], questionType: "input", reasonTags: ["벡터 표현"] },
+    { prompt: "선형 계층의 기본 식은?", choices: ["y = det(W)", "y = Wx + b", "y = x^2만", "y = 정렬(x)"], correctIndex: 1, explanation: "가중치 행렬과 bias가 기본 구조입니다.", conceptTags: ["선형 계층"], questionType: "formula", reasonTags: ["Wx+b"] },
+    { prompt: "가중치 행렬 W는 무엇을 하나?", choices: ["항상 입력을 삭제한다.", "확률만 계산한다.", "입력 특징을 섞어 출력 특징을 만든다.", "문자열만 만든다."], correctIndex: 2, explanation: "W는 특징 공간 사이의 변환입니다.", conceptTags: ["가중치 행렬"], questionType: "weight", reasonTags: ["특징 변환"] },
+    { prompt: "bias는 어떤 감각인가?", choices: ["항상 0", "회전축", "특이값", "출력 공간에서 기준점을 옮기는 성분"], correctIndex: 3, explanation: "bias는 선형변환 뒤에 더해지는 이동입니다.", conceptTags: ["bias"], questionType: "bias", reasonTags: ["이동"] },
+    { prompt: "배치 행렬곱을 쓰는 이유는?", choices: ["샘플을 하나만 쓰기 위해", "여러 샘플을 한 번에 처리하기 위해", "행렬을 금지하기 위해", "항상 느리게 하기 위해"], correctIndex: 1, explanation: "배치 처리는 큰 행렬 곱으로 병렬화됩니다.", conceptTags: ["배치"], questionType: "batch", reasonTags: ["병렬 처리"] },
+    { prompt: "비선형 활성화가 필요한 이유는?", choices: ["행렬 곱을 없애기 위해", "bias를 금지하기 위해", "선형층만 쌓으면 하나의 선형변환으로 합쳐질 수 있어서", "입력을 문자열로 만들기 위해"], correctIndex: 2, explanation: "비선형성이 모델 표현력을 키웁니다.", conceptTags: ["활성화"], questionType: "nonlinearity", reasonTags: ["표현력"] },
+    { prompt: "입력 벡터는 무엇이 될 수 있나?", choices: ["항상 각도 하나", "조건수만", "파일명만", "픽셀, 임베딩, feature"], correctIndex: 3, explanation: "신경망 입력은 다양한 데이터를 벡터화한 것입니다.", conceptTags: ["입력 벡터"], questionType: "input", reasonTags: ["벡터 표현"] },
     { prompt: "classifier의 마지막 선형층은 보통 무엇을 만들까?", choices: ["클래스별 점수", "3D 회전축", "LU 분해", "정렬된 문자열"], correctIndex: 0, explanation: "분류기는 feature를 클래스 점수 공간으로 보냅니다.", conceptTags: ["분류기"], questionType: "classifier", reasonTags: ["점수"] },
-    { prompt: "Transformer projection 행렬도 어떤 관점으로 볼 수 있나?", choices: ["특징 공간 변환", "그래픽스 clipping만", "정수 나눗셈", "해시 충돌"], correctIndex: 0, explanation: "projection은 representation을 다른 특징 공간으로 보냅니다.", conceptTags: ["projection"], questionType: "transformer", reasonTags: ["특징 변환"] },
-    { prompt: "가중치를 점수표로만 보면 놓치는 것은?", choices: ["입력 공간에서 출력 공간으로 가는 변환 관점", "문자열 처리", "파일 경로", "확률 금지"], correctIndex: 0, explanation: "행렬은 feature를 섞는 변환입니다.", conceptTags: ["해석"], questionType: "pitfall", reasonTags: ["변환"] },
-    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["역전파 전체 유도와 프레임워크 내부 구현", "Wx+b 감각", "배치 행렬곱", "비선형 활성화 필요성"], correctIndex: 0, explanation: "여기서는 선형대수 관점의 계층 해석을 봅니다.", conceptTags: ["범위 조절"], questionType: "scope", reasonTags: ["심화 제외"] },
+    { prompt: "Transformer projection 행렬도 어떤 관점으로 볼 수 있나?", choices: ["그래픽스 clipping만", "정수 나눗셈", "특징 공간 변환", "해시 충돌"], correctIndex: 2, explanation: "projection은 representation을 다른 특징 공간으로 보냅니다.", conceptTags: ["projection"], questionType: "transformer", reasonTags: ["특징 변환"] },
+    { prompt: "가중치를 점수표로만 보면 놓치는 것은?", choices: ["문자열 처리", "파일 경로", "확률 금지", "입력 공간에서 출력 공간으로 가는 변환 관점"], correctIndex: 3, explanation: "행렬은 feature를 섞는 변환입니다.", conceptTags: ["해석"], questionType: "pitfall", reasonTags: ["변환"] },
+    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["Wx+b 감각", "역전파 전체 유도와 프레임워크 내부 구현", "배치 행렬곱", "비선형 활성화 필요성"], correctIndex: 1, explanation: "여기서는 선형대수 관점의 계층 해석을 봅니다.", conceptTags: ["범위 조절"], questionType: "scope", reasonTags: ["심화 제외"] },
   ]}
 />
 

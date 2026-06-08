@@ -947,7 +947,7 @@ export const discreteMathLevels: RoadmapLevel[] = [
   {
     level: 3,
     title: "Level 3. 컴공 응용",
-    description: "알고리즘, 그래프, 정수론처럼 전공 과목과 직접 맞닿는 주제로 확장할 예정입니다.",
+    description: "알고리즘, 그래프, 정수론처럼 전공 과목과 직접 맞닿는 주제로 확장합니다.",
     chapters: discreteMathLevel3Chapters,
   },
 ];

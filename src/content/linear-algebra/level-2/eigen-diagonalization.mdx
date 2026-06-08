@@ -76,16 +76,16 @@ A_power = eigenvectors @ np.diag(eigenvalues ** k) @ np.linalg.inv(eigenvectors)
 <MultipleChoiceQuiz
   title="종합 점검"
   questions={[
-    { prompt: "고유벡터는 어떤 벡터인가?", choices: ["변환 뒤에도 방향이 바뀌지 않는 벡터", "항상 길이가 0인 벡터", "항상 좌표축 벡터", "행렬식과 같은 값"], correctIndex: 0, explanation: "고유벡터는 자기 방향을 유지합니다.", conceptTags: ["고유벡터"], questionType: "definition", reasonTags: ["방향 유지"] },
-    { prompt: "고유값은 무엇을 말하나?", choices: ["고유벡터 방향이 몇 배로 변하는지", "행렬의 열 이름", "확률의 합", "코드 줄 수"], correctIndex: 0, explanation: "고유값은 고유 방향의 스케일 변화입니다.", conceptTags: ["고유값"], questionType: "scale", reasonTags: ["몇 배"] },
-    { prompt: "대각화의 핵심 해석은?", choices: ["좋은 축에서 변환을 방향별 스케일 변화로 읽기", "행렬을 삭제하기", "모든 값을 정렬하기", "항상 역행렬을 없애기"], correctIndex: 0, explanation: "대각화는 축을 잘 잡아 변환을 단순하게 읽는 관점입니다.", conceptTags: ["대각화"], questionType: "meaning", reasonTags: ["좋은 축"] },
-    { prompt: "모든 행렬이 대각화되는가?", choices: ["아니다. 독립인 고유벡터가 충분해야 한다.", "그렇다. 항상 가능하다.", "2x2만 불가능하다.", "행렬식이 있으면 무조건 가능하다."], correctIndex: 0, explanation: "대각화 가능성은 충분한 독립 고유벡터에 달려 있습니다.", conceptTags: ["대각화 가능성"], questionType: "condition", reasonTags: ["독립 고유벡터"] },
-    { prompt: "대각 행렬이 읽기 쉬운 이유는?", choices: ["축 방향을 서로 섞지 않고 따로 스케일하기 때문", "모든 성분이 무작위이기 때문", "항상 랭크 0이기 때문", "열공간이 사라지기 때문"], correctIndex: 0, explanation: "대각 행렬은 각 축을 독립적으로 늘리고 줄입니다.", conceptTags: ["대각 행렬"], questionType: "diagonal", reasonTags: ["축별 스케일"] },
-    { prompt: "반복 변환에서 고유값이 중요한 이유는?", choices: ["어떤 방향이 커지거나 줄어드는지 보여 주기 때문", "항상 코드를 빠르게 하기 때문", "오차를 무조건 0으로 만들기 때문", "확률을 금지하기 때문"], correctIndex: 0, explanation: "고유값 크기는 반복 후 방향별 성장과 감소를 알려 줍니다.", conceptTags: ["반복 변환"], questionType: "iteration", reasonTags: ["성장률"] },
+    { prompt: "고유벡터는 어떤 벡터인가?", choices: ["항상 길이가 0인 벡터", "변환 뒤에도 방향이 바뀌지 않는 벡터", "항상 좌표축 벡터", "행렬식과 같은 값"], correctIndex: 1, explanation: "고유벡터는 자기 방향을 유지합니다.", conceptTags: ["고유벡터"], questionType: "definition", reasonTags: ["방향 유지"] },
+    { prompt: "고유값은 무엇을 말하나?", choices: ["행렬의 열 이름", "확률의 합", "고유벡터 방향이 몇 배로 변하는지", "코드 줄 수"], correctIndex: 2, explanation: "고유값은 고유 방향의 스케일 변화입니다.", conceptTags: ["고유값"], questionType: "scale", reasonTags: ["몇 배"] },
+    { prompt: "대각화의 핵심 해석은?", choices: ["행렬을 삭제하기", "모든 값을 정렬하기", "항상 역행렬을 없애기", "좋은 축에서 변환을 방향별 스케일 변화로 읽기"], correctIndex: 3, explanation: "대각화는 축을 잘 잡아 변환을 단순하게 읽는 관점입니다.", conceptTags: ["대각화"], questionType: "meaning", reasonTags: ["좋은 축"] },
+    { prompt: "모든 행렬이 대각화되는가?", choices: ["그렇다. 항상 가능하다.", "아니다. 독립인 고유벡터가 충분해야 한다.", "2x2만 불가능하다.", "행렬식이 있으면 무조건 가능하다."], correctIndex: 1, explanation: "대각화 가능성은 충분한 독립 고유벡터에 달려 있습니다.", conceptTags: ["대각화 가능성"], questionType: "condition", reasonTags: ["독립 고유벡터"] },
+    { prompt: "대각 행렬이 읽기 쉬운 이유는?", choices: ["모든 성분이 무작위이기 때문", "항상 랭크 0이기 때문", "축 방향을 서로 섞지 않고 따로 스케일하기 때문", "열공간이 사라지기 때문"], correctIndex: 2, explanation: "대각 행렬은 각 축을 독립적으로 늘리고 줄입니다.", conceptTags: ["대각 행렬"], questionType: "diagonal", reasonTags: ["축별 스케일"] },
+    { prompt: "반복 변환에서 고유값이 중요한 이유는?", choices: ["항상 코드를 빠르게 하기 때문", "오차를 무조건 0으로 만들기 때문", "확률을 금지하기 때문", "어떤 방향이 커지거나 줄어드는지 보여 주기 때문"], correctIndex: 3, explanation: "고유값 크기는 반복 후 방향별 성장과 감소를 알려 줍니다.", conceptTags: ["반복 변환"], questionType: "iteration", reasonTags: ["성장률"] },
     { prompt: "고유벡터 축은 항상 기존 x/y축인가?", choices: ["아니다. 변환에 맞는 다른 축일 수 있다.", "그렇다. 항상 x/y축이다.", "항상 y축만이다.", "축과 무관하다."], correctIndex: 0, explanation: "좋은 축은 기존 좌표축과 다를 수 있습니다.", conceptTags: ["축"], questionType: "basis", reasonTags: ["기저 변경"] },
-    { prompt: "대각화를 행렬을 없애는 일로 보면 왜 문제인가?", choices: ["같은 변환을 다른 기준에서 읽는다는 핵심을 놓친다.", "항상 계산이 너무 쉬워진다.", "고유값이 사라지지 않는다.", "문자열이 늘어난다."], correctIndex: 0, explanation: "대각화는 표현을 바꾸는 일이지 변환 자체를 삭제하는 일이 아닙니다.", conceptTags: ["해석"], questionType: "misconception", reasonTags: ["표현 변경"] },
-    { prompt: "PCA와 대각화 감각의 연결은?", choices: ["데이터를 잘 설명하는 축을 찾는 관점", "데이터를 모두 0으로 만드는 관점", "정렬 알고리즘만 쓰는 관점", "확률을 배제하는 관점"], correctIndex: 0, explanation: "PCA도 중요한 축을 찾아 해석을 단순하게 만듭니다.", conceptTags: ["PCA"], questionType: "connection", reasonTags: ["축 찾기"] },
-    { prompt: "이 장에서 깊게 하지 않는 것은?", choices: ["특성다항식과 대각화 증명 반복", "고유벡터 방향 해석", "고유값 스케일 해석", "대각 행렬 감각"], correctIndex: 0, explanation: "Level 2에서는 증명보다 해석 중심으로 봅니다.", conceptTags: ["범위 조절"], questionType: "scope", reasonTags: ["증명 제외"] },
+    { prompt: "대각화를 행렬을 없애는 일로 보면 왜 문제인가?", choices: ["항상 계산이 너무 쉬워진다.", "고유값이 사라지지 않는다.", "같은 변환을 다른 기준에서 읽는다는 핵심을 놓친다.", "문자열이 늘어난다."], correctIndex: 2, explanation: "대각화는 표현을 바꾸는 일이지 변환 자체를 삭제하는 일이 아닙니다.", conceptTags: ["해석"], questionType: "misconception", reasonTags: ["표현 변경"] },
+    { prompt: "PCA와 대각화 감각의 연결은?", choices: ["데이터를 모두 0으로 만드는 관점", "정렬 알고리즘만 쓰는 관점", "확률을 배제하는 관점", "데이터를 잘 설명하는 축을 찾는 관점"], correctIndex: 3, explanation: "PCA도 중요한 축을 찾아 해석을 단순하게 만듭니다.", conceptTags: ["PCA"], questionType: "connection", reasonTags: ["축 찾기"] },
+    { prompt: "이 장에서 깊게 하지 않는 것은?", choices: ["고유벡터 방향 해석", "특성다항식과 대각화 증명 반복", "고유값 스케일 해석", "대각 행렬 감각"], correctIndex: 1, explanation: "Level 2에서는 증명보다 해석 중심으로 봅니다.", conceptTags: ["범위 조절"], questionType: "scope", reasonTags: ["증명 제외"] },
   ]}
 />
 

@@ -74,16 +74,16 @@ const worldDirection = modelMatrix.multiply([dx, dy, 0]);
 <MultipleChoiceQuiz
   title="종합 점검"
   questions={[
-    { prompt: "아핀 변환은 무엇을 포함하나?", choices: ["선형변환과 이동", "확률분포만", "정렬 결과만", "항상 영행렬"], correctIndex: 0, explanation: "아핀 변환은 회전/스케일 같은 선형변환에 translation을 더합니다.", conceptTags: ["아핀 변환"], questionType: "definition", reasonTags: ["선형+이동"] },
-    { prompt: "선형변환만으로 이동이 어려운 이유는?", choices: ["원점을 고정하기 때문", "행렬 곱이 없기 때문", "벡터가 없기 때문", "분산이 크기 때문"], correctIndex: 0, explanation: "순수 선형변환은 0을 0으로 보냅니다.", conceptTags: ["선형변환"], questionType: "translation", reasonTags: ["원점 고정"] },
-    { prompt: "동차좌표에서 점에 흔히 붙는 w 값은?", choices: ["1", "0", "-1", "항상 10"], correctIndex: 0, explanation: "점은 w=1로 두어 이동의 영향을 받게 합니다.", conceptTags: ["동차좌표"], questionType: "point-w", reasonTags: ["점"] },
-    { prompt: "동차좌표에서 방향 벡터에 흔히 붙는 w 값은?", choices: ["0", "1", "2", "항상 -3"], correctIndex: 0, explanation: "방향은 w=0으로 두어 translation을 무시할 수 있습니다.", conceptTags: ["방향 벡터"], questionType: "direction-w", reasonTags: ["이동 무시"] },
-    { prompt: "transform 합성이 중요한 이유는?", choices: ["여러 변환을 하나의 행렬 흐름으로 묶기 위해", "모든 변환을 삭제하기 위해", "좌표를 문자열로 만들기 위해", "확률을 곱하기 위해"], correctIndex: 0, explanation: "그래픽스에서는 여러 변환을 곱해 한 번에 적용합니다.", conceptTags: ["transform 합성"], questionType: "composition", reasonTags: ["행렬 곱"] },
-    { prompt: "행렬 곱 순서가 중요한 이유는?", choices: ["회전 후 이동과 이동 후 회전이 다를 수 있기 때문", "항상 같은 결과라서", "계산을 금지해서", "PCA 때문"], correctIndex: 0, explanation: "행렬 곱은 일반적으로 교환되지 않습니다.", conceptTags: ["행렬 곱"], questionType: "order", reasonTags: ["비가환"] },
+    { prompt: "아핀 변환은 무엇을 포함하나?", choices: ["확률분포만", "선형변환과 이동", "정렬 결과만", "항상 영행렬"], correctIndex: 1, explanation: "아핀 변환은 회전/스케일 같은 선형변환에 translation을 더합니다.", conceptTags: ["아핀 변환"], questionType: "definition", reasonTags: ["선형+이동"] },
+    { prompt: "선형변환만으로 이동이 어려운 이유는?", choices: ["행렬 곱이 없기 때문", "벡터가 없기 때문", "원점을 고정하기 때문", "분산이 크기 때문"], correctIndex: 2, explanation: "순수 선형변환은 0을 0으로 보냅니다.", conceptTags: ["선형변환"], questionType: "translation", reasonTags: ["원점 고정"] },
+    { prompt: "동차좌표에서 점에 흔히 붙는 w 값은?", choices: ["0", "-1", "항상 10", "1"], correctIndex: 3, explanation: "점은 w=1로 두어 이동의 영향을 받게 합니다.", conceptTags: ["동차좌표"], questionType: "point-w", reasonTags: ["점"] },
+    { prompt: "동차좌표에서 방향 벡터에 흔히 붙는 w 값은?", choices: ["1", "0", "2", "항상 -3"], correctIndex: 1, explanation: "방향은 w=0으로 두어 translation을 무시할 수 있습니다.", conceptTags: ["방향 벡터"], questionType: "direction-w", reasonTags: ["이동 무시"] },
+    { prompt: "transform 합성이 중요한 이유는?", choices: ["모든 변환을 삭제하기 위해", "좌표를 문자열로 만들기 위해", "여러 변환을 하나의 행렬 흐름으로 묶기 위해", "확률을 곱하기 위해"], correctIndex: 2, explanation: "그래픽스에서는 여러 변환을 곱해 한 번에 적용합니다.", conceptTags: ["transform 합성"], questionType: "composition", reasonTags: ["행렬 곱"] },
+    { prompt: "행렬 곱 순서가 중요한 이유는?", choices: ["항상 같은 결과라서", "계산을 금지해서", "PCA 때문", "회전 후 이동과 이동 후 회전이 다를 수 있기 때문"], correctIndex: 3, explanation: "행렬 곱은 일반적으로 교환되지 않습니다.", conceptTags: ["행렬 곱"], questionType: "order", reasonTags: ["비가환"] },
     { prompt: "동차좌표를 실제 물리 차원으로만 해석하면?", choices: ["표현 도구라는 핵심을 놓친다.", "항상 정확하다.", "이동이 쉬워진다.", "회전이 불가능하다."], correctIndex: 0, explanation: "동차좌표는 transform을 통일하기 위한 표현입니다.", conceptTags: ["오해"], questionType: "misconception", reasonTags: ["표현 도구"] },
-    { prompt: "모델 행렬이 하는 일은?", choices: ["오브젝트 로컬 좌표를 월드 좌표로 보낸다.", "문장을 번역한다.", "데이터를 삭제한다.", "조건수를 계산하지 않는다."], correctIndex: 0, explanation: "model matrix는 오브젝트 배치를 나타냅니다.", conceptTags: ["모델 행렬"], questionType: "model-matrix", reasonTags: ["로컬->월드"] },
-    { prompt: "이 개념이 그래픽스에서 쓰이는 곳은?", choices: ["2D/3D transform", "해시 테이블 충돌만", "재귀 깊이만", "정렬 안정성만"], correctIndex: 0, explanation: "대부분의 transform 시스템은 아핀 변환을 씁니다.", conceptTags: ["그래픽스"], questionType: "application", reasonTags: ["transform"] },
-    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["사영기하학 심화", "이동", "회전", "스케일"], correctIndex: 0, explanation: "여기서는 그래픽스 transform 감각만 잡습니다.", conceptTags: ["범위 조절"], questionType: "scope", reasonTags: ["심화 제외"] },
+    { prompt: "모델 행렬이 하는 일은?", choices: ["문장을 번역한다.", "데이터를 삭제한다.", "오브젝트 로컬 좌표를 월드 좌표로 보낸다.", "조건수를 계산하지 않는다."], correctIndex: 2, explanation: "model matrix는 오브젝트 배치를 나타냅니다.", conceptTags: ["모델 행렬"], questionType: "model-matrix", reasonTags: ["로컬->월드"] },
+    { prompt: "이 개념이 그래픽스에서 쓰이는 곳은?", choices: ["해시 테이블 충돌만", "재귀 깊이만", "정렬 안정성만", "2D/3D transform"], correctIndex: 3, explanation: "대부분의 transform 시스템은 아핀 변환을 씁니다.", conceptTags: ["그래픽스"], questionType: "application", reasonTags: ["transform"] },
+    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["이동", "사영기하학 심화", "회전", "스케일"], correctIndex: 1, explanation: "여기서는 그래픽스 transform 감각만 잡습니다.", conceptTags: ["범위 조절"], questionType: "scope", reasonTags: ["심화 제외"] },
   ]}
 />
 

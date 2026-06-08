@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import ChapterAiChatbot from "@/components/interactive/ChapterAiChatbot";
 import { ChapterSlugProvider } from "@/components/interactive/ChapterSlugProvider";
 import { getChapter, getChapterNavigation, getReadyChapters, getReadyChaptersInSameLevel } from "@/lib/chapters";
 import { chapterContentLoaders } from "@/lib/content";
@@ -54,6 +55,7 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
 
   return (
     <main className="mx-auto max-w-6xl px-0 py-0 sm:px-5 sm:py-10">
+      <ChapterAiChatbot slug={slug} chapterTitle={chapter.title} />
       <details className="group fixed bottom-4 right-4 z-50 lg:hidden">
         <summary className="flex h-12 w-12 list-none items-center justify-center rounded-full bg-slate-950/40 text-white shadow-lg shadow-slate-900/20 backdrop-blur marker:hidden">
           <span className="sr-only">챕터 이동 열기</span>

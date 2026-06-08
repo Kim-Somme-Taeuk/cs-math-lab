@@ -109,8 +109,8 @@ values, vectors = eig(A)
   questions={[
     {
       prompt: "고유벡터의 핵심 감각은?",
-      choices: ["변환해도 방향이 유지된다.", "항상 길이가 0이다.", "항상 행렬이다.", "항상 방향이 90도 바뀐다."],
-      correctIndex: 0,
+      choices: ["항상 길이가 0이다.", "변환해도 방향이 유지된다.", "항상 행렬이다.", "항상 방향이 90도 바뀐다."],
+      correctIndex: 1,
       explanation: "고유벡터는 변환 뒤에도 같은 방향 선 위에 남습니다.",
       conceptTags: ["고유벡터"],
       questionType: "eigenvector-meaning",
@@ -118,8 +118,8 @@ values, vectors = eig(A)
     },
     {
       prompt: "고유값은 무엇을 나타내는가?",
-      choices: ["고유벡터의 크기 변화 정도", "행렬의 행 개수", "벡터의 이름", "항상 차원 수"],
-      correctIndex: 0,
+      choices: ["행렬의 행 개수", "벡터의 이름", "고유벡터의 크기 변화 정도", "항상 차원 수"],
+      correctIndex: 2,
       explanation: "고유값은 고유벡터가 몇 배로 늘거나 줄었는지 나타냅니다.",
       conceptTags: ["고유값"],
       questionType: "eigenvalue-meaning",
@@ -127,8 +127,8 @@ values, vectors = eig(A)
     },
     {
       prompt: "[1, 0]이 [2, 0]으로 바뀌면 방향은?",
-      choices: ["같다.", "항상 직교한다.", "사라진다.", "3차원이 된다."],
-      correctIndex: 0,
+      choices: ["항상 직교한다.", "사라진다.", "3차원이 된다.", "같다."],
+      correctIndex: 3,
       explanation: "둘 다 x축 방향에 있으므로 방향은 유지됩니다.",
       conceptTags: ["방향 유지"],
       questionType: "direction",
@@ -136,8 +136,8 @@ values, vectors = eig(A)
     },
     {
       prompt: "[1, 0] -> [2, 0]에서 크기 변화 배율은?",
-      choices: ["2", "0", "1", "-1"],
-      correctIndex: 0,
+      choices: ["0", "2", "1", "-1"],
+      correctIndex: 1,
       explanation: "x축 방향으로 2배가 되었습니다.",
       conceptTags: ["고유값"],
       questionType: "scale-factor",
@@ -145,8 +145,8 @@ values, vectors = eig(A)
     },
     {
       prompt: "모든 벡터가 고유벡터인가?",
-      choices: ["아니다.", "그렇다.", "2D에서만 그렇다.", "행렬이 있으면 항상 그렇다."],
-      correctIndex: 0,
+      choices: ["그렇다.", "2D에서만 그렇다.", "아니다.", "행렬이 있으면 항상 그렇다."],
+      correctIndex: 2,
       explanation: "변환 뒤 방향이 유지되는 특별한 벡터만 고유벡터입니다.",
       conceptTags: ["고유벡터"],
       questionType: "not-all-vectors",
@@ -154,8 +154,8 @@ values, vectors = eig(A)
     },
     {
       prompt: "고유값이 음수라는 감각과 가까운 것은?",
-      choices: ["방향이 반대로 놓일 수 있다.", "벡터가 사라진다.", "행렬이 문자열이 된다.", "항상 오류다."],
-      correctIndex: 0,
+      choices: ["벡터가 사라진다.", "행렬이 문자열이 된다.", "항상 오류다.", "방향이 반대로 놓일 수 있다."],
+      correctIndex: 3,
       explanation: "음수 배율은 같은 직선 위 반대 방향에 놓이는 감각과 연결됩니다.",
       conceptTags: ["음수 고유값"],
       questionType: "negative-eigenvalue",
@@ -172,8 +172,8 @@ values, vectors = eig(A)
     },
     {
       prompt: "고유값은 벡터인가?",
-      choices: ["아니다. 숫자다.", "그렇다.", "항상 행렬이다.", "항상 문자열이다."],
-      correctIndex: 0,
+      choices: ["그렇다.", "항상 행렬이다.", "아니다. 숫자다.", "항상 문자열이다."],
+      correctIndex: 2,
       explanation: "고유값은 크기 변화 배율을 나타내는 숫자입니다.",
       conceptTags: ["고유값"],
       questionType: "value-type",
@@ -181,8 +181,8 @@ values, vectors = eig(A)
     },
     {
       prompt: "이 장에서 깊게 다루지 않는 것은?",
-      choices: ["특성방정식 계산과 대각화", "방향 유지 감각", "크기 변화", "PCA 맛보기"],
-      correctIndex: 0,
+      choices: ["방향 유지 감각", "크기 변화", "PCA 맛보기", "특성방정식 계산과 대각화"],
+      correctIndex: 3,
       explanation: "Level 1에서는 계산보다 고유벡터의 의미를 맛보는 데 집중합니다.",
       conceptTags: ["범위 조절"],
       questionType: "scope-boundary",
@@ -190,8 +190,8 @@ values, vectors = eig(A)
     },
     {
       prompt: "고유값/고유벡터가 쓰이는 장면으로 맞는 것은?",
-      choices: ["PCA와 안정 상태 맛보기", "CSS 여백 계산만", "HTML 제목 태그", "파일 확장자 검사"],
-      correctIndex: 0,
+      choices: ["CSS 여백 계산만", "PCA와 안정 상태 맛보기", "HTML 제목 태그", "파일 확장자 검사"],
+      correctIndex: 1,
       explanation: "고유값과 고유벡터는 데이터의 중요한 방향이나 변환의 성격을 요약할 때 등장합니다.",
       conceptTags: ["전공 연결"],
       questionType: "cs-context",

@@ -73,16 +73,16 @@ const mvp = projectionMatrix.multiply(viewMatrix).multiply(modelMatrix);
 <MultipleChoiceQuiz
   title="종합 점검"
   questions={[
-    { prompt: "모델 공간은 무엇을 기준으로 하나?", choices: ["모델 자체", "카메라", "화면 픽셀", "데이터 평균"], correctIndex: 0, explanation: "모델 공간은 오브젝트의 로컬 기준입니다.", conceptTags: ["모델 공간"], questionType: "model-space", reasonTags: ["로컬"] },
-    { prompt: "월드 공간은 무엇을 나타내나?", choices: ["장면 안에 배치된 좌표", "항상 화면 좌표", "손실 함수", "특이값"], correctIndex: 0, explanation: "월드 공간은 여러 오브젝트가 공유하는 장면 기준입니다.", conceptTags: ["월드 공간"], questionType: "world-space", reasonTags: ["장면"] },
-    { prompt: "뷰 공간은 누구를 기준으로 하나?", choices: ["카메라", "모델 파일", "정렬 알고리즘", "확률 변수"], correctIndex: 0, explanation: "view transform은 카메라 기준으로 좌표를 바꿉니다.", conceptTags: ["뷰 공간"], questionType: "view-space", reasonTags: ["카메라"] },
-    { prompt: "projection 행렬은 어떤 감각과 연결되나?", choices: ["카메라와 화면 투영", "문자열 압축", "조건부 확률", "해시 충돌"], correctIndex: 0, explanation: "projection은 3D를 화면에 보이게 하는 단계입니다.", conceptTags: ["투영"], questionType: "projection", reasonTags: ["카메라"] },
-    { prompt: "vertex shader에서 MVP 곱이 하는 일은?", choices: ["정점을 화면으로 보내는 좌표 변환", "픽셀을 무작위로 섞기", "PCA 계산", "LU 분해"], correctIndex: 0, explanation: "MVP는 model-view-projection 변환입니다.", conceptTags: ["MVP"], questionType: "shader", reasonTags: ["좌표 변환"] },
-    { prompt: "model * view * projection 순서를 아무렇게나 바꾸면?", choices: ["의미와 결과가 달라질 수 있다.", "항상 같다.", "렌더링이 더 정확해진다.", "행렬이 사라진다."], correctIndex: 0, explanation: "행렬 곱 순서는 좌표 공간 흐름을 정합니다.", conceptTags: ["행렬 합성"], questionType: "order", reasonTags: ["공간 순서"] },
+    { prompt: "모델 공간은 무엇을 기준으로 하나?", choices: ["카메라", "모델 자체", "화면 픽셀", "데이터 평균"], correctIndex: 1, explanation: "모델 공간은 오브젝트의 로컬 기준입니다.", conceptTags: ["모델 공간"], questionType: "model-space", reasonTags: ["로컬"] },
+    { prompt: "월드 공간은 무엇을 나타내나?", choices: ["항상 화면 좌표", "손실 함수", "장면 안에 배치된 좌표", "특이값"], correctIndex: 2, explanation: "월드 공간은 여러 오브젝트가 공유하는 장면 기준입니다.", conceptTags: ["월드 공간"], questionType: "world-space", reasonTags: ["장면"] },
+    { prompt: "뷰 공간은 누구를 기준으로 하나?", choices: ["모델 파일", "정렬 알고리즘", "확률 변수", "카메라"], correctIndex: 3, explanation: "view transform은 카메라 기준으로 좌표를 바꿉니다.", conceptTags: ["뷰 공간"], questionType: "view-space", reasonTags: ["카메라"] },
+    { prompt: "projection 행렬은 어떤 감각과 연결되나?", choices: ["문자열 압축", "카메라와 화면 투영", "조건부 확률", "해시 충돌"], correctIndex: 1, explanation: "projection은 3D를 화면에 보이게 하는 단계입니다.", conceptTags: ["투영"], questionType: "projection", reasonTags: ["카메라"] },
+    { prompt: "vertex shader에서 MVP 곱이 하는 일은?", choices: ["픽셀을 무작위로 섞기", "PCA 계산", "정점을 화면으로 보내는 좌표 변환", "LU 분해"], correctIndex: 2, explanation: "MVP는 model-view-projection 변환입니다.", conceptTags: ["MVP"], questionType: "shader", reasonTags: ["좌표 변환"] },
+    { prompt: "model * view * projection 순서를 아무렇게나 바꾸면?", choices: ["항상 같다.", "렌더링이 더 정확해진다.", "행렬이 사라진다.", "의미와 결과가 달라질 수 있다."], correctIndex: 3, explanation: "행렬 곱 순서는 좌표 공간 흐름을 정합니다.", conceptTags: ["행렬 합성"], questionType: "order", reasonTags: ["공간 순서"] },
     { prompt: "클립 공간은 무엇과 관련 있나?", choices: ["화면에 보일 후보 판단", "추천 점수", "문장 분류", "정수론"], correctIndex: 0, explanation: "clip space는 보이는 영역 판정과 연결됩니다.", conceptTags: ["클립 공간"], questionType: "clip", reasonTags: ["가시 영역"] },
-    { prompt: "같은 숫자 좌표라도 공간이 다르면?", choices: ["의미가 달라질 수 있다.", "항상 같은 점이다.", "항상 오류다.", "확률이 된다."], correctIndex: 0, explanation: "좌표는 기준 공간과 함께 해석해야 합니다.", conceptTags: ["좌표 공간"], questionType: "meaning", reasonTags: ["기준"] },
-    { prompt: "그래픽스 파이프라인이 선형대수와 연결되는 이유는?", choices: ["대부분의 위치 변환이 행렬 곱으로 표현되기 때문", "그래프 탐색만 하기 때문", "행렬을 쓰지 않기 때문", "분산을 금지하기 때문"], correctIndex: 0, explanation: "좌표 변환은 행렬 응용의 대표 사례입니다.", conceptTags: ["그래픽스"], questionType: "connection", reasonTags: ["행렬 곱"] },
-    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["렌더링 방정식과 GPU 세부 구현", "모델 공간", "뷰 공간", "투영 감각"], correctIndex: 0, explanation: "여기서는 좌표 변환 흐름을 봅니다.", conceptTags: ["범위 조절"], questionType: "scope", reasonTags: ["GPU 심화 제외"] },
+    { prompt: "같은 숫자 좌표라도 공간이 다르면?", choices: ["항상 같은 점이다.", "항상 오류다.", "의미가 달라질 수 있다.", "확률이 된다."], correctIndex: 2, explanation: "좌표는 기준 공간과 함께 해석해야 합니다.", conceptTags: ["좌표 공간"], questionType: "meaning", reasonTags: ["기준"] },
+    { prompt: "그래픽스 파이프라인이 선형대수와 연결되는 이유는?", choices: ["그래프 탐색만 하기 때문", "행렬을 쓰지 않기 때문", "분산을 금지하기 때문", "대부분의 위치 변환이 행렬 곱으로 표현되기 때문"], correctIndex: 3, explanation: "좌표 변환은 행렬 응용의 대표 사례입니다.", conceptTags: ["그래픽스"], questionType: "connection", reasonTags: ["행렬 곱"] },
+    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["모델 공간", "렌더링 방정식과 GPU 세부 구현", "뷰 공간", "투영 감각"], correctIndex: 1, explanation: "여기서는 좌표 변환 흐름을 봅니다.", conceptTags: ["범위 조절"], questionType: "scope", reasonTags: ["GPU 심화 제외"] },
   ]}
 />
 

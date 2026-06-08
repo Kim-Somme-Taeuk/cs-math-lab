@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { normalizeAiChatAnswer, validateAiChatPayload } from "../src/lib/aiChat";
 import ConditionalPlayground from "../src/components/interactive/ConditionalPlayground";
 import CountingPlayground from "../src/components/interactive/CountingPlayground";
 import CounterexamplePlayground from "../src/components/interactive/CounterexamplePlayground";
@@ -87,6 +88,19 @@ function reviewQuestionCountInMdx(slug: string) {
   return reviewBlock.match(/prompt:/g)?.length ?? 0;
 }
 
+function correctIndexesInMdx(slug: string) {
+  const contentRoot = join(process.cwd(), "src", "content");
+  const subjects = ["discrete-math", "linear-algebra", "calculus", "probability-statistics"];
+  const levels = ["level-1", "level-2", "level-3"];
+  const paths = subjects.flatMap((subject) => levels.map((level) => join(contentRoot, subject, level, `${slug}.mdx`)));
+  const path = paths.find((candidate) => existsSync(candidate));
+
+  if (!path) return [];
+
+  const text = readFileSync(path, "utf8");
+  return Array.from(text.matchAll(/correctIndex:\s*([0-3])/g), (match) => Number(match[1]));
+}
+
 describe("review question counts", () => {
   it("keeps every ready chapter review quiz at ten questions", () => {
     const readyChapters = roadmapSubjects
@@ -106,6 +120,22 @@ describe("review question counts", () => {
         Math.min(existingCount + supplementalCount, reviewQuestionCount),
         `${chapter.slug} should render ${reviewQuestionCount} review questions`,
       ).toBe(reviewQuestionCount);
+    }
+  });
+
+  it("keeps linear algebra quiz answer positions mixed", () => {
+    const linearAlgebraChapters = roadmapSubjects
+      .find((subject) => subject.id === "linear-algebra")
+      ?.levels.flatMap((level) => level.chapters)
+      .filter((chapter) => chapter.status === "ready") ?? [];
+    const allIndexes = linearAlgebraChapters.flatMap((chapter) => correctIndexesInMdx(chapter.slug));
+
+    expect(allIndexes.length).toBeGreaterThan(0);
+    expect(new Set(allIndexes)).toEqual(new Set([0, 1, 2, 3]));
+
+    for (const chapter of linearAlgebraChapters) {
+      const chapterIndexes = correctIndexesInMdx(chapter.slug);
+      expect(new Set(chapterIndexes).size, `${chapter.slug} should mix answer positions`).toBeGreaterThanOrEqual(3);
     }
   });
 });
@@ -521,5 +551,36 @@ describe("personalized recommendations", () => {
 
     expect(validateAiCoachPayload(oversizedPayload)).toBe(false);
     expect(normalizeCoachMemo("첫 줄\n\n둘째 줄")).toBe("첫 줄 둘째 줄");
+  });
+
+  it("validates chapter AI chat payloads and normalizes answers", () => {
+    expect(
+      validateAiChatPayload({
+        slug: "logic",
+        messages: [
+          { role: "user", content: "명제는 뭐야?" },
+        ],
+      }),
+    ).toBe(true);
+
+    expect(
+      validateAiChatPayload({
+        slug: "../logic",
+        messages: [
+          { role: "user", content: "명제는 뭐야?" },
+        ],
+      }),
+    ).toBe(false);
+
+    expect(
+      validateAiChatPayload({
+        slug: "logic",
+        messages: [
+          { role: "assistant", content: "이전 답변" },
+        ],
+      }),
+    ).toBe(false);
+
+    expect(normalizeAiChatAnswer("  첫 줄\n\n\n둘째 줄  ")).toBe("첫 줄\n둘째 줄");
   });
 });

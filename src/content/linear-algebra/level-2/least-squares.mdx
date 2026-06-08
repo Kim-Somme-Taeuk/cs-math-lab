@@ -74,16 +74,16 @@ loss = np.sum(residual ** 2)
 <MultipleChoiceQuiz
   title="종합 점검"
   questions={[
-    { prompt: "최소제곱은 어떤 문제를 다루나?", choices: ["정확한 해가 없을 때 가장 가까운 근사 해 찾기", "항상 0만 찾기", "행렬식만 계산하기", "문자열 비교하기"], correctIndex: 0, explanation: "최소제곱은 풀 수 없는 시스템을 근사 문제로 바꿉니다.", conceptTags: ["최소제곱"], questionType: "definition", reasonTags: ["근사 해"] },
-    { prompt: "잔차는 무엇인가?", choices: ["실제값과 예측값의 차이", "항상 고유값", "벡터 이름", "행렬의 열 개수"], correctIndex: 0, explanation: "잔차는 설명하지 못하고 남은 차이입니다.", conceptTags: ["잔차"], questionType: "residual", reasonTags: ["차이"] },
-    { prompt: "왜 오차를 제곱하나?", choices: ["양수/음수 상쇄를 막고 큰 오차를 더 반영하기 위해", "항상 차원을 줄이기 위해", "정렬을 빠르게 하기 위해", "행렬을 삭제하기 위해"], correctIndex: 0, explanation: "제곱합은 오차 크기를 안정적으로 비교하게 해 줍니다.", conceptTags: ["제곱오차"], questionType: "squared-error", reasonTags: ["상쇄 방지"] },
-    { prompt: "열공간 관점에서 최소제곱은?", choices: ["b에 가장 가까운 열공간 안의 벡터 찾기", "열공간 밖으로 b를 밀기", "모든 열을 삭제하기", "항상 b=0 만들기"], correctIndex: 0, explanation: "A의 열공간 안에서 b에 가장 가까운 Ax를 찾습니다.", conceptTags: ["열공간"], questionType: "column-space", reasonTags: ["가장 가까운 Ax"] },
-    { prompt: "최소제곱 해는 보통 어떤 해인가?", choices: ["근사 해", "항상 정확한 해", "항상 무한히 많은 해", "항상 없는 해"], correctIndex: 0, explanation: "정확히 풀리지 않는 상황에서 근사를 찾는 경우가 많습니다.", conceptTags: ["근사"], questionType: "approximation", reasonTags: ["정확하지 않을 수 있음"] },
-    { prompt: "데이터 점이 직선 위에 완벽히 있지 않아도 할 수 있는 일은?", choices: ["가장 그럴듯한 직선을 찾는다.", "모든 점을 버린다.", "항상 수직선만 쓴다.", "확률을 금지한다."], correctIndex: 0, explanation: "최소제곱은 전체 오차가 작은 직선을 고릅니다.", conceptTags: ["회귀"], questionType: "regression-intuition", reasonTags: ["best fit"] },
+    { prompt: "최소제곱은 어떤 문제를 다루나?", choices: ["항상 0만 찾기", "정확한 해가 없을 때 가장 가까운 근사 해 찾기", "행렬식만 계산하기", "문자열 비교하기"], correctIndex: 1, explanation: "최소제곱은 풀 수 없는 시스템을 근사 문제로 바꿉니다.", conceptTags: ["최소제곱"], questionType: "definition", reasonTags: ["근사 해"] },
+    { prompt: "잔차는 무엇인가?", choices: ["항상 고유값", "벡터 이름", "실제값과 예측값의 차이", "행렬의 열 개수"], correctIndex: 2, explanation: "잔차는 설명하지 못하고 남은 차이입니다.", conceptTags: ["잔차"], questionType: "residual", reasonTags: ["차이"] },
+    { prompt: "왜 오차를 제곱하나?", choices: ["항상 차원을 줄이기 위해", "정렬을 빠르게 하기 위해", "행렬을 삭제하기 위해", "양수/음수 상쇄를 막고 큰 오차를 더 반영하기 위해"], correctIndex: 3, explanation: "제곱합은 오차 크기를 안정적으로 비교하게 해 줍니다.", conceptTags: ["제곱오차"], questionType: "squared-error", reasonTags: ["상쇄 방지"] },
+    { prompt: "열공간 관점에서 최소제곱은?", choices: ["열공간 밖으로 b를 밀기", "b에 가장 가까운 열공간 안의 벡터 찾기", "모든 열을 삭제하기", "항상 b=0 만들기"], correctIndex: 1, explanation: "A의 열공간 안에서 b에 가장 가까운 Ax를 찾습니다.", conceptTags: ["열공간"], questionType: "column-space", reasonTags: ["가장 가까운 Ax"] },
+    { prompt: "최소제곱 해는 보통 어떤 해인가?", choices: ["항상 정확한 해", "항상 무한히 많은 해", "근사 해", "항상 없는 해"], correctIndex: 2, explanation: "정확히 풀리지 않는 상황에서 근사를 찾는 경우가 많습니다.", conceptTags: ["근사"], questionType: "approximation", reasonTags: ["정확하지 않을 수 있음"] },
+    { prompt: "데이터 점이 직선 위에 완벽히 있지 않아도 할 수 있는 일은?", choices: ["모든 점을 버린다.", "항상 수직선만 쓴다.", "확률을 금지한다.", "가장 그럴듯한 직선을 찾는다."], correctIndex: 3, explanation: "최소제곱은 전체 오차가 작은 직선을 고릅니다.", conceptTags: ["회귀"], questionType: "regression-intuition", reasonTags: ["best fit"] },
     { prompt: "식이 많아질수록 정확한 해가 없기 쉬운 이유는?", choices: ["모든 제약을 동시에 만족하기 어려워지기 때문", "변수가 항상 사라지기 때문", "행렬식이 항상 1이기 때문", "코드가 실행되지 않기 때문"], correctIndex: 0, explanation: "제약이 많으면 완벽히 맞추기 어렵습니다.", conceptTags: ["과잉결정"], questionType: "overdetermined", reasonTags: ["제약 증가"] },
-    { prompt: "최소제곱과 정사영의 연결은?", choices: ["b를 열공간 위의 가장 가까운 점으로 내린다.", "b를 무조건 멀리 보낸다.", "정사영을 쓰면 오차가 커진다.", "정사영은 관계없다."], correctIndex: 0, explanation: "근사 해석은 정사영 감각과 연결됩니다.", conceptTags: ["정사영"], questionType: "projection-link", reasonTags: ["가까운 점"] },
-    { prompt: "최소제곱에서 피해야 할 해석은?", choices: ["정확한 해와 근사 해를 구분하지 않는 것", "잔차를 보는 것", "제곱오차를 비교하는 것", "열공간을 생각하는 것"], correctIndex: 0, explanation: "근사 문제인지 정확한 풀이인지 구분해야 합니다.", conceptTags: ["오해"], questionType: "misconception", reasonTags: ["정확/근사 구분"] },
-    { prompt: "이 장의 핵심 목표는?", choices: ["해가 없을 때 오차가 가장 작은 설명을 찾는 감각", "정규방정식 증명을 외우기", "모든 회귀 모델을 구현하기", "행렬식을 반복 계산하기"], correctIndex: 0, explanation: "공식보다 근사와 오차 해석이 중심입니다.", conceptTags: ["최소제곱"], questionType: "chapter-goal", reasonTags: ["오차 최소"] },
+    { prompt: "최소제곱과 정사영의 연결은?", choices: ["b를 무조건 멀리 보낸다.", "정사영을 쓰면 오차가 커진다.", "b를 열공간 위의 가장 가까운 점으로 내린다.", "정사영은 관계없다."], correctIndex: 2, explanation: "근사 해석은 정사영 감각과 연결됩니다.", conceptTags: ["정사영"], questionType: "projection-link", reasonTags: ["가까운 점"] },
+    { prompt: "최소제곱에서 피해야 할 해석은?", choices: ["잔차를 보는 것", "제곱오차를 비교하는 것", "열공간을 생각하는 것", "정확한 해와 근사 해를 구분하지 않는 것"], correctIndex: 3, explanation: "근사 문제인지 정확한 풀이인지 구분해야 합니다.", conceptTags: ["오해"], questionType: "misconception", reasonTags: ["정확/근사 구분"] },
+    { prompt: "이 장의 핵심 목표는?", choices: ["정규방정식 증명을 외우기", "해가 없을 때 오차가 가장 작은 설명을 찾는 감각", "모든 회귀 모델을 구현하기", "행렬식을 반복 계산하기"], correctIndex: 1, explanation: "공식보다 근사와 오차 해석이 중심입니다.", conceptTags: ["최소제곱"], questionType: "chapter-goal", reasonTags: ["오차 최소"] },
   ]}
 />
 

@@ -114,8 +114,8 @@ z = A @ B
   questions={[
     {
       prompt: "(2 x 3) * (3 x 4)의 결과 모양은?",
-      choices: ["2 x 4", "3 x 3", "2 x 3", "곱할 수 없음"],
-      correctIndex: 0,
+      choices: ["3 x 3", "2 x 4", "2 x 3", "곱할 수 없음"],
+      correctIndex: 1,
       explanation: "가운데 3이 맞고 결과는 바깥 차원인 2 x 4입니다.",
       conceptTags: ["차원 맞추기"],
       questionType: "matrix-shape",
@@ -123,8 +123,8 @@ z = A @ B
     },
     {
       prompt: "(2 x 3) * (2 x 4)는?",
-      choices: ["곱할 수 없음", "2 x 4", "3 x 2", "4 x 3"],
-      correctIndex: 0,
+      choices: ["2 x 4", "3 x 2", "곱할 수 없음", "4 x 3"],
+      correctIndex: 2,
       explanation: "왼쪽 열 3과 오른쪽 행 2가 맞지 않습니다.",
       conceptTags: ["차원 맞추기"],
       questionType: "incompatible-shape",
@@ -132,8 +132,8 @@ z = A @ B
     },
     {
       prompt: "행렬-벡터 곱에서 각 결과 성분은 어떻게 만들어지나?",
-      choices: ["행과 벡터의 내적", "열끼리 문자열 합치기", "행렬식 계산", "항상 0"],
-      correctIndex: 0,
+      choices: ["열끼리 문자열 합치기", "행렬식 계산", "항상 0", "행과 벡터의 내적"],
+      correctIndex: 3,
       explanation: "각 행과 입력 벡터를 내적해 결과 성분을 만듭니다.",
       conceptTags: ["행렬-벡터 곱"],
       questionType: "matvec",
@@ -141,8 +141,8 @@ z = A @ B
     },
     {
       prompt: "행렬 곱셈에서 먼저 확인할 것은?",
-      choices: ["차원이 맞는지", "색상이 예쁜지", "파일 이름이 짧은지", "항상 정사각형인지"],
-      correctIndex: 0,
+      choices: ["색상이 예쁜지", "차원이 맞는지", "파일 이름이 짧은지", "항상 정사각형인지"],
+      correctIndex: 1,
       explanation: "곱셈 가능 여부는 차원으로 먼저 판단합니다.",
       conceptTags: ["차원"],
       questionType: "dimension-first",
@@ -150,8 +150,8 @@ z = A @ B
     },
     {
       prompt: "행렬 곱셈을 변환 관점에서 읽으면?",
-      choices: ["변환을 적용하거나 합성하는 것", "숫자를 무조건 정렬하는 것", "행을 삭제하는 것", "벡터를 문자열로 만드는 것"],
-      correctIndex: 0,
+      choices: ["숫자를 무조건 정렬하는 것", "행을 삭제하는 것", "변환을 적용하거나 합성하는 것", "벡터를 문자열로 만드는 것"],
+      correctIndex: 2,
       explanation: "행렬 곱셈은 벡터 변환과 변환의 합성으로 읽을 수 있습니다.",
       conceptTags: ["변환 합성"],
       questionType: "composition",
@@ -159,8 +159,8 @@ z = A @ B
     },
     {
       prompt: "행렬 곱셈의 흔한 오해는?",
-      choices: ["성분별 곱이라고 생각하는 것", "내적을 쓴다고 생각하는 것", "차원을 본다는 것", "결과 모양이 정해진다는 것"],
-      correctIndex: 0,
+      choices: ["내적을 쓴다고 생각하는 것", "차원을 본다는 것", "결과 모양이 정해진다는 것", "성분별 곱이라고 생각하는 것"],
+      correctIndex: 3,
       explanation: "행렬 곱셈은 같은 위치끼리만 곱하는 연산이 아닙니다.",
       conceptTags: ["행렬 곱셈"],
       questionType: "common-mistake",
@@ -177,8 +177,8 @@ z = A @ B
     },
     {
       prompt: "NumPy에서 행렬 곱셈에 자주 쓰는 연산자는?",
-      choices: ["@", "+", "%", "and"],
-      correctIndex: 0,
+      choices: ["+", "%", "@", "and"],
+      correctIndex: 2,
       explanation: "Python/NumPy에서는 @를 행렬 곱셈에 씁니다.",
       conceptTags: ["코드 표현"],
       questionType: "operator",
@@ -186,8 +186,8 @@ z = A @ B
     },
     {
       prompt: "이 장에서 깊게 다루지 않는 것은?",
-      choices: ["고급 블록 행렬", "행렬-벡터 곱", "변환 합성", "차원 맞추기"],
-      correctIndex: 0,
+      choices: ["행렬-벡터 곱", "변환 합성", "차원 맞추기", "고급 블록 행렬"],
+      correctIndex: 3,
       explanation: "Level 1에서는 고급 블록 행렬보다 기본 곱셈 의미를 봅니다.",
       conceptTags: ["범위 조절"],
       questionType: "scope-boundary",
@@ -195,8 +195,8 @@ z = A @ B
     },
     {
       prompt: "행렬 곱셈이 쓰이는 장면으로 맞는 것은?",
-      choices: ["신경망 레이어와 그래픽스 변환", "HTML 줄바꿈만 처리", "파일 확장자 검사", "CSS 클래스 이름 정하기"],
-      correctIndex: 0,
+      choices: ["HTML 줄바꿈만 처리", "신경망 레이어와 그래픽스 변환", "파일 확장자 검사", "CSS 클래스 이름 정하기"],
+      correctIndex: 1,
       explanation: "행렬 곱셈은 데이터 변환, 좌표 변환, 신경망 계산에 자주 등장합니다.",
       conceptTags: ["전공 연결"],
       questionType: "cs-context",

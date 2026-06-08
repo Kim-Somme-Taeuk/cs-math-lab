@@ -75,16 +75,16 @@ def looks_like_subspace(contains_zero, closed_add, closed_scale):
 <MultipleChoiceQuiz
   title="종합 점검"
   questions={[
-    { prompt: "부분공간은 반드시 무엇을 포함해야 하나?", choices: ["영벡터", "모든 3D 벡터", "행렬식", "고유값"], correctIndex: 0, explanation: "부분공간은 0벡터를 포함해야 합니다.", conceptTags: ["부분공간"], questionType: "zero-vector", reasonTags: ["필수 조건"] },
-    { prompt: "덧셈에 대해 닫힘이란?", choices: ["안의 두 벡터를 더해도 안에 남는다.", "항상 0이 된다.", "더하면 밖으로 나간다.", "더할 수 없다."], correctIndex: 0, explanation: "부분공간 안에서 덧셈 결과도 그 안에 있어야 합니다.", conceptTags: ["닫힘"], questionType: "closed-addition", reasonTags: ["덧셈"] },
-    { prompt: "스칼라 곱에 대해 닫힘이란?", choices: ["안의 벡터에 숫자를 곱해도 안에 남는다.", "항상 1만 곱한다.", "숫자를 곱하면 문자열이 된다.", "곱하면 항상 밖으로 간다."], correctIndex: 0, explanation: "스칼라 곱 결과도 부분공간 안에 있어야 합니다.", conceptTags: ["닫힘"], questionType: "closed-scale", reasonTags: ["스칼라 곱"] },
-    { prompt: "원점을 지나지 않는 직선이 부분공간이 아닌 이유는?", choices: ["영벡터를 포함하지 않기 때문", "직선이라서", "2D라서", "벡터가 많아서"], correctIndex: 0, explanation: "부분공간은 반드시 원점, 즉 0벡터를 포함해야 합니다.", conceptTags: ["영벡터"], questionType: "line-not-through-origin", reasonTags: ["원점"] },
-    { prompt: "원점을 지나는 직선은 부분공간 감각을 갖는 이유는?", choices: ["덧셈과 스칼라 곱 뒤에도 그 직선 위에 남기 때문", "항상 곡선이기 때문", "행렬식이 1이기 때문", "모든 평면을 포함하기 때문"], correctIndex: 0, explanation: "한 방향의 모든 배수는 같은 직선 위에 남습니다.", conceptTags: ["부분공간"], questionType: "line-through-origin", reasonTags: ["닫힘"] },
-    { prompt: "부분집합이면 무조건 부분공간인가?", choices: ["아니다.", "그렇다.", "2D에서는 그렇다.", "원소가 3개면 그렇다."], correctIndex: 0, explanation: "영벡터와 닫힘 조건을 확인해야 합니다.", conceptTags: ["부분공간 조건"], questionType: "subset-vs-subspace", reasonTags: ["조건 필요"] },
+    { prompt: "부분공간은 반드시 무엇을 포함해야 하나?", choices: ["모든 3D 벡터", "영벡터", "행렬식", "고유값"], correctIndex: 1, explanation: "부분공간은 0벡터를 포함해야 합니다.", conceptTags: ["부분공간"], questionType: "zero-vector", reasonTags: ["필수 조건"] },
+    { prompt: "덧셈에 대해 닫힘이란?", choices: ["항상 0이 된다.", "더하면 밖으로 나간다.", "안의 두 벡터를 더해도 안에 남는다.", "더할 수 없다."], correctIndex: 2, explanation: "부분공간 안에서 덧셈 결과도 그 안에 있어야 합니다.", conceptTags: ["닫힘"], questionType: "closed-addition", reasonTags: ["덧셈"] },
+    { prompt: "스칼라 곱에 대해 닫힘이란?", choices: ["항상 1만 곱한다.", "숫자를 곱하면 문자열이 된다.", "곱하면 항상 밖으로 간다.", "안의 벡터에 숫자를 곱해도 안에 남는다."], correctIndex: 3, explanation: "스칼라 곱 결과도 부분공간 안에 있어야 합니다.", conceptTags: ["닫힘"], questionType: "closed-scale", reasonTags: ["스칼라 곱"] },
+    { prompt: "원점을 지나지 않는 직선이 부분공간이 아닌 이유는?", choices: ["직선이라서", "영벡터를 포함하지 않기 때문", "2D라서", "벡터가 많아서"], correctIndex: 1, explanation: "부분공간은 반드시 원점, 즉 0벡터를 포함해야 합니다.", conceptTags: ["영벡터"], questionType: "line-not-through-origin", reasonTags: ["원점"] },
+    { prompt: "원점을 지나는 직선은 부분공간 감각을 갖는 이유는?", choices: ["항상 곡선이기 때문", "행렬식이 1이기 때문", "덧셈과 스칼라 곱 뒤에도 그 직선 위에 남기 때문", "모든 평면을 포함하기 때문"], correctIndex: 2, explanation: "한 방향의 모든 배수는 같은 직선 위에 남습니다.", conceptTags: ["부분공간"], questionType: "line-through-origin", reasonTags: ["닫힘"] },
+    { prompt: "부분집합이면 무조건 부분공간인가?", choices: ["그렇다.", "2D에서는 그렇다.", "원소가 3개면 그렇다.", "아니다."], correctIndex: 3, explanation: "영벡터와 닫힘 조건을 확인해야 합니다.", conceptTags: ["부분공간 조건"], questionType: "subset-vs-subspace", reasonTags: ["조건 필요"] },
     { prompt: "부분공간이 이어지는 개념으로 맞는 것은?", choices: ["해공간과 열공간", "CSS 박스 모델", "HTTP 캐시", "파일 경로"], correctIndex: 0, explanation: "해공간과 열공간은 부분공간 관점으로 이해합니다.", conceptTags: ["해공간", "열공간"], questionType: "next-concepts", reasonTags: ["공간 해석"] },
-    { prompt: "닫힘을 확인할 때 중요한 태도는?", choices: ["모든 경우에 대해 유지되는지 본다.", "예시 하나만 본다.", "항상 그림만 본다.", "문자열 길이를 센다."], correctIndex: 0, explanation: "닫힘은 임의의 벡터와 스칼라에 대해 유지되어야 합니다.", conceptTags: ["닫힘"], questionType: "all-cases", reasonTags: ["일반성"] },
-    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["추상 벡터공간 일반론", "영벡터 포함", "덧셈 닫힘", "스칼라 곱 닫힘"], correctIndex: 0, explanation: "Level 2에서는 해석에 필요한 부분공간 조건만 다룹니다.", conceptTags: ["범위 조절"], questionType: "scope-boundary", reasonTags: ["과확장 방지"] },
-    { prompt: "부분공간이 판단하게 해 주는 것은?", choices: ["벡터 연산 후에도 같은 공간 안에 남는지", "색상이 같은지", "파일이 큰지", "문자열이 비었는지"], correctIndex: 0, explanation: "부분공간은 연산에 대해 닫혀 있는지 판단합니다.", conceptTags: ["부분공간"], questionType: "judgment", reasonTags: ["닫힘 판단"] },
+    { prompt: "닫힘을 확인할 때 중요한 태도는?", choices: ["예시 하나만 본다.", "항상 그림만 본다.", "모든 경우에 대해 유지되는지 본다.", "문자열 길이를 센다."], correctIndex: 2, explanation: "닫힘은 임의의 벡터와 스칼라에 대해 유지되어야 합니다.", conceptTags: ["닫힘"], questionType: "all-cases", reasonTags: ["일반성"] },
+    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["영벡터 포함", "덧셈 닫힘", "스칼라 곱 닫힘", "추상 벡터공간 일반론"], correctIndex: 3, explanation: "Level 2에서는 해석에 필요한 부분공간 조건만 다룹니다.", conceptTags: ["범위 조절"], questionType: "scope-boundary", reasonTags: ["과확장 방지"] },
+    { prompt: "부분공간이 판단하게 해 주는 것은?", choices: ["색상이 같은지", "벡터 연산 후에도 같은 공간 안에 남는지", "파일이 큰지", "문자열이 비었는지"], correctIndex: 1, explanation: "부분공간은 연산에 대해 닫혀 있는지 판단합니다.", conceptTags: ["부분공간"], questionType: "judgment", reasonTags: ["닫힘 판단"] },
   ]}
 />
 

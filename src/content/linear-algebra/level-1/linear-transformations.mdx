@@ -102,8 +102,8 @@ new_position = transform_matrix @ position
   questions={[
     {
       prompt: "선형변환의 입력과 출력으로 가장 알맞은 것은?",
-      choices: ["벡터에서 벡터", "문자열에서 CSS", "파일에서 폴더", "항상 숫자 하나에서 숫자 하나"],
-      correctIndex: 0,
+      choices: ["문자열에서 CSS", "벡터에서 벡터", "파일에서 폴더", "항상 숫자 하나에서 숫자 하나"],
+      correctIndex: 1,
       explanation: "선형변환은 벡터를 다른 벡터로 보내는 규칙입니다.",
       conceptTags: ["선형변환"],
       questionType: "input-output",
@@ -111,8 +111,8 @@ new_position = transform_matrix @ position
     },
     {
       prompt: "행렬-벡터 곱을 변환 관점에서 읽으면?",
-      choices: ["행렬이 벡터에 변환을 적용한다.", "벡터를 정렬한다.", "행렬을 삭제한다.", "항상 벡터를 0으로 만든다."],
-      correctIndex: 0,
+      choices: ["벡터를 정렬한다.", "행렬을 삭제한다.", "행렬이 벡터에 변환을 적용한다.", "항상 벡터를 0으로 만든다."],
+      correctIndex: 2,
       explanation: "행렬은 선형변환을 표현하고, 곱셈은 그 변환을 적용하는 계산입니다.",
       conceptTags: ["행렬", "선형변환"],
       questionType: "matrix-transform",
@@ -120,8 +120,8 @@ new_position = transform_matrix @ position
     },
     {
       prompt: "스케일 변환은 무엇을 바꾸는가?",
-      choices: ["크기", "파일 이름", "HTML 구조", "항상 차원 수"],
-      correctIndex: 0,
+      choices: ["파일 이름", "HTML 구조", "항상 차원 수", "크기"],
+      correctIndex: 3,
       explanation: "스케일은 방향별 크기를 키우거나 줄입니다.",
       conceptTags: ["스케일"],
       questionType: "scale",
@@ -129,8 +129,8 @@ new_position = transform_matrix @ position
     },
     {
       prompt: "반사 변환과 가까운 설명은?",
-      choices: ["거울처럼 뒤집는 변환", "항상 90도 돌리는 변환", "모든 값을 삭제하는 변환", "문자열을 합치는 변환"],
-      correctIndex: 0,
+      choices: ["항상 90도 돌리는 변환", "거울처럼 뒤집는 변환", "모든 값을 삭제하는 변환", "문자열을 합치는 변환"],
+      correctIndex: 1,
       explanation: "반사는 특정 축이나 평면을 기준으로 뒤집는 변환입니다.",
       conceptTags: ["반사"],
       questionType: "reflection",
@@ -138,8 +138,8 @@ new_position = transform_matrix @ position
     },
     {
       prompt: "투영에서 조심할 점은?",
-      choices: ["일부 정보가 사라질 수 있다.", "항상 모든 정보가 보존된다.", "절대 행렬로 표현할 수 없다.", "항상 회전과 같다."],
-      correctIndex: 0,
+      choices: ["항상 모든 정보가 보존된다.", "절대 행렬로 표현할 수 없다.", "일부 정보가 사라질 수 있다.", "항상 회전과 같다."],
+      correctIndex: 2,
       explanation: "투영은 한 방향 정보만 남길 수 있어서 원래 값을 완전히 복원하지 못할 수 있습니다.",
       conceptTags: ["투영"],
       questionType: "projection",
@@ -147,8 +147,8 @@ new_position = transform_matrix @ position
     },
     {
       prompt: "그래픽스에서 선형변환이 쓰이는 대표 장면은?",
-      choices: ["좌표 회전과 스케일", "HTTP 쿠키 저장", "텍스트 줄바꿈", "파일 권한 문자열"],
-      correctIndex: 0,
+      choices: ["HTTP 쿠키 저장", "텍스트 줄바꿈", "파일 권한 문자열", "좌표 회전과 스케일"],
+      correctIndex: 3,
       explanation: "그래픽스에서는 좌표 벡터를 변환해 물체를 움직이고 회전합니다.",
       conceptTags: ["그래픽스"],
       questionType: "graphics-context",
@@ -165,8 +165,8 @@ new_position = transform_matrix @ position
     },
     {
       prompt: "행렬을 선형변환으로 보는 관점의 장점은?",
-      choices: ["숫자 표가 어떤 움직임을 만드는지 이해할 수 있다.", "모든 계산을 없앨 수 있다.", "행과 열을 무시할 수 있다.", "벡터를 쓰지 않아도 된다."],
-      correctIndex: 0,
+      choices: ["모든 계산을 없앨 수 있다.", "행과 열을 무시할 수 있다.", "숫자 표가 어떤 움직임을 만드는지 이해할 수 있다.", "벡터를 쓰지 않아도 된다."],
+      correctIndex: 2,
       explanation: "행렬을 변환으로 보면 좌표와 데이터가 어떻게 바뀌는지 읽기 쉬워집니다.",
       conceptTags: ["행렬 해석"],
       questionType: "interpretation",
@@ -174,8 +174,8 @@ new_position = transform_matrix @ position
     },
     {
       prompt: "이 장에서 깊게 다루지 않는 것은?",
-      choices: ["랭크-널리티 정리", "회전", "스케일", "행렬로 변환 표현"],
-      correctIndex: 0,
+      choices: ["회전", "스케일", "행렬로 변환 표현", "랭크-널리티 정리"],
+      correctIndex: 3,
       explanation: "Level 1에서는 정리보다 변환 감각에 집중합니다.",
       conceptTags: ["범위 조절"],
       questionType: "scope-boundary",
@@ -183,8 +183,8 @@ new_position = transform_matrix @ position
     },
     {
       prompt: "선형변환이 쓰이는 전공 장면으로 맞는 것은?",
-      choices: ["게임 좌표와 카메라 변환", "CSS 클래스명 생성", "HTML 태그 닫기", "문자열 공백 제거만"],
-      correctIndex: 0,
+      choices: ["CSS 클래스명 생성", "게임 좌표와 카메라 변환", "HTML 태그 닫기", "문자열 공백 제거만"],
+      correctIndex: 1,
       explanation: "게임과 그래픽스에서 좌표 변환은 선형변환 감각과 직접 연결됩니다.",
       conceptTags: ["전공 연결"],
       questionType: "cs-context",

@@ -105,8 +105,8 @@ score = dot(query_embedding, document_embedding)
   questions={[
     {
       prompt: "[2, 1] · [3, 5]는?",
-      choices: ["11", "10", "16", "[6, 5]"],
-      correctIndex: 0,
+      choices: ["10", "11", "16", "[6, 5]"],
+      correctIndex: 1,
       explanation: "2 x 3 + 1 x 5 = 11입니다.",
       conceptTags: ["내적"],
       questionType: "dot-product-calculation",
@@ -114,8 +114,8 @@ score = dot(query_embedding, document_embedding)
     },
     {
       prompt: "내적 결과의 형태는?",
-      choices: ["숫자 하나", "항상 벡터", "항상 행렬", "항상 참/거짓"],
-      correctIndex: 0,
+      choices: ["항상 벡터", "항상 행렬", "숫자 하나", "항상 참/거짓"],
+      correctIndex: 2,
       explanation: "내적은 두 벡터를 받아 숫자 하나를 만듭니다.",
       conceptTags: ["내적"],
       questionType: "result-type",
@@ -123,8 +123,8 @@ score = dot(query_embedding, document_embedding)
     },
     {
       prompt: "내적이 0인 두 벡터를 보통 무엇이라 부르나?",
-      choices: ["직교", "평행", "동일", "역행렬"],
-      correctIndex: 0,
+      choices: ["평행", "동일", "역행렬", "직교"],
+      correctIndex: 3,
       explanation: "내적이 0이면 직교 관계로 봅니다.",
       conceptTags: ["직교"],
       questionType: "orthogonal",
@@ -132,8 +132,8 @@ score = dot(query_embedding, document_embedding)
     },
     {
       prompt: "[1, 0] · [0, 1]은?",
-      choices: ["0", "1", "2", "[0, 0]"],
-      correctIndex: 0,
+      choices: ["1", "0", "2", "[0, 0]"],
+      correctIndex: 1,
       explanation: "1 x 0 + 0 x 1 = 0입니다. 두 표준 방향은 직교합니다.",
       conceptTags: ["직교"],
       questionType: "standard-basis-dot",
@@ -141,8 +141,8 @@ score = dot(query_embedding, document_embedding)
     },
     {
       prompt: "코사인 유사도와 가장 가까운 설명은?",
-      choices: ["벡터 방향의 비슷함을 비교하는 값", "행렬의 행 개수", "벡터의 차원을 삭제하는 방법", "항상 거리만 세는 방법"],
-      correctIndex: 0,
+      choices: ["행렬의 행 개수", "벡터의 차원을 삭제하는 방법", "벡터 방향의 비슷함을 비교하는 값", "항상 거리만 세는 방법"],
+      correctIndex: 2,
       explanation: "코사인 유사도는 길이보다 방향의 비슷함에 집중합니다.",
       conceptTags: ["코사인 유사도"],
       questionType: "cosine-similarity",
@@ -150,8 +150,8 @@ score = dot(query_embedding, document_embedding)
     },
     {
       prompt: "검색에서 질문 벡터와 문서 벡터를 비교하는 이유는?",
-      choices: ["의미가 비슷한 방향인지 보려고", "문서 길이를 0으로 만들려고", "HTML을 파싱하려고", "파일명을 바꾸려고"],
-      correctIndex: 0,
+      choices: ["문서 길이를 0으로 만들려고", "HTML을 파싱하려고", "파일명을 바꾸려고", "의미가 비슷한 방향인지 보려고"],
+      correctIndex: 3,
       explanation: "임베딩 벡터가 비슷한 방향이면 의미가 가깝다고 보는 방식이 쓰입니다.",
       conceptTags: ["검색", "임베딩"],
       questionType: "search-context",
@@ -168,8 +168,8 @@ score = dot(query_embedding, document_embedding)
     },
     {
       prompt: "두 벡터 차원이 다르면 내적이 바로 어려운 이유는?",
-      choices: ["같은 위치끼리 곱할 짝이 맞지 않기 때문", "항상 직교하기 때문", "결과가 문자열이 되기 때문", "항상 1이 되기 때문"],
-      correctIndex: 0,
+      choices: ["항상 직교하기 때문", "결과가 문자열이 되기 때문", "같은 위치끼리 곱할 짝이 맞지 않기 때문", "항상 1이 되기 때문"],
+      correctIndex: 2,
       explanation: "내적은 같은 위치 성분끼리 곱하므로 성분 개수가 맞아야 합니다.",
       conceptTags: ["차원"],
       questionType: "dimension-match",
@@ -177,8 +177,8 @@ score = dot(query_embedding, document_embedding)
     },
     {
       prompt: "이 장에서 깊게 다루지 않는 것은?",
-      choices: ["정사영 공식 심화", "내적 계산", "직교", "코사인 유사도 맛보기"],
-      correctIndex: 0,
+      choices: ["내적 계산", "직교", "코사인 유사도 맛보기", "정사영 공식 심화"],
+      correctIndex: 3,
       explanation: "Level 1에서는 정사영 공식보다 유사도와 방향 감각에 집중합니다.",
       conceptTags: ["범위 조절"],
       questionType: "scope-boundary",
@@ -186,8 +186,8 @@ score = dot(query_embedding, document_embedding)
     },
     {
       prompt: "내적이 전공에서 쓰이는 장면으로 맞는 것은?",
-      choices: ["추천과 검색의 유사도 계산", "CSS 여백 지정", "HTTP 상태 코드 이름짓기", "이미지 파일 삭제"],
-      correctIndex: 0,
+      choices: ["CSS 여백 지정", "추천과 검색의 유사도 계산", "HTTP 상태 코드 이름짓기", "이미지 파일 삭제"],
+      correctIndex: 1,
       explanation: "내적은 벡터 유사도와 선형 점수 계산의 기본 도구입니다.",
       conceptTags: ["전공 연결"],
       questionType: "cs-context",

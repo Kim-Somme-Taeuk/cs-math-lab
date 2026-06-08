@@ -74,16 +74,16 @@ print(pca.explained_variance_ratio_)
 <MultipleChoiceQuiz
   title="종합 점검"
   questions={[
-    { prompt: "PCA의 핵심 목표는?", choices: ["데이터를 잘 설명하는 주요 방향 찾기", "모든 값을 0으로 만들기", "정렬만 하기", "확률을 제거하기"], correctIndex: 0, explanation: "PCA는 분산이 큰 축을 찾습니다.", conceptTags: ["PCA"], questionType: "goal", reasonTags: ["주요 방향"] },
-    { prompt: "PCA에서 분산이 큰 방향은?", choices: ["데이터가 많이 퍼진 방향", "항상 y=0", "가장 짧은 축", "파일 이름"], correctIndex: 0, explanation: "분산은 퍼짐 정도입니다.", conceptTags: ["분산"], questionType: "variance", reasonTags: ["퍼짐"] },
-    { prompt: "차원 축소는 무엇인가?", choices: ["중요한 축만 남겨 더 적은 좌표로 표현하기", "데이터를 무조건 삭제하기", "모든 feature를 그대로 두기", "회전 금지"], correctIndex: 0, explanation: "차원 축소는 표현 차원을 줄입니다.", conceptTags: ["차원 축소"], questionType: "definition", reasonTags: ["적은 좌표"] },
-    { prompt: "PCA의 새 축은 보통 무엇인가?", choices: ["원래 feature들의 선형결합", "항상 원래 feature 하나", "문자열", "랜덤 숫자"], correctIndex: 0, explanation: "PCA 축은 feature 조합으로 만들어집니다.", conceptTags: ["선형결합"], questionType: "axis", reasonTags: ["feature 조합"] },
-    { prompt: "고유벡터는 PCA에서 무엇과 연결되나?", choices: ["주요 방향", "학습률", "해시 충돌", "정렬 순서"], correctIndex: 0, explanation: "공분산 행렬의 고유벡터는 방향을 줍니다.", conceptTags: ["고유벡터"], questionType: "eigenvector", reasonTags: ["방향"] },
-    { prompt: "고유값은 PCA에서 무엇과 연결되나?", choices: ["그 방향의 설명 분산 크기", "문장 길이", "배치 크기", "회전 순서"], correctIndex: 0, explanation: "큰 고유값은 큰 분산 방향을 뜻합니다.", conceptTags: ["고유값"], questionType: "eigenvalue", reasonTags: ["분산 크기"] },
+    { prompt: "PCA의 핵심 목표는?", choices: ["모든 값을 0으로 만들기", "데이터를 잘 설명하는 주요 방향 찾기", "정렬만 하기", "확률을 제거하기"], correctIndex: 1, explanation: "PCA는 분산이 큰 축을 찾습니다.", conceptTags: ["PCA"], questionType: "goal", reasonTags: ["주요 방향"] },
+    { prompt: "PCA에서 분산이 큰 방향은?", choices: ["항상 y=0", "가장 짧은 축", "데이터가 많이 퍼진 방향", "파일 이름"], correctIndex: 2, explanation: "분산은 퍼짐 정도입니다.", conceptTags: ["분산"], questionType: "variance", reasonTags: ["퍼짐"] },
+    { prompt: "차원 축소는 무엇인가?", choices: ["데이터를 무조건 삭제하기", "모든 feature를 그대로 두기", "회전 금지", "중요한 축만 남겨 더 적은 좌표로 표현하기"], correctIndex: 3, explanation: "차원 축소는 표현 차원을 줄입니다.", conceptTags: ["차원 축소"], questionType: "definition", reasonTags: ["적은 좌표"] },
+    { prompt: "PCA의 새 축은 보통 무엇인가?", choices: ["항상 원래 feature 하나", "원래 feature들의 선형결합", "문자열", "랜덤 숫자"], correctIndex: 1, explanation: "PCA 축은 feature 조합으로 만들어집니다.", conceptTags: ["선형결합"], questionType: "axis", reasonTags: ["feature 조합"] },
+    { prompt: "고유벡터는 PCA에서 무엇과 연결되나?", choices: ["학습률", "해시 충돌", "주요 방향", "정렬 순서"], correctIndex: 2, explanation: "공분산 행렬의 고유벡터는 방향을 줍니다.", conceptTags: ["고유벡터"], questionType: "eigenvector", reasonTags: ["방향"] },
+    { prompt: "고유값은 PCA에서 무엇과 연결되나?", choices: ["문장 길이", "배치 크기", "회전 순서", "그 방향의 설명 분산 크기"], correctIndex: 3, explanation: "큰 고유값은 큰 분산 방향을 뜻합니다.", conceptTags: ["고유값"], questionType: "eigenvalue", reasonTags: ["분산 크기"] },
     { prompt: "PCA 압축에서 주의할 점은?", choices: ["일부 정보가 손실될 수 있다.", "항상 완전 복원된다.", "차원이 늘어난다.", "행렬을 쓰지 않는다."], correctIndex: 0, explanation: "낮은 차원만 남기면 버려지는 정보가 있습니다.", conceptTags: ["압축"], questionType: "loss", reasonTags: ["정보 손실"] },
-    { prompt: "PCA가 임베딩 시각화에 쓰이는 이유는?", choices: ["고차원 데이터를 낮은 차원으로 볼 수 있게 해서", "이미지를 회전해서", "조건수를 계산해서", "정렬을 빨리 해서"], correctIndex: 0, explanation: "2D/3D로 줄이면 시각화가 쉬워집니다.", conceptTags: ["시각화"], questionType: "application", reasonTags: ["낮은 차원"] },
-    { prompt: "분산이 작은 방향을 버려도 항상 문제없는가?", choices: ["아니다. 과제에 따라 중요할 수 있다.", "항상 문제없다.", "항상 정확도가 오른다.", "항상 그래픽스만 된다."], correctIndex: 0, explanation: "PCA 기준과 실제 목표가 다를 수 있습니다.", conceptTags: ["주의"], questionType: "limitation", reasonTags: ["목표 의존"] },
-    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["공분산 행렬 계산 심화", "주요 방향", "차원 축소", "분산 감각"], correctIndex: 0, explanation: "계산보다 응용 감각을 봅니다.", conceptTags: ["범위 조절"], questionType: "scope", reasonTags: ["계산 심화 제외"] },
+    { prompt: "PCA가 임베딩 시각화에 쓰이는 이유는?", choices: ["이미지를 회전해서", "조건수를 계산해서", "고차원 데이터를 낮은 차원으로 볼 수 있게 해서", "정렬을 빨리 해서"], correctIndex: 2, explanation: "2D/3D로 줄이면 시각화가 쉬워집니다.", conceptTags: ["시각화"], questionType: "application", reasonTags: ["낮은 차원"] },
+    { prompt: "분산이 작은 방향을 버려도 항상 문제없는가?", choices: ["항상 문제없다.", "항상 정확도가 오른다.", "항상 그래픽스만 된다.", "아니다. 과제에 따라 중요할 수 있다."], correctIndex: 3, explanation: "PCA 기준과 실제 목표가 다를 수 있습니다.", conceptTags: ["주의"], questionType: "limitation", reasonTags: ["목표 의존"] },
+    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["주요 방향", "공분산 행렬 계산 심화", "차원 축소", "분산 감각"], correctIndex: 1, explanation: "계산보다 응용 감각을 봅니다.", conceptTags: ["범위 조절"], questionType: "scope", reasonTags: ["계산 심화 제외"] },
   ]}
 />
 

@@ -36,19 +36,23 @@ test("subject cards open the matching roadmap subject", async ({ page }) => {
   await expect(page.getByRole("link", { name: /벡터/ }).first().getByText("공개 중")).toBeVisible();
 });
 
-test("home ready chapters switch by discrete math level", async ({ page }) => {
+test("home ready chapters switch across all public subject levels", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.getByText("Level 1. 입문")).toBeVisible();
-  await expect(page.getByRole("link", { name: /명제와 논리/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "전체 공개 챕터" })).toBeVisible();
+  await expect(page.getByText("Level 1. 전체 공개 챕터")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Level 1-1 명제와 논리" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Level 1-1 벡터" })).toBeVisible();
 
   await page.getByRole("button", { name: "다음 레벨" }).click();
-  await expect(page.getByText("Level 2. 핵심 확장")).toBeVisible();
-  await expect(page.getByRole("link", { name: /증명 기법/ })).toBeVisible();
+  await expect(page.getByText("Level 2. 전체 공개 챕터")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Level 2-1 증명 기법" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Level 2-1 선형결합과 span" })).toBeVisible();
 
   await page.getByRole("button", { name: "다음 레벨" }).click();
-  await expect(page.getByText("Level 3. 컴공 응용")).toBeVisible();
-  await expect(page.getByRole("link", { name: /점근적 분석/ })).toBeVisible();
+  await expect(page.getByText("Level 3. 전체 공개 챕터")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Level 3-1 점근적 분석" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Level 3-1 좌표계와 변환 행렬" })).toBeVisible();
 });
 
 test("asymptotic analysis chapter is available", async ({ page }) => {
@@ -60,6 +64,46 @@ test("asymptotic analysis chapter is available", async ({ page }) => {
 
   const hasHorizontalOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   expect(hasHorizontalOverflow).toBe(false);
+});
+
+test("chapter AI chatbot opens and sends chapter-scoped questions", async ({ page }) => {
+  await page.route("**/api/ai/chat", async (route) => {
+    const body = route.request().postDataJSON() as { slug: string; messages: Array<{ role: string; content: string }> };
+
+    expect(body.slug).toBe("logic");
+    expect(body.messages.at(-1)).toMatchObject({ role: "user", content: "명제 예시 알려줘" });
+
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        answer: "명제와 논리 챕터 자료 기준으로, 참과 거짓을 판단할 수 있는 문장이 명제입니다.",
+        source: "fallback",
+      }),
+    });
+  });
+
+  await page.goto("/chapters/logic");
+
+  await page.getByRole("button", { name: "AI 챗봇 열기" }).click();
+  await expect(page.getByRole("region", { name: "AI 챗봇" })).toBeVisible();
+  await page.getByLabel("AI 챗봇 질문").fill("명제 예시 알려줘");
+  await page.getByRole("button", { name: "질문 보내기" }).click();
+
+  await expect(page.getByText("명제와 논리 챕터 자료 기준으로")).toBeVisible();
+});
+
+test("mobile AI chatbot button sits above chapter navigation button", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "mobile", "mobile layout only");
+
+  await page.goto("/chapters/logic");
+
+  const aiBox = await page.getByRole("button", { name: "AI 챗봇 열기" }).boundingBox();
+  const navBox = await page.locator("details summary").filter({ hasText: "챕터 이동 열기" }).boundingBox();
+
+  expect(aiBox).not.toBeNull();
+  expect(navBox).not.toBeNull();
+  expect(aiBox!.y + aiBox!.height).toBeLessThan(navBox!.y);
 });
 
 test("recursion and recurrences chapter is available", async ({ page }) => {

@@ -81,16 +81,16 @@ if no_solution:
 <MultipleChoiceQuiz
   title="종합 점검"
   questions={[
-    { prompt: "Ax=b의 핵심 질문은?", choices: ["A의 열벡터 조합으로 b를 만들 수 있는가", "A의 색상은 무엇인가", "b의 문자열 길이", "x가 HTML인가"], correctIndex: 0, explanation: "Ax는 A 열들의 선형결합입니다.", conceptTags: ["Ax=b"], questionType: "meaning", reasonTags: ["열벡터 조합"] },
-    { prompt: "b가 열공간 밖에 있으면?", choices: ["해가 없다.", "항상 해가 하나", "항상 무한히 많음", "항상 x=0"], correctIndex: 0, explanation: "열공간 밖 목표는 만들 수 없습니다.", conceptTags: ["해 없음"], questionType: "no-solution", reasonTags: ["b outside column space"] },
-    { prompt: "해가 무한히 많을 수 있는 경우는?", choices: ["중복 방향이 있어 여러 x가 같은 b를 만들 때", "항상 b=0이 아닐 때", "행렬이 문자열일 때", "열공간이 없을 때"], correctIndex: 0, explanation: "종속 방향이 있으면 계수를 다르게 해도 같은 결과가 나올 수 있습니다.", conceptTags: ["무한해"], questionType: "infinite-solutions", reasonTags: ["중복 방향"] },
-    { prompt: "해가 하나라는 감각은?", choices: ["b를 만드는 계수가 하나로 정해진다.", "항상 해가 없다.", "항상 무한히 많다.", "b가 사라진다."], correctIndex: 0, explanation: "독립 방향이 충분하면 표현 계수가 하나로 정해질 수 있습니다.", conceptTags: ["유일해"], questionType: "unique-solution", reasonTags: ["계수 유일"] },
-    { prompt: "가우스 소거법은 여기서 어떻게 다루나?", choices: ["맛보기 수준", "계산 반복 훈련 중심", "다루지 않는 문자열", "CSS 도구"], correctIndex: 0, explanation: "이 장은 절차 반복보다 해석 중심입니다.", conceptTags: ["가우스 소거법"], questionType: "scope", reasonTags: ["맛보기"] },
-    { prompt: "x는 어떤 역할인가?", choices: ["열벡터를 섞는 계수", "항상 행렬식", "항상 목표 벡터", "파일 이름"], correctIndex: 0, explanation: "x의 성분은 A의 각 열에 붙는 계수로 볼 수 있습니다.", conceptTags: ["계수"], questionType: "x-role", reasonTags: ["열 조합 계수"] },
+    { prompt: "Ax=b의 핵심 질문은?", choices: ["A의 색상은 무엇인가", "A의 열벡터 조합으로 b를 만들 수 있는가", "b의 문자열 길이", "x가 HTML인가"], correctIndex: 1, explanation: "Ax는 A 열들의 선형결합입니다.", conceptTags: ["Ax=b"], questionType: "meaning", reasonTags: ["열벡터 조합"] },
+    { prompt: "b가 열공간 밖에 있으면?", choices: ["항상 해가 하나", "항상 무한히 많음", "해가 없다.", "항상 x=0"], correctIndex: 2, explanation: "열공간 밖 목표는 만들 수 없습니다.", conceptTags: ["해 없음"], questionType: "no-solution", reasonTags: ["b outside column space"] },
+    { prompt: "해가 무한히 많을 수 있는 경우는?", choices: ["항상 b=0이 아닐 때", "행렬이 문자열일 때", "열공간이 없을 때", "중복 방향이 있어 여러 x가 같은 b를 만들 때"], correctIndex: 3, explanation: "종속 방향이 있으면 계수를 다르게 해도 같은 결과가 나올 수 있습니다.", conceptTags: ["무한해"], questionType: "infinite-solutions", reasonTags: ["중복 방향"] },
+    { prompt: "해가 하나라는 감각은?", choices: ["항상 해가 없다.", "b를 만드는 계수가 하나로 정해진다.", "항상 무한히 많다.", "b가 사라진다."], correctIndex: 1, explanation: "독립 방향이 충분하면 표현 계수가 하나로 정해질 수 있습니다.", conceptTags: ["유일해"], questionType: "unique-solution", reasonTags: ["계수 유일"] },
+    { prompt: "가우스 소거법은 여기서 어떻게 다루나?", choices: ["계산 반복 훈련 중심", "다루지 않는 문자열", "맛보기 수준", "CSS 도구"], correctIndex: 2, explanation: "이 장은 절차 반복보다 해석 중심입니다.", conceptTags: ["가우스 소거법"], questionType: "scope", reasonTags: ["맛보기"] },
+    { prompt: "x는 어떤 역할인가?", choices: ["항상 행렬식", "항상 목표 벡터", "파일 이름", "열벡터를 섞는 계수"], correctIndex: 3, explanation: "x의 성분은 A의 각 열에 붙는 계수로 볼 수 있습니다.", conceptTags: ["계수"], questionType: "x-role", reasonTags: ["열 조합 계수"] },
     { prompt: "선형시스템과 최소제곱의 연결은?", choices: ["정확한 해가 없을 때 가장 가까운 해를 찾는다.", "항상 CSS로 바꾼다.", "해를 숨긴다.", "행렬을 삭제한다."], correctIndex: 0, explanation: "풀 수 없는 시스템은 근사 문제로 이어집니다.", conceptTags: ["최소제곱"], questionType: "least-squares-link", reasonTags: ["근사 풀이"] },
-    { prompt: "Ax를 열 관점으로 읽으면?", choices: ["A의 열벡터 선형결합", "A의 행 이름", "b의 길이", "x의 문자열"], correctIndex: 0, explanation: "행렬-벡터 곱은 열벡터 조합으로 볼 수 있습니다.", conceptTags: ["열공간"], questionType: "column-view", reasonTags: ["선형결합"] },
-    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["가우스 소거법 반복 훈련", "해 없음", "해 하나", "해 무한히 많음"], correctIndex: 0, explanation: "계산 절차보다 판단 감각을 봅니다.", conceptTags: ["범위 조절"], questionType: "scope-boundary", reasonTags: ["계산 노가다 제외"] },
-    { prompt: "선형시스템이 판단하게 해 주는 것은?", choices: ["제약을 만족하는 계수가 있는지", "버튼 색상", "파일 확장자", "문자열 대소문자"], correctIndex: 0, explanation: "Ax=b는 목표를 만들 계수 x가 있는지 묻습니다.", conceptTags: ["선형시스템"], questionType: "judgment", reasonTags: ["해 존재"] },
+    { prompt: "Ax를 열 관점으로 읽으면?", choices: ["A의 행 이름", "b의 길이", "A의 열벡터 선형결합", "x의 문자열"], correctIndex: 2, explanation: "행렬-벡터 곱은 열벡터 조합으로 볼 수 있습니다.", conceptTags: ["열공간"], questionType: "column-view", reasonTags: ["선형결합"] },
+    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["해 없음", "해 하나", "해 무한히 많음", "가우스 소거법 반복 훈련"], correctIndex: 3, explanation: "계산 절차보다 판단 감각을 봅니다.", conceptTags: ["범위 조절"], questionType: "scope-boundary", reasonTags: ["계산 노가다 제외"] },
+    { prompt: "선형시스템이 판단하게 해 주는 것은?", choices: ["버튼 색상", "제약을 만족하는 계수가 있는지", "파일 확장자", "문자열 대소문자"], correctIndex: 1, explanation: "Ax=b는 목표를 만들 계수 x가 있는지 묻습니다.", conceptTags: ["선형시스템"], questionType: "judgment", reasonTags: ["해 존재"] },
   ]}
 />
 

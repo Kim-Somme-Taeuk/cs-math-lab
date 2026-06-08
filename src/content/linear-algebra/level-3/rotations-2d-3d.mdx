@@ -73,16 +73,16 @@ const orientation = yawMatrix.multiply(pitchMatrix).multiply(rollMatrix);
 <MultipleChoiceQuiz
   title="종합 점검"
   questions={[
-    { prompt: "순수 회전이 보존하는 것은?", choices: ["길이와 각도", "항상 x좌표", "확률", "문자열"], correctIndex: 0, explanation: "회전은 형태를 유지하고 방향만 바꿉니다.", conceptTags: ["회전"], questionType: "property", reasonTags: ["길이 보존"] },
-    { prompt: "2D 회전은 주로 무엇으로 표현하나?", choices: ["각도 하나", "축 세 개", "특이값 목록", "조건수"], correctIndex: 0, explanation: "2D 원점 회전은 한 각도로 표현할 수 있습니다.", conceptTags: ["2D 회전"], questionType: "2d", reasonTags: ["각도"] },
-    { prompt: "3D 회전에서 중요한 정보는?", choices: ["축과 순서", "항상 면적", "배치 크기만", "정렬 방식"], correctIndex: 0, explanation: "3D 회전은 어느 축을 어떤 순서로 도는지가 중요합니다.", conceptTags: ["3D 회전"], questionType: "3d", reasonTags: ["축/순서"] },
-    { prompt: "오일러 각의 장점은?", choices: ["사람이 이해하기 쉽다.", "항상 문제없다.", "행렬이 필요 없다.", "회전을 금지한다."], correctIndex: 0, explanation: "yaw/pitch/roll 같은 표현은 직관적입니다.", conceptTags: ["오일러 각"], questionType: "euler-benefit", reasonTags: ["직관"] },
-    { prompt: "오일러 각의 한계는?", choices: ["순서 의존과 짐벌락", "무조건 느림", "2D에서만 가능", "스케일만 가능"], correctIndex: 0, explanation: "축 회전 방식은 특정 상황에서 자유도를 잃을 수 있습니다.", conceptTags: ["오일러 각"], questionType: "euler-limit", reasonTags: ["짐벌락"] },
-    { prompt: "쿼터니언을 쓰는 대표 이유는?", choices: ["3D 회전 보간과 합성을 안정적으로 다루기 위해", "확률을 계산하기 위해", "벡터를 없애기 위해", "항상 좌표를 0으로 만들기 위해"], correctIndex: 0, explanation: "게임 엔진은 회전 보간에 쿼터니언을 자주 씁니다.", conceptTags: ["쿼터니언"], questionType: "quaternion", reasonTags: ["보간"] },
+    { prompt: "순수 회전이 보존하는 것은?", choices: ["항상 x좌표", "길이와 각도", "확률", "문자열"], correctIndex: 1, explanation: "회전은 형태를 유지하고 방향만 바꿉니다.", conceptTags: ["회전"], questionType: "property", reasonTags: ["길이 보존"] },
+    { prompt: "2D 회전은 주로 무엇으로 표현하나?", choices: ["축 세 개", "특이값 목록", "각도 하나", "조건수"], correctIndex: 2, explanation: "2D 원점 회전은 한 각도로 표현할 수 있습니다.", conceptTags: ["2D 회전"], questionType: "2d", reasonTags: ["각도"] },
+    { prompt: "3D 회전에서 중요한 정보는?", choices: ["항상 면적", "배치 크기만", "정렬 방식", "축과 순서"], correctIndex: 3, explanation: "3D 회전은 어느 축을 어떤 순서로 도는지가 중요합니다.", conceptTags: ["3D 회전"], questionType: "3d", reasonTags: ["축/순서"] },
+    { prompt: "오일러 각의 장점은?", choices: ["항상 문제없다.", "사람이 이해하기 쉽다.", "행렬이 필요 없다.", "회전을 금지한다."], correctIndex: 1, explanation: "yaw/pitch/roll 같은 표현은 직관적입니다.", conceptTags: ["오일러 각"], questionType: "euler-benefit", reasonTags: ["직관"] },
+    { prompt: "오일러 각의 한계는?", choices: ["무조건 느림", "2D에서만 가능", "순서 의존과 짐벌락", "스케일만 가능"], correctIndex: 2, explanation: "축 회전 방식은 특정 상황에서 자유도를 잃을 수 있습니다.", conceptTags: ["오일러 각"], questionType: "euler-limit", reasonTags: ["짐벌락"] },
+    { prompt: "쿼터니언을 쓰는 대표 이유는?", choices: ["확률을 계산하기 위해", "벡터를 없애기 위해", "항상 좌표를 0으로 만들기 위해", "3D 회전 보간과 합성을 안정적으로 다루기 위해"], correctIndex: 3, explanation: "게임 엔진은 회전 보간에 쿼터니언을 자주 씁니다.", conceptTags: ["쿼터니언"], questionType: "quaternion", reasonTags: ["보간"] },
     { prompt: "회전 행렬과 스케일 행렬을 구분해야 하는 이유는?", choices: ["회전은 길이를 보존하지만 스케일은 크기를 바꾼다.", "둘은 항상 같다.", "스케일은 방향을 금지한다.", "회전은 행렬이 아니다."], correctIndex: 0, explanation: "두 변환은 기하적 효과가 다릅니다.", conceptTags: ["변환"], questionType: "compare", reasonTags: ["효과 구분"] },
-    { prompt: "카메라 yaw/pitch는 어떤 개념과 연결되나?", choices: ["3D 회전", "PCA", "LU 분해", "해시"], correctIndex: 0, explanation: "카메라 방향 제어는 회전 응용입니다.", conceptTags: ["게임 카메라"], questionType: "application", reasonTags: ["카메라 회전"] },
-    { prompt: "여러 회전을 곱할 때 주의할 점은?", choices: ["곱하는 순서", "항상 알파벳순", "확률 합", "문자열 길이"], correctIndex: 0, explanation: "회전 합성은 순서에 따라 결과가 달라질 수 있습니다.", conceptTags: ["회전 합성"], questionType: "order", reasonTags: ["비가환"] },
-    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["쿼터니언 대수 심화", "2D 회전 감각", "3D 축 회전", "게임 회전 응용"], correctIndex: 0, explanation: "쿼터니언은 필요성만 맛봅니다.", conceptTags: ["범위 조절"], questionType: "scope", reasonTags: ["심화 제외"] },
+    { prompt: "카메라 yaw/pitch는 어떤 개념과 연결되나?", choices: ["PCA", "LU 분해", "3D 회전", "해시"], correctIndex: 2, explanation: "카메라 방향 제어는 회전 응용입니다.", conceptTags: ["게임 카메라"], questionType: "application", reasonTags: ["카메라 회전"] },
+    { prompt: "여러 회전을 곱할 때 주의할 점은?", choices: ["항상 알파벳순", "확률 합", "문자열 길이", "곱하는 순서"], correctIndex: 3, explanation: "회전 합성은 순서에 따라 결과가 달라질 수 있습니다.", conceptTags: ["회전 합성"], questionType: "order", reasonTags: ["비가환"] },
+    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["2D 회전 감각", "쿼터니언 대수 심화", "3D 축 회전", "게임 회전 응용"], correctIndex: 1, explanation: "쿼터니언은 필요성만 맛봅니다.", conceptTags: ["범위 조절"], questionType: "scope", reasonTags: ["심화 제외"] },
   ]}
 />
 
