@@ -2,11 +2,13 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import {
-  aiChatBlockMs,
+  aiChatBaseBlockMs,
+  aiChatClientBlockCountStorageKey,
   aiChatClientBlockedUntilStorageKey,
   aiChatClientUsageStorageKey,
   aiChatMaxRequestsPerWindow,
   aiChatWindowMs,
+  nextAiChatBlockMs,
   type AiChatMessage,
   type AiChatResponsePayload,
 } from "@/lib/aiChat";
@@ -39,10 +41,13 @@ function checkLocalRateLimit(now = Date.now()) {
   const timestamps = usage.timestamps.filter((timestamp) => now - timestamp < aiChatWindowMs);
 
   if (timestamps.length >= aiChatMaxRequestsPerWindow) {
-    const nextBlockedUntil = now + aiChatBlockMs;
+    const previousBlockCount = Number(window.localStorage.getItem(aiChatClientBlockCountStorageKey) ?? 0);
+    const waitMs = nextAiChatBlockMs(previousBlockCount);
+    const nextBlockedUntil = now + waitMs;
     window.localStorage.setItem(aiChatClientBlockedUntilStorageKey, String(nextBlockedUntil));
+    window.localStorage.setItem(aiChatClientBlockCountStorageKey, String(previousBlockCount + 1));
     window.localStorage.setItem(aiChatClientUsageStorageKey, JSON.stringify({ timestamps: [] }));
-    return { allowed: false, waitMs: aiChatBlockMs };
+    return { allowed: false, waitMs };
   }
 
   window.localStorage.setItem(aiChatClientUsageStorageKey, JSON.stringify({ timestamps: [...timestamps, now] }));
@@ -104,7 +109,7 @@ export default function ChapterAiChatbot({ slug, chapterTitle }: { slug: string;
 
       if (response.status === 429) {
         const data = (await response.json()) as { retryAfterSeconds?: number };
-        const seconds = data.retryAfterSeconds ?? Math.ceil(aiChatBlockMs / 1000);
+        const seconds = data.retryAfterSeconds ?? Math.ceil(aiChatBaseBlockMs / 1000);
         const blockedUntil = Date.now() + seconds * 1000;
         window.localStorage.setItem(aiChatClientBlockedUntilStorageKey, String(blockedUntil));
         setBlockedMessage(`질문이 너무 많습니다. ${seconds}초 후 다시 시도하세요.`);

@@ -3,8 +3,10 @@ export const aiChatFallbackAnswer =
 
 export const aiChatClientUsageStorageKey = "cs-math-lab:ai-chat-usage";
 export const aiChatClientBlockedUntilStorageKey = "cs-math-lab:ai-chat-blocked-until";
+export const aiChatClientBlockCountStorageKey = "cs-math-lab:ai-chat-block-count";
 export const aiChatWindowMs = 60_000;
-export const aiChatBlockMs = 120_000;
+export const aiChatBaseBlockMs = 120_000;
+export const aiChatMaxBlockMs = 1_800_000;
 export const aiChatMaxRequestsPerWindow = 5;
 
 export type AiChatMessage = {
@@ -70,4 +72,9 @@ export function normalizeAiChatAnswer(value: unknown) {
   if (!text) return aiChatFallbackAnswer;
 
   return text.length > maxAnswerLength ? `${text.slice(0, maxAnswerLength - 3)}...` : text;
+}
+
+export function nextAiChatBlockMs(previousBlockCount: number) {
+  const safeCount = Math.max(0, Math.floor(previousBlockCount));
+  return Math.min(aiChatBaseBlockMs * 2 ** safeCount, aiChatMaxBlockMs);
 }

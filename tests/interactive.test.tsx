@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { normalizeAiChatAnswer, validateAiChatPayload } from "../src/lib/aiChat";
+import { aiChatMaxBlockMs, nextAiChatBlockMs, normalizeAiChatAnswer, validateAiChatPayload } from "../src/lib/aiChat";
 import ConditionalPlayground from "../src/components/interactive/ConditionalPlayground";
 import CountingPlayground from "../src/components/interactive/CountingPlayground";
 import CounterexamplePlayground from "../src/components/interactive/CounterexamplePlayground";
@@ -582,5 +582,12 @@ describe("personalized recommendations", () => {
     ).toBe(false);
 
     expect(normalizeAiChatAnswer("  첫 줄\n\n\n둘째 줄  ")).toBe("첫 줄\n둘째 줄");
+  });
+
+  it("increases repeated AI chat block duration up to a maximum", () => {
+    expect(nextAiChatBlockMs(0)).toBe(120_000);
+    expect(nextAiChatBlockMs(1)).toBe(240_000);
+    expect(nextAiChatBlockMs(2)).toBe(480_000);
+    expect(nextAiChatBlockMs(20)).toBe(aiChatMaxBlockMs);
   });
 });

@@ -2,10 +2,10 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { NextResponse } from "next/server";
 import {
-  aiChatBlockMs,
   aiChatFallbackAnswer,
   aiChatMaxRequestsPerWindow,
   aiChatWindowMs,
+  nextAiChatBlockMs,
   normalizeAiChatAnswer,
   validateAiChatPayload,
   type AiChatResponsePayload,
@@ -25,6 +25,7 @@ type OpenAiResponse = {
 type RateEntry = {
   timestamps: number[];
   blockedUntil: number;
+  blockCount: number;
 };
 
 const rateByClient = new Map<string, RateEntry>();
@@ -35,7 +36,7 @@ function clientId(request: Request) {
 }
 
 function checkRateLimit(id: string, now = Date.now()) {
-  const entry = rateByClient.get(id) ?? { timestamps: [], blockedUntil: 0 };
+  const entry = rateByClient.get(id) ?? { timestamps: [], blockedUntil: 0, blockCount: 0 };
 
   if (entry.blockedUntil > now) {
     return { allowed: false, retryAfterSeconds: Math.ceil((entry.blockedUntil - now) / 1000) };
@@ -44,10 +45,12 @@ function checkRateLimit(id: string, now = Date.now()) {
   entry.timestamps = entry.timestamps.filter((timestamp) => now - timestamp < aiChatWindowMs);
 
   if (entry.timestamps.length >= aiChatMaxRequestsPerWindow) {
-    entry.blockedUntil = now + aiChatBlockMs;
+    const waitMs = nextAiChatBlockMs(entry.blockCount);
+    entry.blockedUntil = now + waitMs;
+    entry.blockCount += 1;
     entry.timestamps = [];
     rateByClient.set(id, entry);
-    return { allowed: false, retryAfterSeconds: Math.ceil(aiChatBlockMs / 1000) };
+    return { allowed: false, retryAfterSeconds: Math.ceil(waitMs / 1000) };
   }
 
   entry.timestamps.push(now);
