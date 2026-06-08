@@ -69,12 +69,10 @@ describe("set helpers", () => {
 });
 
 function reviewQuestionCountInMdx(slug: string) {
-  const contentRoot = join(process.cwd(), "src", "content", "discrete-math");
-  const paths = [
-    join(contentRoot, "level-1", `${slug}.mdx`),
-    join(contentRoot, "level-2", `${slug}.mdx`),
-    join(contentRoot, "level-3", `${slug}.mdx`),
-  ];
+  const contentRoot = join(process.cwd(), "src", "content");
+  const subjects = ["discrete-math", "linear-algebra", "calculus", "probability-statistics"];
+  const levels = ["level-1", "level-2", "level-3"];
+  const paths = subjects.flatMap((subject) => levels.map((level) => join(contentRoot, subject, level, `${slug}.mdx`)));
   const path = paths.find((candidate) => existsSync(candidate));
 
   if (!path) return 0;

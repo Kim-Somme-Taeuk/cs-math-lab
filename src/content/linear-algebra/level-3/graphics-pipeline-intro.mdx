@@ -1,0 +1,91 @@
+## 왜 배우나
+
+3D 모델이 화면 픽셀로 보이기까지는 여러 좌표 공간을 거칩니다. 그래픽스 파이프라인을 알면 vertex shader에서 행렬 곱이 반복해서 등장하는 이유를 이해할 수 있습니다.
+
+핵심은 <strong>모델 공간의 점이 월드, 뷰, 클립 공간을 지나 화면에 가까워지는 흐름을 읽는 것</strong>입니다.
+
+## 먼저 감 잡기
+
+모델 파일 안의 점은 오브젝트 기준 좌표입니다. 이 점을 장면에 배치하고, 카메라 기준으로 바꾸고, 화면에 투영해야 우리가 보는 그림이 됩니다.
+
+<MultipleChoiceQuiz
+  questions={[{ prompt: "그래픽스 파이프라인에서 행렬 곱이 자주 나오는 이유는?", choices: ["좌표 공간을 단계적으로 바꾸기 위해", "픽셀 색을 항상 무작위로 만들기 위해", "모든 정점을 삭제하기 위해", "확률분포를 만들기 위해"], correctIndex: 0, explanation: "각 단계는 좌표를 다른 공간으로 보내는 변환입니다.", conceptTags: ["그래픽스 파이프라인"], questionType: "purpose", reasonTags: ["공간 변환"] }]}
+/>
+
+## 핵심 정의
+
+### 모델 공간
+
+모델 자체를 기준으로 한 좌표입니다. 파일에 저장된 정점 좌표가 보통 여기에 가깝습니다.
+
+### 월드 공간
+
+모델을 장면 안에 배치한 뒤의 좌표입니다.
+
+### 뷰 공간
+
+카메라를 기준으로 본 좌표입니다. 카메라가 원점에 있다고 생각하기 쉽게 바꿉니다.
+
+### 클립 공간
+
+투영 뒤 화면에 보일 후보를 판단하기 위한 공간입니다.
+
+<UnderstandingCheck concept="그래픽스 파이프라인" prompt="각 행렬이 점을 다른 좌표 공간으로 보내는 단계라는 점이 보이나요?" />
+
+## 자주 헷갈리는 지점
+
+<strong>모든 좌표가 같은 의미라고 보는 실수.</strong> 모델 좌표와 카메라 기준 좌표는 같은 숫자라도 의미가 다릅니다.
+
+<strong>투영을 단순 스케일로만 보는 실수.</strong> 원근 투영은 멀리 있는 물체를 작게 보이게 하는 카메라 모델과 연결됩니다.
+
+<strong>행렬 합성 순서를 대충 보는 실수.</strong> model, view, projection 순서가 파이프라인 의미를 만듭니다.
+
+<strong>vertex shader의 행렬 곱을 암기 코드로만 보는 실수.</strong> 정점을 화면으로 보내는 좌표 변환입니다.
+
+## 직접 실험하기
+
+아래 실험에서 점이 transform과 projection 흐름을 지나며 어떻게 해석되는지 확인합니다.
+
+<LinearAlgebraLevelThreePlayground mode="graphics-pipeline" />
+
+## 코드로 읽기
+
+```glsl
+gl_Position = projection * view * model * vec4(position, 1.0);
+```
+
+이 한 줄은 모델 좌표의 정점을 월드, 카메라, 투영 좌표로 차례로 보냅니다. 곱셈 순서는 어떤 공간에서 어떤 공간으로 가는지를 나타냅니다.
+
+```ts
+const mvp = projectionMatrix.multiply(viewMatrix).multiply(modelMatrix);
+```
+
+## 전공에서 만나는 장면
+
+- WebGL과 vertex shader
+- 게임 엔진 렌더링
+- 카메라 이동과 투영
+- 3D 모델 배치
+- 화면 밖 정점 clipping
+
+## 종합 점검
+
+<MultipleChoiceQuiz
+  title="종합 점검"
+  questions={[
+    { prompt: "모델 공간은 무엇을 기준으로 하나?", choices: ["모델 자체", "카메라", "화면 픽셀", "데이터 평균"], correctIndex: 0, explanation: "모델 공간은 오브젝트의 로컬 기준입니다.", conceptTags: ["모델 공간"], questionType: "model-space", reasonTags: ["로컬"] },
+    { prompt: "월드 공간은 무엇을 나타내나?", choices: ["장면 안에 배치된 좌표", "항상 화면 좌표", "손실 함수", "특이값"], correctIndex: 0, explanation: "월드 공간은 여러 오브젝트가 공유하는 장면 기준입니다.", conceptTags: ["월드 공간"], questionType: "world-space", reasonTags: ["장면"] },
+    { prompt: "뷰 공간은 누구를 기준으로 하나?", choices: ["카메라", "모델 파일", "정렬 알고리즘", "확률 변수"], correctIndex: 0, explanation: "view transform은 카메라 기준으로 좌표를 바꿉니다.", conceptTags: ["뷰 공간"], questionType: "view-space", reasonTags: ["카메라"] },
+    { prompt: "projection 행렬은 어떤 감각과 연결되나?", choices: ["카메라와 화면 투영", "문자열 압축", "조건부 확률", "해시 충돌"], correctIndex: 0, explanation: "projection은 3D를 화면에 보이게 하는 단계입니다.", conceptTags: ["투영"], questionType: "projection", reasonTags: ["카메라"] },
+    { prompt: "vertex shader에서 MVP 곱이 하는 일은?", choices: ["정점을 화면으로 보내는 좌표 변환", "픽셀을 무작위로 섞기", "PCA 계산", "LU 분해"], correctIndex: 0, explanation: "MVP는 model-view-projection 변환입니다.", conceptTags: ["MVP"], questionType: "shader", reasonTags: ["좌표 변환"] },
+    { prompt: "model * view * projection 순서를 아무렇게나 바꾸면?", choices: ["의미와 결과가 달라질 수 있다.", "항상 같다.", "렌더링이 더 정확해진다.", "행렬이 사라진다."], correctIndex: 0, explanation: "행렬 곱 순서는 좌표 공간 흐름을 정합니다.", conceptTags: ["행렬 합성"], questionType: "order", reasonTags: ["공간 순서"] },
+    { prompt: "클립 공간은 무엇과 관련 있나?", choices: ["화면에 보일 후보 판단", "추천 점수", "문장 분류", "정수론"], correctIndex: 0, explanation: "clip space는 보이는 영역 판정과 연결됩니다.", conceptTags: ["클립 공간"], questionType: "clip", reasonTags: ["가시 영역"] },
+    { prompt: "같은 숫자 좌표라도 공간이 다르면?", choices: ["의미가 달라질 수 있다.", "항상 같은 점이다.", "항상 오류다.", "확률이 된다."], correctIndex: 0, explanation: "좌표는 기준 공간과 함께 해석해야 합니다.", conceptTags: ["좌표 공간"], questionType: "meaning", reasonTags: ["기준"] },
+    { prompt: "그래픽스 파이프라인이 선형대수와 연결되는 이유는?", choices: ["대부분의 위치 변환이 행렬 곱으로 표현되기 때문", "그래프 탐색만 하기 때문", "행렬을 쓰지 않기 때문", "분산을 금지하기 때문"], correctIndex: 0, explanation: "좌표 변환은 행렬 응용의 대표 사례입니다.", conceptTags: ["그래픽스"], questionType: "connection", reasonTags: ["행렬 곱"] },
+    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["렌더링 방정식과 GPU 세부 구현", "모델 공간", "뷰 공간", "투영 감각"], correctIndex: 0, explanation: "여기서는 좌표 변환 흐름을 봅니다.", conceptTags: ["범위 조절"], questionType: "scope", reasonTags: ["GPU 심화 제외"] },
+  ]}
+/>
+
+## 다음으로
+
+<NextChapterButton href="/chapters/pca-dimensionality-reduction" label="다음 챕터로 가기" />

@@ -1,0 +1,252 @@
+## 왜 배우나
+
+유클리드 알고리즘은 두 정수의 최대공약수 gcd를 빠르게 구하는 방법입니다. 코딩테스트에서는 약분, 최소공배수,
+주기 계산, 정수 문제 전처리에서 자주 등장합니다.
+
+정수론 기초에서 gcd의 의미를 봤고, 모듈러 연산에서 나머지를 봤습니다. 이 장에서는 그 둘을 연결합니다.
+핵심은 <strong>나머지를 반복해서 gcd 문제를 더 작은 gcd 문제로 바꾸는 감각</strong>입니다.
+
+확장 유클리드 알고리즘은 맛보기로만 언급하고, 디오판토스 방정식이나 모듈러 역원 본격 풀이는 다루지 않습니다.
+
+## 먼저 감 잡기
+
+84와 30의 gcd를 구한다고 해 봅시다. 약수를 전부 나열하지 않아도 됩니다.
+
+```text
+84 = 30 x 2 + 24
+30 = 24 x 1 + 6
+24 = 6 x 4 + 0
+```
+
+나머지가 0이 되는 순간의 나누는 수 6이 gcd입니다.
+
+<MultipleChoiceQuiz
+  questions={[
+    {
+      prompt: "84와 30의 gcd는?",
+      choices: ["6", "12", "24", "30"],
+      correctIndex: 0,
+      explanation: "84 = 30 x 2 + 24, 30 = 24 x 1 + 6, 24 = 6 x 4 + 0이므로 gcd는 6입니다.",
+      conceptTags: ["유클리드 알고리즘", "gcd"],
+      questionType: "euclidean-trace",
+      reasonTags: ["나머지가 0이 되는 단계 확인"],
+    },
+  ]}
+/>
+
+## 핵심 정의
+
+### gcd 복습
+
+gcd(a, b)는 a와 b를 동시에 나누는 가장 큰 양수입니다.
+
+작은 수에서는 약수를 나열해도 되지만, 입력이 커지면 모든 약수를 확인하는 방식은 비효율적입니다.
+
+### 핵심 등식
+
+유클리드 알고리즘의 핵심은 다음입니다.
+
+$$
+gcd(a, b) = gcd(b, a \bmod b)
+$$
+
+a와 b의 공약수는 b와 a를 b로 나눈 나머지도 나눕니다. 그래서 gcd 문제가 더 작은 수의 gcd 문제로 바뀝니다.
+이 장에서는 엄밀한 증명보다 이 변환을 코드로 읽는 감각에 집중합니다.
+
+### 종료 조건
+
+반복하다가 b가 0이 되면 현재 a가 gcd입니다.
+
+```text
+gcd(24, 6) = gcd(6, 0)
+```
+
+이때 gcd는 6입니다.
+
+### lcm과의 연결
+
+gcd를 구하면 lcm도 쉽게 구할 수 있습니다.
+
+$$
+lcm(a, b) = \frac{a \times b}{gcd(a, b)}
+$$
+
+곱셈이 큰 언어에서는 overflow를 피하려고 `(a // gcd(a, b)) * b`처럼 계산 순서를 조정하기도 합니다.
+
+<UnderstandingCheck
+  concept="유클리드 알고리즘"
+  prompt="gcd 문제를 나머지를 이용해 더 작은 gcd 문제로 바꾸는 흐름이 보이나요?"
+/>
+
+## 자주 헷갈리는 지점
+
+<strong>나머지가 아니라 몫을 다음 입력으로 넣는 실수.</strong> 다음 단계는 gcd(b, a mod b)입니다.
+
+<strong>종료 조건을 잘못 잡는 실수.</strong> b가 0이면 현재 a가 답입니다.
+
+<strong>입력 순서에 너무 신경 쓰는 실수.</strong> gcd(a, b)는 gcd(b, a)와 같아서, 큰 수를 앞에 두고 시작하면 편합니다.
+
+<strong>lcm 계산에서 gcd를 빼먹는 실수.</strong> lcm은 단순히 a x b가 아니라 a x b / gcd(a, b)입니다.
+
+<strong>확장 유클리드까지 한 번에 외우려는 실수.</strong> 지금 단계에서는 기본 gcd 반복 구조가 먼저입니다.
+
+## 직접 실험하기
+
+아래 실험에서 두 수를 바꾸며 나머지가 어떻게 줄어드는지 확인합니다.
+
+<EuclideanAlgorithmPlayground />
+
+## 코드로 읽기
+
+### 반복 구현
+
+```python
+def gcd(a, b):
+    while b != 0:
+        a, b = b, a % b
+    return a
+```
+
+한 줄 `a, b = b, a % b`가 핵심입니다. 이전 b가 다음 a가 되고, 이전 나머지가 다음 b가 됩니다.
+
+### 재귀 구현
+
+```python
+def gcd(a, b):
+    if b == 0:
+        return a
+
+    return gcd(b, a % b)
+```
+
+재귀 버전은 수식 `gcd(a, b) = gcd(b, a mod b)`를 거의 그대로 옮긴 형태입니다.
+
+### lcm 구현
+
+```python
+def lcm(a, b):
+    return a // gcd(a, b) * b
+```
+
+먼저 나눈 뒤 곱하면 큰 수 언어에서 overflow 위험을 줄일 수 있습니다.
+
+## 전공에서 만나는 장면
+
+유클리드 알고리즘은 다음 상황에서 자주 만납니다.
+
+- 분수 약분
+- 최소공배수 계산
+- 주기나 반복 패턴 맞추기
+- 격자와 정수 좌표 문제
+- RSA 같은 암호 기초 맛보기
+- 확장 유클리드 알고리즘으로 이어지는 정수 알고리즘
+
+시간복잡도는 입력 숫자가 빠르게 줄어든다는 점 때문에 매우 좋습니다. 지금 단계에서는 매번 나머지를 취하면서
+문제 크기가 크게 줄어든다는 감각이면 충분합니다.
+
+## 종합 점검
+
+<MultipleChoiceQuiz
+  title="종합 점검"
+  questions={[
+    {
+      prompt: "유클리드 알고리즘의 핵심 변환으로 맞는 것은?",
+      choices: ["gcd(a, b) = gcd(b, a mod b)", "gcd(a, b) = a + b", "gcd(a, b) = a x b", "gcd(a, b) = a - b만 반복"],
+      correctIndex: 0,
+      explanation: "나머지를 이용해 같은 gcd를 더 작은 입력의 gcd로 바꿉니다.",
+      conceptTags: ["유클리드 알고리즘"],
+      questionType: "core-identity",
+      reasonTags: ["gcd 변환식"],
+    },
+    {
+      prompt: "반복 구현에서 while b != 0이 끝났을 때 반환해야 하는 값은?",
+      choices: ["a", "b", "a % b", "a + b"],
+      correctIndex: 0,
+      explanation: "b가 0이 되는 순간 현재 a가 gcd입니다.",
+      conceptTags: ["종료 조건"],
+      questionType: "base-case",
+      reasonTags: ["b가 0일 때 답"],
+    },
+    {
+      prompt: "gcd(84, 30)의 첫 변환으로 맞는 것은?",
+      choices: ["gcd(30, 24)", "gcd(84, 2)", "gcd(24, 30)", "gcd(54, 30)"],
+      correctIndex: 0,
+      explanation: "84 mod 30은 24이므로 gcd(84, 30) = gcd(30, 24)입니다.",
+      conceptTags: ["나머지 단계"],
+      questionType: "trace-step",
+      reasonTags: ["a mod b 계산"],
+    },
+    {
+      prompt: "30 = 24 x 1 + 6 다음 단계로 맞는 것은?",
+      choices: ["gcd(24, 6)", "gcd(24, 1)", "gcd(30, 6)", "gcd(6, 24)만 가능"],
+      correctIndex: 0,
+      explanation: "다음 입력은 이전 b와 나머지입니다.",
+      conceptTags: ["나머지 단계"],
+      questionType: "next-step",
+      reasonTags: ["b와 remainder로 이동"],
+    },
+    {
+      prompt: "24 = 6 x 4 + 0이면 gcd는?",
+      choices: ["6", "0", "4", "24"],
+      correctIndex: 0,
+      explanation: "나머지가 0이 되었으므로 그때의 나누는 수 6이 gcd입니다.",
+      conceptTags: ["종료 조건"],
+      questionType: "zero-remainder",
+      reasonTags: ["나머지 0 단계"],
+    },
+    {
+      prompt: "gcd(12, 18)에 대한 설명으로 맞는 것은?",
+      choices: ["gcd(18, 12)와 같다.", "항상 12다.", "항상 더 큰 수다.", "입력 순서를 바꾸면 값이 달라진다."],
+      correctIndex: 0,
+      explanation: "gcd는 공통 약수의 최대값이라 입력 순서를 바꿔도 같습니다.",
+      conceptTags: ["gcd 성질"],
+      questionType: "symmetry",
+      reasonTags: ["입력 순서"],
+    },
+    {
+      prompt: "lcm(a, b)를 gcd로 구하는 식으로 맞는 것은?",
+      choices: ["a x b / gcd(a, b)", "a + b - gcd(a, b)", "gcd(a, b) / a", "a mod b"],
+      correctIndex: 0,
+      explanation: "최소공배수는 두 수의 곱을 gcd로 나눈 값입니다.",
+      conceptTags: ["lcm", "gcd"],
+      questionType: "lcm-formula",
+      reasonTags: ["gcd와 lcm 연결"],
+    },
+    {
+      prompt: "반복 구현의 핵심 대입으로 맞는 것은?",
+      choices: ["a, b = b, a % b", "a, b = a % b, b", "a, b = a + b, b", "a, b = b, a * b"],
+      correctIndex: 0,
+      explanation: "이전 b와 이전 나머지가 다음 gcd 문제의 입력이 됩니다.",
+      conceptTags: ["코드 구현"],
+      questionType: "implementation",
+      reasonTags: ["반복 상태 갱신"],
+    },
+    {
+      prompt: "확장 유클리드 알고리즘을 이 장에서 깊게 다루지 않는 이유로 맞는 것은?",
+      choices: [
+        "기본 gcd 반복 구조를 먼저 익히는 단계이기 때문",
+        "확장 유클리드는 존재하지 않기 때문",
+        "gcd와 관련이 없기 때문",
+        "항상 O(2^n)이기 때문",
+      ],
+      correctIndex: 0,
+      explanation: "확장 유클리드는 모듈러 역원과 연결되는 심화 주제라 여기서는 맛보기로만 둡니다.",
+      conceptTags: ["확장 유클리드"],
+      questionType: "scope-boundary",
+      reasonTags: ["심화 주제 분리"],
+    },
+    {
+      prompt: "유클리드 알고리즘이 전공에서 쓰이는 장면으로 맞는 것은?",
+      choices: ["분수 약분과 최소공배수 계산", "CSS 애니메이션", "HTML 태그 선택", "이미지 밝기 조절"],
+      correctIndex: 0,
+      explanation: "gcd는 약분, lcm, 정수 알고리즘에서 자주 쓰입니다.",
+      conceptTags: ["전공 연결"],
+      questionType: "cs-context",
+      reasonTags: ["유클리드 알고리즘 적용 장면"],
+    },
+  ]}
+/>
+
+## 다음으로
+
+<NextChapterButton href="/chapters/boolean-algebra" label="다음 챕터로 가기" />

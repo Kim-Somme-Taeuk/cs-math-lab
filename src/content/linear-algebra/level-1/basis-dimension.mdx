@@ -1,0 +1,206 @@
+## 왜 배우나
+
+기저와 차원은 좌표가 어떤 기준으로 표현되는지 이해하게 해 줍니다. 같은 점도 기준 벡터를 어떻게 잡느냐에 따라
+좌표 표현이 달라질 수 있습니다.
+
+이 장의 핵심은 <strong>기저를 공간을 만드는 기준 벡터, 차원을 필요한 독립 방향의 수로 읽는 법</strong>입니다.
+선형독립의 엄밀한 증명은 다루지 않습니다.
+
+## 먼저 감 잡기
+
+2D 평면에서는 보통 `[1, 0]`과 `[0, 1]`을 기준 방향으로 씁니다. `[3, 2]`는 `[1, 0]`을 3번, `[0, 1]`을 2번
+쓴 좌표라고 볼 수 있습니다.
+
+```text
+[3, 2] = 3[1, 0] + 2[0, 1]
+```
+
+<MultipleChoiceQuiz
+  questions={[
+    {
+      prompt: "2D 표준기저로 맞는 것은?",
+      choices: ["[1, 0]과 [0, 1]", "[1, 1] 하나", "[0, 0]과 [0, 0]", "[2, 2] 하나"],
+      correctIndex: 0,
+      explanation: "[1, 0]과 [0, 1]은 2D 좌표를 만드는 기본 방향입니다.",
+      conceptTags: ["표준기저"],
+      questionType: "standard-basis",
+      reasonTags: ["기본 방향"],
+    },
+  ]}
+/>
+
+## 핵심 정의
+
+### 기저
+
+기저는 공간의 모든 벡터를 만들 수 있는 기준 벡터들의 묶음입니다.
+
+입문 단계에서는 "좌표를 만드는 기준 방향"으로 이해하면 됩니다.
+
+### 차원
+
+차원은 공간을 표현하는 데 필요한 독립적인 방향의 수입니다. 2D 평면은 두 방향이 필요하고, 3D 공간은 세 방향이 필요합니다.
+
+### 표준기저
+
+2D 표준기저는 다음 두 벡터입니다.
+
+```text
+e1 = [1, 0]
+e2 = [0, 1]
+```
+
+### 좌표 표현
+
+좌표는 기준 벡터를 얼마나 섞을지 나타내는 숫자입니다.
+
+```text
+[3, 2] = 3e1 + 2e2
+```
+
+<UnderstandingCheck
+  concept="기저와 차원"
+  prompt="좌표가 그냥 숫자 묶음이 아니라 기준 벡터를 얼마나 섞었는지 나타낸다는 점이 보이나요?"
+/>
+
+## 자주 헷갈리는 지점
+
+<strong>차원을 화면의 축 개수로만 보는 실수.</strong> 데이터에서는 특징 수가 차원이 될 수 있습니다.
+
+<strong>기저를 하나의 벡터라고 생각하는 실수.</strong> 보통 기저는 여러 기준 벡터의 묶음입니다.
+
+<strong>기준이 바뀌어도 좌표가 항상 같다고 보는 실수.</strong> 같은 벡터도 기준이 바뀌면 좌표 숫자가 달라질 수 있습니다.
+
+<strong>선형독립 증명부터 파고드는 실수.</strong> 여기서는 필요한 독립 방향의 수라는 감각이 먼저입니다.
+
+## 직접 실험하기
+
+아래 실험에서 표준기저와 벡터 좌표를 같이 보며 `[x, y]`가 기준 방향의 조합이라는 점을 확인합니다.
+
+<LinearAlgebraPlayground mode="basis-dimension" />
+
+## 코드로 읽기
+
+```python
+e1 = [1, 0]
+e2 = [0, 1]
+v = [3, 2]
+```
+
+`v = [3, 2]`는 표준기저 기준으로 `3 * e1 + 2 * e2`라고 읽을 수 있습니다.
+
+데이터에서는 특징이 128개라면 128차원 벡터로 다루는 식입니다.
+
+```python
+embedding_dim = len(embedding)
+```
+
+## 전공에서 만나는 장면
+
+- 좌표계와 카메라 기준
+- 데이터 특징 수
+- 임베딩 차원
+- 차원 축소의 필요성 맛보기
+- 그래픽스 좌표 표현
+
+## 종합 점검
+
+<MultipleChoiceQuiz
+  title="종합 점검"
+  questions={[
+    {
+      prompt: "기저를 입문 단계에서 가장 가깝게 읽으면?",
+      choices: ["공간을 만드는 기준 벡터 묶음", "항상 숫자 하나", "행렬의 마지막 열", "내적의 결과"],
+      correctIndex: 0,
+      explanation: "기저는 벡터를 표현하기 위한 기준 방향들의 묶음입니다.",
+      conceptTags: ["기저"],
+      questionType: "basis-meaning",
+      reasonTags: ["기준 벡터"],
+    },
+    {
+      prompt: "차원은 무엇과 가까운가?",
+      choices: ["필요한 독립 방향의 수", "파일 크기", "HTML 태그 수", "항상 픽셀 개수"],
+      correctIndex: 0,
+      explanation: "차원은 공간을 표현하는 데 필요한 독립 방향의 수로 볼 수 있습니다.",
+      conceptTags: ["차원"],
+      questionType: "dimension-meaning",
+      reasonTags: ["독립 방향"],
+    },
+    {
+      prompt: "2D 표준기저의 두 벡터는?",
+      choices: ["[1, 0], [0, 1]", "[1, 1], [1, 1]", "[0, 0], [1, 1]", "[2, 0], [0, 0]"],
+      correctIndex: 0,
+      explanation: "2D 표준기저는 x축 방향과 y축 방향의 기본 벡터입니다.",
+      conceptTags: ["표준기저"],
+      questionType: "standard-basis",
+      reasonTags: ["2D 기준"],
+    },
+    {
+      prompt: "[3, 2]를 표준기저로 읽으면?",
+      choices: ["3[1,0] + 2[0,1]", "2[1,0] + 3[0,1]", "[1,0]만 사용", "[0,1]만 사용"],
+      correctIndex: 0,
+      explanation: "첫 좌표는 e1의 계수, 둘째 좌표는 e2의 계수입니다.",
+      conceptTags: ["좌표 표현"],
+      questionType: "coordinate-expression",
+      reasonTags: ["기저 계수"],
+    },
+    {
+      prompt: "특징이 20개인 데이터 벡터는 보통 몇 차원으로 볼 수 있나?",
+      choices: ["20차원", "2차원", "1차원", "항상 3차원"],
+      correctIndex: 0,
+      explanation: "성분이나 특징이 20개면 20차원 벡터로 볼 수 있습니다.",
+      conceptTags: ["데이터 차원"],
+      questionType: "feature-dimension",
+      reasonTags: ["특징 수"],
+    },
+    {
+      prompt: "기준 벡터가 바뀌면 좌표 숫자는?",
+      choices: ["달라질 수 있다.", "항상 같다.", "항상 0이 된다.", "항상 정수가 아니다."],
+      correctIndex: 0,
+      explanation: "같은 벡터도 어떤 기준으로 표현하느냐에 따라 좌표가 달라질 수 있습니다.",
+      conceptTags: ["좌표 표현"],
+      questionType: "basis-change-intuition",
+      reasonTags: ["기준 의존"],
+    },
+    {
+      prompt: "기저를 하나의 벡터로만 생각하면 안 되는 이유는?",
+      choices: ["공간을 만들 기준 벡터 묶음인 경우가 많기 때문", "항상 행렬식이 필요하기 때문", "벡터는 기저가 될 수 없기 때문", "좌표가 사라지기 때문"],
+      correctIndex: 0,
+      explanation: "2D에서는 보통 두 기준 벡터가 함께 기저를 이룹니다.",
+      conceptTags: ["기저"],
+      questionType: "basis-set",
+      reasonTags: ["벡터 묶음"],
+    },
+    {
+      prompt: "임베딩 차원은 보통 무엇을 뜻하나?",
+      choices: ["임베딩 벡터의 성분 개수", "문장 글자 수만", "파일 개수", "행렬의 행렬식"],
+      correctIndex: 0,
+      explanation: "임베딩 차원은 임베딩 벡터가 가진 숫자 성분의 개수입니다.",
+      conceptTags: ["임베딩 차원"],
+      questionType: "embedding-dimension",
+      reasonTags: ["성분 개수"],
+    },
+    {
+      prompt: "이 장에서 깊게 다루지 않는 것은?",
+      choices: ["선형독립의 엄밀한 증명", "표준기저", "차원 감각", "좌표 표현"],
+      correctIndex: 0,
+      explanation: "Level 1에서는 증명보다 기준과 좌표 감각에 집중합니다.",
+      conceptTags: ["범위 조절"],
+      questionType: "scope-boundary",
+      reasonTags: ["입문 난이도"],
+    },
+    {
+      prompt: "기저와 차원이 전공에서 쓰이는 장면으로 맞는 것은?",
+      choices: ["데이터 특징 수와 좌표 표현", "CSS 폰트 이름", "HTTP 메서드 이름", "파일 확장자"],
+      correctIndex: 0,
+      explanation: "기저와 차원은 좌표계, 특징 수, 임베딩 차원과 연결됩니다.",
+      conceptTags: ["전공 연결"],
+      questionType: "cs-context",
+      reasonTags: ["차원 적용"],
+    },
+  ]}
+/>
+
+## 다음으로
+
+<NextChapterButton href="/chapters/inverse-matrices" label="다음 챕터로 가기" />

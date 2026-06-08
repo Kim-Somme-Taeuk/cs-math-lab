@@ -1,0 +1,316 @@
+## 왜 배우나
+
+정수론은 정수를 나누고 묶는 규칙을 다룹니다. 컴퓨터공학에서는 코딩테스트의 약수 문제, 배수 판정, 최대공약수,
+최소공배수, 나머지 계산, 해싱, 암호 맛보기에서 자주 만납니다.
+
+이 장에서는 페르마 소정리, 오일러 정리, 중국인의 나머지 정리처럼 깊은 정리를 다루지 않습니다.
+핵심은 <strong>정수를 약수, 배수, 소수, gcd, lcm 관점으로 읽고 코드로 옮기는 감각</strong>입니다.
+
+## 먼저 감 잡기
+
+12를 예로 봅시다.
+
+- 12의 약수: 1, 2, 3, 4, 6, 12
+- 12의 배수: 12, 24, 36, 48, ...
+- 12는 소수가 아니라 합성수입니다.
+- 12는 $2 \times 2 \times 3$으로 소인수분해됩니다.
+
+정수론 문제는 보통 "나누어떨어지는가", "공통으로 나누는 수가 있는가", "반복되는 주기가 있는가"를 묻습니다.
+
+<MultipleChoiceQuiz
+  questions={[
+    {
+      prompt: "18의 약수로 맞는 것은?",
+      choices: ["6", "5", "7", "10"],
+      correctIndex: 0,
+      explanation: "18은 6으로 나누어떨어지므로 6은 18의 약수입니다.",
+      conceptTags: ["약수"],
+      questionType: "divisor",
+      reasonTags: ["나누어떨어짐 조건 확인"],
+    },
+  ]}
+/>
+
+## 핵심 정의
+
+### 약수와 배수
+
+정수 a가 정수 b를 나누어떨어지게 하면 a는 b의 약수입니다.
+
+```python
+def divides(a, b):
+    return b % a == 0
+```
+
+반대로 b가 a의 배수라는 말은 b가 a로 나누어떨어진다는 뜻입니다.
+
+### 소수와 합성수
+
+소수는 1보다 큰 정수 중 약수가 1과 자기 자신뿐인 수입니다. 2, 3, 5, 7, 11은 소수입니다.
+
+합성수는 1보다 큰 정수 중 소수가 아닌 수입니다. 4, 6, 8, 9, 10은 합성수입니다.
+
+1은 소수도 합성수도 아닙니다. 이 점을 코드에서 자주 빼먹습니다.
+
+### 소인수분해
+
+소인수분해는 정수를 소수들의 곱으로 나타내는 것입니다.
+
+$$
+60 = 2^2 \times 3 \times 5
+$$
+
+소인수분해는 약수 개수, gcd/lcm, 배수 조건을 이해하는 데 도움이 됩니다.
+
+### gcd와 lcm
+
+gcd는 greatest common divisor, 즉 최대공약수입니다. 두 수를 동시에 나누는 가장 큰 양수입니다.
+
+lcm은 least common multiple, 즉 최소공배수입니다. 두 수의 공통 배수 중 가장 작은 양수입니다.
+
+예를 들어 18과 24의 gcd는 6이고, lcm은 72입니다.
+
+$$
+lcm(a, b) = \frac{a \times b}{gcd(a, b)}
+$$
+
+### 나눗셈 정리
+
+정수 a를 양의 정수 b로 나누면 다음처럼 쓸 수 있습니다.
+
+$$
+a = bq + r
+$$
+
+여기서 q는 몫이고 r은 나머지입니다. 나머지는 $0 \le r < b$ 범위에 있습니다.
+
+예를 들어 29를 5로 나누면 다음과 같습니다.
+
+$$
+29 = 5 \times 5 + 4
+$$
+
+<UnderstandingCheck
+  concept="정수론 기초"
+  prompt="약수, 배수, 소수, gcd, lcm이 모두 나누어떨어짐과 연결된다는 점이 보이나요?"
+/>
+
+## 자주 헷갈리는 지점
+
+<strong>1을 소수로 보는 실수.</strong> 1은 약수가 하나뿐이므로 소수가 아닙니다.
+
+<strong>약수와 배수를 뒤집는 실수.</strong> 3은 12의 약수이고, 12는 3의 배수입니다.
+
+<strong>gcd와 lcm을 섞는 실수.</strong> gcd는 공통으로 나누는 가장 큰 수이고, lcm은 공통으로 나누어떨어지는
+가장 작은 수입니다.
+
+<strong>나머지 조건을 빼먹는 실수.</strong> $a = bq + r$에서 r은 아무 정수가 아니라 0 이상 b 미만입니다.
+
+<strong>소인수분해를 너무 큰 수에 무작정 시도하는 실수.</strong> 입문 단계에서는 개념을 이해하되, 큰 입력에서는
+시간복잡도도 같이 봐야 합니다.
+
+## 직접 실험하기
+
+아래 실험에서 두 수를 바꿔 보며 약수, 소수 여부, 소인수분해, gcd/lcm, 나눗셈 정리를 같이 확인합니다.
+
+<NumberTheoryPlayground />
+
+## 코드로 읽기
+
+### 약수 판정
+
+```python
+def is_divisor(d, n):
+    return n % d == 0
+```
+
+핵심은 나머지가 0인지 확인하는 것입니다.
+
+### 소수 판정
+
+```python
+def is_prime(n):
+    if n < 2:
+        return False
+
+    d = 2
+    while d * d <= n:
+        if n % d == 0:
+            return False
+        d += 1
+
+    return True
+```
+
+약수를 2부터 확인하되, $d^2 \le n$까지만 보면 됩니다. 만약 n이 합성수라면 두 인수 중 하나는 $\sqrt n$ 이하에
+있기 때문입니다. 이 정도 감각이면 지금 단계에서는 충분합니다.
+
+### gcd와 lcm
+
+```python
+def gcd(a, b):
+    while b != 0:
+        a, b = b, a % b
+    return a
+
+def lcm(a, b):
+    return a * b // gcd(a, b)
+```
+
+gcd 계산 자체는 다음 챕터인 유클리드 알고리즘에서 더 자세히 봅니다. 여기서는 gcd와 lcm이 무엇을 뜻하는지만
+잡으면 됩니다.
+
+## 전공에서 만나는 장면
+
+정수론은 코딩테스트에서 다음처럼 자주 등장합니다.
+
+- 약수 개수 세기
+- 소수 판정과 소인수분해
+- 최대공약수와 최소공배수
+- 반복 주기 계산
+- 나머지 연산과 모듈러 패턴
+- 해시, 난수, 암호 기초 맛보기
+
+다음 챕터의 모듈러 연산은 이 나눗셈 정리와 나머지 감각을 기반으로 합니다.
+
+## 종합 점검
+
+<MultipleChoiceQuiz
+  title="종합 점검"
+  questions={[
+    {
+      prompt: "약수의 의미로 맞는 것은?",
+      choices: [
+        "어떤 수를 나누어떨어지게 하는 수",
+        "항상 더 큰 수",
+        "항상 소수인 수",
+        "나머지를 항상 1로 만드는 수",
+      ],
+      correctIndex: 0,
+      explanation: "d가 n의 약수라는 말은 n % d가 0이라는 뜻입니다.",
+      conceptTags: ["약수"],
+      questionType: "divisor-definition",
+      reasonTags: ["약수 정의 확인"],
+    },
+    {
+      prompt: "12와 18의 최대공약수는?",
+      choices: ["6", "3", "12", "36"],
+      correctIndex: 0,
+      explanation: "12와 18을 동시에 나누는 수 중 가장 큰 수는 6입니다.",
+      conceptTags: ["gcd"],
+      questionType: "gcd",
+      reasonTags: ["공통 약수 중 최대값"],
+    },
+    {
+      prompt: "4와 6의 최소공배수는?",
+      choices: ["12", "2", "24", "6"],
+      correctIndex: 0,
+      explanation: "4와 6의 공통 배수 중 가장 작은 양수는 12입니다.",
+      conceptTags: ["lcm"],
+      questionType: "lcm",
+      reasonTags: ["공통 배수 중 최소값"],
+    },
+    {
+      prompt: "소수에 대한 설명으로 맞는 것은?",
+      choices: [
+        "1보다 크고 약수가 1과 자기 자신뿐인 수",
+        "1을 포함한 모든 홀수",
+        "약수가 세 개 이상인 수",
+        "항상 짝수인 수",
+      ],
+      correctIndex: 0,
+      explanation: "소수는 1보다 커야 하고, 약수가 1과 자기 자신뿐이어야 합니다.",
+      conceptTags: ["소수"],
+      questionType: "prime-definition",
+      reasonTags: ["1은 소수가 아님"],
+    },
+    {
+      prompt: "1에 대한 설명으로 맞는 것은?",
+      choices: [
+        "소수도 합성수도 아니다.",
+        "가장 작은 소수다.",
+        "가장 작은 합성수다.",
+        "모든 수의 배수가 아니다.",
+      ],
+      correctIndex: 0,
+      explanation: "1은 약수가 하나뿐이라 소수 정의를 만족하지 않고, 합성수도 아닙니다.",
+      conceptTags: ["소수", "합성수"],
+      questionType: "prime-edge-case",
+      reasonTags: ["1 처리 실수"],
+    },
+    {
+      prompt: "60의 소인수분해로 맞는 것은?",
+      choices: [
+        "$2^2 \\times 3 \\times 5$",
+        "$2 \\times 30$",
+        "$4 \\times 15$",
+        "$6 \\times 10$",
+      ],
+      correctIndex: 0,
+      explanation: "소인수분해는 모든 인수를 소수로 쪼갠 형태입니다.",
+      conceptTags: ["소인수분해"],
+      questionType: "prime-factorization",
+      reasonTags: ["합성 인수를 소수로 더 쪼개기"],
+    },
+    {
+      prompt: "나눗셈 정리 $a = bq + r$에서 r이 만족해야 하는 범위는?",
+      choices: [
+        "$0 \\le r < b$",
+        "$r > b$",
+        "$r = b$",
+        "$r < 0$",
+      ],
+      correctIndex: 0,
+      explanation: "나머지는 0 이상이고 나누는 수보다 작아야 합니다.",
+      conceptTags: ["나눗셈 정리"],
+      questionType: "division-algorithm",
+      reasonTags: ["나머지 범위"],
+    },
+    {
+      prompt: "29를 5로 나눌 때 몫과 나머지는?",
+      choices: [
+        "몫 5, 나머지 4",
+        "몫 4, 나머지 5",
+        "몫 6, 나머지 -1",
+        "몫 5, 나머지 5",
+      ],
+      correctIndex: 0,
+      explanation: "29 = 5 x 5 + 4입니다.",
+      conceptTags: ["나눗셈 정리"],
+      questionType: "quotient-remainder",
+      reasonTags: ["몫과 나머지 계산"],
+    },
+    {
+      prompt: "소수 판정에서 $d^2 \\le n$까지만 확인해도 되는 감각은?",
+      choices: [
+        "합성수라면 작은 쪽 인수가 제곱근 이하에 있기 때문",
+        "모든 약수가 n보다 크기 때문",
+        "소수는 항상 짝수이기 때문",
+        "나머지가 항상 1이기 때문",
+      ],
+      correctIndex: 0,
+      explanation: "두 인수가 모두 sqrt(n)보다 크면 곱이 n보다 커지므로, 작은 쪽 인수는 sqrt(n) 이하입니다.",
+      conceptTags: ["소수 판정"],
+      questionType: "prime-check",
+      reasonTags: ["제곱근까지만 검사"],
+    },
+    {
+      prompt: "정수론이 코딩테스트에서 자주 쓰이는 장면으로 맞는 것은?",
+      choices: [
+        "약수, 배수, gcd/lcm 계산",
+        "CSS 색상 선택",
+        "HTML 태그 닫기",
+        "이미지 압축률 조정",
+      ],
+      correctIndex: 0,
+      explanation: "정수론 기초는 약수, 배수, gcd/lcm, 나머지 문제로 자주 등장합니다.",
+      conceptTags: ["코딩테스트", "정수론"],
+      questionType: "cs-context",
+      reasonTags: ["정수론 적용 장면"],
+    },
+  ]}
+/>
+
+## 다음으로
+
+<NextChapterButton href="/chapters/modular-arithmetic" label="다음 챕터로 가기" />

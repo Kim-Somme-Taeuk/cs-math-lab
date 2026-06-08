@@ -1,0 +1,93 @@
+## 왜 배우나
+
+부분공간은 큰 공간 안에서 벡터 연산을 해도 그 안에 남는 작은 공간입니다. 해공간, 열공간, 영공간 같은 개념으로
+이어지는 준비가 됩니다.
+
+핵심은 <strong>어떤 벡터 집합이 덧셈과 스칼라 곱에 대해 닫혀 있는지 판단하는 법</strong>입니다.
+추상 벡터공간 일반론은 다루지 않습니다.
+
+## 먼저 감 잡기
+
+2D 평면에서 원점을 지나는 직선은 부분공간 감각을 가집니다. 그 직선 위 벡터 둘을 더해도 여전히 직선 위에 있고,
+스칼라를 곱해도 직선 위에 남습니다.
+
+하지만 원점을 지나지 않는 직선은 0벡터를 포함하지 않으므로 부분공간이 아닙니다.
+
+<MultipleChoiceQuiz
+  questions={[{ prompt: "부분공간이 되기 위한 기본 조건으로 맞는 것은?", choices: ["영벡터 포함", "항상 원점을 제외", "항상 곡선", "항상 3차원"], correctIndex: 0, explanation: "부분공간은 반드시 영벡터를 포함해야 합니다.", conceptTags: ["부분공간"], questionType: "subspace-condition", reasonTags: ["영벡터"] }]}
+/>
+
+## 핵심 정의
+
+### 큰 공간 안의 작은 공간
+
+부분공간은 어떤 벡터 공간 안에 들어 있는 작은 공간입니다.
+
+### 영벡터 포함
+
+부분공간은 0벡터를 포함해야 합니다.
+
+### 덧셈에 대해 닫힘
+
+부분공간 안의 두 벡터를 더했을 때 결과도 그 안에 있어야 합니다.
+
+### 스칼라 곱에 대해 닫힘
+
+부분공간 안의 벡터에 어떤 숫자를 곱해도 결과가 그 안에 있어야 합니다.
+
+<UnderstandingCheck concept="부분공간" prompt="부분공간은 벡터 연산을 해도 밖으로 새지 않는 공간이라는 점이 보이나요?" />
+
+## 자주 헷갈리는 지점
+
+<strong>원점을 지나지 않는 직선을 부분공간으로 보는 실수.</strong> 0벡터가 없으면 부분공간이 아닙니다.
+
+<strong>일부 예시만 보고 닫힘을 확인했다고 생각하는 실수.</strong> 모든 경우에 대해 닫혀 있어야 합니다.
+
+<strong>부분집합이면 무조건 부분공간이라고 보는 실수.</strong> 벡터 연산 조건을 만족해야 합니다.
+
+<strong>부분공간을 추상 이론으로만 보는 실수.</strong> 해공간과 열공간을 이해하기 위한 판단 도구입니다.
+
+## 직접 판별하기
+
+아래 실험에서 부분공간 조건을 체크리스트처럼 확인합니다.
+
+<LinearAlgebraLevelTwoPlayground mode="subspace" />
+
+## 코드로 읽기
+
+```python
+def looks_like_subspace(contains_zero, closed_add, closed_scale):
+    return contains_zero and closed_add and closed_scale
+```
+
+실제 계산에서는 모든 벡터를 직접 검사하기 어렵지만, 조건 자체는 체크리스트처럼 읽을 수 있습니다.
+
+## 전공에서 만나는 장면
+
+- 선형시스템의 해공간
+- 행렬의 열공간
+- 가능한 상태들의 집합
+- 제약을 만족하는 벡터 집합
+- 차원과 랭크 해석
+
+## 종합 점검
+
+<MultipleChoiceQuiz
+  title="종합 점검"
+  questions={[
+    { prompt: "부분공간은 반드시 무엇을 포함해야 하나?", choices: ["영벡터", "모든 3D 벡터", "행렬식", "고유값"], correctIndex: 0, explanation: "부분공간은 0벡터를 포함해야 합니다.", conceptTags: ["부분공간"], questionType: "zero-vector", reasonTags: ["필수 조건"] },
+    { prompt: "덧셈에 대해 닫힘이란?", choices: ["안의 두 벡터를 더해도 안에 남는다.", "항상 0이 된다.", "더하면 밖으로 나간다.", "더할 수 없다."], correctIndex: 0, explanation: "부분공간 안에서 덧셈 결과도 그 안에 있어야 합니다.", conceptTags: ["닫힘"], questionType: "closed-addition", reasonTags: ["덧셈"] },
+    { prompt: "스칼라 곱에 대해 닫힘이란?", choices: ["안의 벡터에 숫자를 곱해도 안에 남는다.", "항상 1만 곱한다.", "숫자를 곱하면 문자열이 된다.", "곱하면 항상 밖으로 간다."], correctIndex: 0, explanation: "스칼라 곱 결과도 부분공간 안에 있어야 합니다.", conceptTags: ["닫힘"], questionType: "closed-scale", reasonTags: ["스칼라 곱"] },
+    { prompt: "원점을 지나지 않는 직선이 부분공간이 아닌 이유는?", choices: ["영벡터를 포함하지 않기 때문", "직선이라서", "2D라서", "벡터가 많아서"], correctIndex: 0, explanation: "부분공간은 반드시 원점, 즉 0벡터를 포함해야 합니다.", conceptTags: ["영벡터"], questionType: "line-not-through-origin", reasonTags: ["원점"] },
+    { prompt: "원점을 지나는 직선은 부분공간 감각을 갖는 이유는?", choices: ["덧셈과 스칼라 곱 뒤에도 그 직선 위에 남기 때문", "항상 곡선이기 때문", "행렬식이 1이기 때문", "모든 평면을 포함하기 때문"], correctIndex: 0, explanation: "한 방향의 모든 배수는 같은 직선 위에 남습니다.", conceptTags: ["부분공간"], questionType: "line-through-origin", reasonTags: ["닫힘"] },
+    { prompt: "부분집합이면 무조건 부분공간인가?", choices: ["아니다.", "그렇다.", "2D에서는 그렇다.", "원소가 3개면 그렇다."], correctIndex: 0, explanation: "영벡터와 닫힘 조건을 확인해야 합니다.", conceptTags: ["부분공간 조건"], questionType: "subset-vs-subspace", reasonTags: ["조건 필요"] },
+    { prompt: "부분공간이 이어지는 개념으로 맞는 것은?", choices: ["해공간과 열공간", "CSS 박스 모델", "HTTP 캐시", "파일 경로"], correctIndex: 0, explanation: "해공간과 열공간은 부분공간 관점으로 이해합니다.", conceptTags: ["해공간", "열공간"], questionType: "next-concepts", reasonTags: ["공간 해석"] },
+    { prompt: "닫힘을 확인할 때 중요한 태도는?", choices: ["모든 경우에 대해 유지되는지 본다.", "예시 하나만 본다.", "항상 그림만 본다.", "문자열 길이를 센다."], correctIndex: 0, explanation: "닫힘은 임의의 벡터와 스칼라에 대해 유지되어야 합니다.", conceptTags: ["닫힘"], questionType: "all-cases", reasonTags: ["일반성"] },
+    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["추상 벡터공간 일반론", "영벡터 포함", "덧셈 닫힘", "스칼라 곱 닫힘"], correctIndex: 0, explanation: "Level 2에서는 해석에 필요한 부분공간 조건만 다룹니다.", conceptTags: ["범위 조절"], questionType: "scope-boundary", reasonTags: ["과확장 방지"] },
+    { prompt: "부분공간이 판단하게 해 주는 것은?", choices: ["벡터 연산 후에도 같은 공간 안에 남는지", "색상이 같은지", "파일이 큰지", "문자열이 비었는지"], correctIndex: 0, explanation: "부분공간은 연산에 대해 닫혀 있는지 판단합니다.", conceptTags: ["부분공간"], questionType: "judgment", reasonTags: ["닫힘 판단"] },
+  ]}
+/>
+
+## 다음으로
+
+<NextChapterButton href="/chapters/determinants" label="다음 챕터로 가기" />

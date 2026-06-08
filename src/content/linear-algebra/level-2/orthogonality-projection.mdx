@@ -1,0 +1,94 @@
+## 왜 배우나
+
+직교성은 두 방향이 서로 겹치지 않는다는 감각이고, 정사영은 어떤 벡터를 한 방향이나 부분공간 위의 가장 가까운 그림자로 내리는 방법입니다.
+내적, 거리, 오차, 최소제곱을 이해하려면 먼저 직교와 정사영을 읽을 수 있어야 합니다.
+
+핵심은 <strong>정사영을 공식 암기가 아니라 "가장 가까운 성분만 남기고 나머지는 직교 오차로 분리하는 일"로 보는 것</strong>입니다.
+
+## 먼저 감 잡기
+
+그림자가 바닥 위로 떨어지면 높이 성분은 사라지고 바닥 방향 성분만 남습니다. 정사영도 비슷하게, 목표 벡터에서 기준 방향에 맞는 성분만 남깁니다.
+
+<MultipleChoiceQuiz
+  questions={[{ prompt: "정사영을 가장 잘 설명한 것은?", choices: ["한 방향 위의 가장 가까운 그림자", "벡터를 무조건 0으로 만드는 연산", "행렬식을 크게 만드는 절차", "고유값을 세는 방법"], correctIndex: 0, explanation: "정사영은 기준 방향이나 부분공간 위의 가장 가까운 벡터를 찾는 감각입니다.", conceptTags: ["정사영"], questionType: "intuition", reasonTags: ["가까운 그림자"] }]}
+/>
+
+## 핵심 정의
+
+### 직교
+
+두 벡터의 내적이 0이면 서로 직교한다고 말합니다. 기하적으로는 서로 수직인 방향입니다.
+
+### 정사영
+
+벡터 v를 방향 u 위에 내릴 때, u 방향으로 설명되는 부분만 남깁니다.
+
+### 직교 오차
+
+원래 벡터에서 정사영을 뺀 나머지입니다. 이 오차는 기준 방향과 직교합니다.
+
+### 가장 가까운 점
+
+정사영은 기준 직선이나 부분공간 안에서 원래 벡터와 가장 가까운 점으로 읽을 수 있습니다.
+
+<UnderstandingCheck concept="정사영" prompt="정사영 뒤에 남는 오차가 기준 방향과 직교한다는 점이 보이나요?" />
+
+## 자주 헷갈리는 지점
+
+<strong>정사영을 단순히 좌표 하나를 지우는 것으로 보는 실수.</strong> 기준 방향이 축과 다르면 내적으로 방향 성분을 읽어야 합니다.
+
+<strong>직교와 독립을 같은 말로 보는 실수.</strong> 직교하면 독립인 경우가 많지만, 독립은 더 넓은 개념입니다.
+
+<strong>정사영이 항상 원래 벡터와 같다고 생각하는 실수.</strong> 원래 벡터가 이미 기준 공간 안에 있을 때만 같습니다.
+
+<strong>오차를 실패로만 보는 실수.</strong> 오차는 기준 공간으로 설명하지 못한 남은 성분입니다.
+
+## 직접 실험하기
+
+아래 실험에서 목표 벡터를 바꾸며 정사영과 오차가 어떻게 분리되는지 확인합니다.
+
+<LinearAlgebraLevelTwoPlayground mode="projection" />
+
+## 코드로 읽기
+
+```python
+projection = (dot(v, u) / dot(u, u)) * u
+error = v - projection
+```
+
+이 코드는 v를 u 방향 성분과 그에 직교하는 오차로 나눕니다. 계산보다 중요한 것은 "설명되는 부분"과 "남은 부분"을 구분하는 해석입니다.
+
+```python
+if dot(error, u) == 0:
+    print("오차는 기준 방향과 직교")
+```
+
+## 전공에서 만나는 장면
+
+- 최소제곱의 오차 해석
+- 그래픽스에서 벡터를 축 방향으로 분해
+- 신호에서 원하는 성분만 추출
+- 물리에서 힘을 방향 성분으로 나누기
+- 머신러닝에서 잔차를 해석하기
+
+## 종합 점검
+
+<MultipleChoiceQuiz
+  title="종합 점검"
+  questions={[
+    { prompt: "두 벡터가 직교한다는 뜻은?", choices: ["내적이 0이다.", "항상 같은 방향이다.", "길이가 항상 1이다.", "행렬식이 없다."], correctIndex: 0, explanation: "내적 0은 서로 수직인 방향이라는 신호입니다.", conceptTags: ["직교"], questionType: "definition", reasonTags: ["내적 0"] },
+    { prompt: "정사영은 무엇을 찾나?", choices: ["기준 방향 위의 가장 가까운 벡터", "가장 먼 벡터", "무작위 벡터", "항상 영벡터"], correctIndex: 0, explanation: "정사영은 기준 공간 안에서 가장 가까운 설명 벡터입니다.", conceptTags: ["정사영"], questionType: "nearest-point", reasonTags: ["가장 가까움"] },
+    { prompt: "원래 벡터에서 정사영을 빼면?", choices: ["기준 방향과 직교하는 오차", "항상 원래 벡터", "항상 스칼라", "행렬식"], correctIndex: 0, explanation: "남은 오차는 기준 방향으로 설명되지 않는 성분입니다.", conceptTags: ["오차"], questionType: "residual", reasonTags: ["직교 오차"] },
+    { prompt: "정사영이 원래 벡터와 같아지는 경우는?", choices: ["원래 벡터가 이미 기준 공간 안에 있을 때", "항상", "기준 벡터가 문자열일 때", "내적을 쓰지 않을 때"], correctIndex: 0, explanation: "이미 기준 공간 안에 있으면 그림자가 자기 자신입니다.", conceptTags: ["정사영"], questionType: "same-vector", reasonTags: ["공간 안"] },
+    { prompt: "직교와 독립의 관계를 가장 잘 말한 것은?", choices: ["직교는 더 강한 기하 조건이다.", "항상 같은 말이다.", "직교하면 항상 종속이다.", "독립은 내적이 0이라는 뜻이다."], correctIndex: 0, explanation: "직교는 서로 수직이라는 추가 구조를 말합니다.", conceptTags: ["직교", "독립"], questionType: "compare", reasonTags: ["개념 구분"] },
+    { prompt: "정사영 공식에서 내적이 하는 일은?", choices: ["기준 방향 성분을 읽는다.", "벡터 이름을 바꾼다.", "확률을 계산한다.", "파일을 정렬한다."], correctIndex: 0, explanation: "내적은 한 방향으로 얼마나 맞물리는지 읽습니다.", conceptTags: ["내적"], questionType: "role", reasonTags: ["방향 성분"] },
+    { prompt: "오차를 해석하는 올바른 방식은?", choices: ["기준 공간으로 설명하지 못한 남은 성분", "항상 버그", "항상 0", "고유값 목록"], correctIndex: 0, explanation: "오차는 모델이나 기준 공간 밖에 남는 정보입니다.", conceptTags: ["오차"], questionType: "interpretation", reasonTags: ["남은 성분"] },
+    { prompt: "정사영이 최소제곱으로 이어지는 이유는?", choices: ["가장 가까운 설명을 찾기 때문", "항상 행렬식만 쓰기 때문", "공간을 삭제하기 때문", "확률분포를 만들기 때문"], correctIndex: 0, explanation: "최소제곱은 가까운 근사와 오차를 다룹니다.", conceptTags: ["최소제곱"], questionType: "connection", reasonTags: ["가까운 근사"] },
+    { prompt: "축이 아닌 방향으로 정사영할 때 필요한 감각은?", choices: ["내적으로 기준 방향 성분을 읽기", "좌표 하나 무조건 삭제", "항상 y좌표만 보기", "정렬 알고리즘 쓰기"], correctIndex: 0, explanation: "기준 방향이 바뀌면 단순 좌표 삭제가 아닙니다.", conceptTags: ["정사영"], questionType: "axis-misconception", reasonTags: ["기준 방향"] },
+    { prompt: "이 장의 핵심 목표는?", choices: ["직교와 정사영으로 성분과 오차를 읽기", "공식을 길게 증명하기", "계산량만 외우기", "모든 행렬을 대각화하기"], correctIndex: 0, explanation: "판별과 해석이 중심입니다.", conceptTags: ["직교", "정사영"], questionType: "chapter-goal", reasonTags: ["성분 분해"] },
+  ]}
+/>
+
+## 다음으로
+
+<NextChapterButton href="/chapters/least-squares" label="다음 챕터로 가기" />

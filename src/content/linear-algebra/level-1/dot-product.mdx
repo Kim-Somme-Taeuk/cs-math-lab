@@ -1,0 +1,201 @@
+## 왜 배우나
+
+내적은 두 벡터를 곱해 하나의 숫자로 만드는 연산입니다. 단순 계산을 넘어서 두 벡터가 얼마나 비슷한 방향을 보는지,
+서로 직각에 가까운지, 추천이나 검색에서 얼마나 비슷한지 판단하는 데 연결됩니다.
+
+이 장의 핵심은 <strong>내적을 방향의 비슷함을 읽는 신호로 이해하는 것</strong>입니다. 정사영 공식 심화는 다루지 않습니다.
+
+## 먼저 감 잡기
+
+`[1, 2]`와 `[3, 4]`의 내적은 같은 위치끼리 곱해서 더합니다.
+
+```text
+1 x 3 + 2 x 4 = 11
+```
+
+내적이 크면 두 벡터가 비슷한 방향을 보는 경우가 많고, 0이면 직교라고 부릅니다. 검색과 추천에서는 벡터가 비슷한 방향을
+보는지 비교하는 감각이 중요합니다.
+
+<MultipleChoiceQuiz
+  questions={[
+    {
+      prompt: "[1, 2] · [3, 4]는?",
+      choices: ["11", "10", "7", "[3, 8]"],
+      correctIndex: 0,
+      explanation: "1 x 3 + 2 x 4 = 11입니다.",
+      conceptTags: ["내적"],
+      questionType: "dot-product-calculation",
+      reasonTags: ["성분별 곱의 합"],
+    },
+  ]}
+/>
+
+## 핵심 정의
+
+### 내적 계산
+
+두 벡터의 같은 위치 성분끼리 곱한 뒤 모두 더합니다.
+
+```text
+[a, b] · [c, d] = ac + bd
+```
+
+결과는 벡터가 아니라 숫자 하나입니다.
+
+### 방향이 비슷한 정도
+
+내적은 두 벡터가 비슷한 방향을 볼수록 커지는 경향이 있습니다. 반대 방향이면 음수가 될 수 있습니다.
+
+### 직교
+
+내적이 0이면 두 벡터가 직교한다고 말합니다. 2D 그림에서는 서로 직각인 방향으로 볼 수 있습니다.
+
+### 코사인 유사도 맛보기
+
+코사인 유사도는 길이 차이를 줄이고 방향의 비슷함을 비교하려는 방법입니다. 검색, 추천, 임베딩 비교에서 자주 나옵니다.
+
+<UnderstandingCheck
+  concept="내적"
+  prompt="내적 결과가 숫자 하나이고, 그 숫자로 방향의 비슷함을 읽을 수 있다는 점이 보이나요?"
+/>
+
+## 자주 헷갈리는 지점
+
+<strong>내적 결과를 벡터로 착각하는 실수.</strong> 내적 결과는 숫자 하나입니다.
+
+<strong>성분끼리 곱한 뒤 더하지 않는 실수.</strong> `[1, 2] · [3, 4]`는 `[3, 8]`이 아니라 11입니다.
+
+<strong>내적이 크면 무조건 좋은 추천이라고 보는 실수.</strong> 길이 영향이 있을 수 있어 코사인 유사도 같은 보정이 필요할 수 있습니다.
+
+<strong>직교를 관련이 전혀 없다는 뜻으로만 보는 실수.</strong> 수학적으로는 내적이 0인 방향 관계입니다.
+
+## 직접 실험하기
+
+아래 실험에서 벡터 값을 바꾸며 내적 값이 어떻게 변하는지 확인합니다.
+
+<LinearAlgebraPlayground mode="dot-product" />
+
+## 코드로 읽기
+
+```python
+def dot(u, v):
+    return sum(u[i] * v[i] for i in range(len(u)))
+```
+
+임베딩 검색에서는 문서 벡터와 질문 벡터를 비교합니다.
+
+```python
+score = dot(query_embedding, document_embedding)
+```
+
+실제 시스템에서는 길이를 정규화한 코사인 유사도를 쓰는 경우가 많습니다.
+
+## 전공에서 만나는 장면
+
+- 검색 결과 랭킹
+- 추천 시스템의 유사도 계산
+- 문장 임베딩 비교
+- 그래픽스에서 방향 비교
+- 머신러닝 모델의 선형 점수 계산
+
+## 종합 점검
+
+<MultipleChoiceQuiz
+  title="종합 점검"
+  questions={[
+    {
+      prompt: "[2, 1] · [3, 5]는?",
+      choices: ["11", "10", "16", "[6, 5]"],
+      correctIndex: 0,
+      explanation: "2 x 3 + 1 x 5 = 11입니다.",
+      conceptTags: ["내적"],
+      questionType: "dot-product-calculation",
+      reasonTags: ["성분별 곱의 합"],
+    },
+    {
+      prompt: "내적 결과의 형태는?",
+      choices: ["숫자 하나", "항상 벡터", "항상 행렬", "항상 참/거짓"],
+      correctIndex: 0,
+      explanation: "내적은 두 벡터를 받아 숫자 하나를 만듭니다.",
+      conceptTags: ["내적"],
+      questionType: "result-type",
+      reasonTags: ["스칼라 결과"],
+    },
+    {
+      prompt: "내적이 0인 두 벡터를 보통 무엇이라 부르나?",
+      choices: ["직교", "평행", "동일", "역행렬"],
+      correctIndex: 0,
+      explanation: "내적이 0이면 직교 관계로 봅니다.",
+      conceptTags: ["직교"],
+      questionType: "orthogonal",
+      reasonTags: ["내적 0"],
+    },
+    {
+      prompt: "[1, 0] · [0, 1]은?",
+      choices: ["0", "1", "2", "[0, 0]"],
+      correctIndex: 0,
+      explanation: "1 x 0 + 0 x 1 = 0입니다. 두 표준 방향은 직교합니다.",
+      conceptTags: ["직교"],
+      questionType: "standard-basis-dot",
+      reasonTags: ["서로 다른 축"],
+    },
+    {
+      prompt: "코사인 유사도와 가장 가까운 설명은?",
+      choices: ["벡터 방향의 비슷함을 비교하는 값", "행렬의 행 개수", "벡터의 차원을 삭제하는 방법", "항상 거리만 세는 방법"],
+      correctIndex: 0,
+      explanation: "코사인 유사도는 길이보다 방향의 비슷함에 집중합니다.",
+      conceptTags: ["코사인 유사도"],
+      questionType: "cosine-similarity",
+      reasonTags: ["방향 비교"],
+    },
+    {
+      prompt: "검색에서 질문 벡터와 문서 벡터를 비교하는 이유는?",
+      choices: ["의미가 비슷한 방향인지 보려고", "문서 길이를 0으로 만들려고", "HTML을 파싱하려고", "파일명을 바꾸려고"],
+      correctIndex: 0,
+      explanation: "임베딩 벡터가 비슷한 방향이면 의미가 가깝다고 보는 방식이 쓰입니다.",
+      conceptTags: ["검색", "임베딩"],
+      questionType: "search-context",
+      reasonTags: ["유사도 비교"],
+    },
+    {
+      prompt: "내적 계산에서 가장 흔한 실수는?",
+      choices: ["성분별 곱을 더하지 않고 벡터로 남기는 것", "숫자를 너무 크게 쓰는 것", "항상 0을 더하는 것", "차원을 세지 않는 것만 가능"],
+      correctIndex: 0,
+      explanation: "내적은 성분별 곱을 모두 더해 숫자 하나로 만듭니다.",
+      conceptTags: ["내적 계산"],
+      questionType: "common-mistake",
+      reasonTags: ["곱 후 합"],
+    },
+    {
+      prompt: "두 벡터 차원이 다르면 내적이 바로 어려운 이유는?",
+      choices: ["같은 위치끼리 곱할 짝이 맞지 않기 때문", "항상 직교하기 때문", "결과가 문자열이 되기 때문", "항상 1이 되기 때문"],
+      correctIndex: 0,
+      explanation: "내적은 같은 위치 성분끼리 곱하므로 성분 개수가 맞아야 합니다.",
+      conceptTags: ["차원"],
+      questionType: "dimension-match",
+      reasonTags: ["성분 짝"],
+    },
+    {
+      prompt: "이 장에서 깊게 다루지 않는 것은?",
+      choices: ["정사영 공식 심화", "내적 계산", "직교", "코사인 유사도 맛보기"],
+      correctIndex: 0,
+      explanation: "Level 1에서는 정사영 공식보다 유사도와 방향 감각에 집중합니다.",
+      conceptTags: ["범위 조절"],
+      questionType: "scope-boundary",
+      reasonTags: ["입문 난이도"],
+    },
+    {
+      prompt: "내적이 전공에서 쓰이는 장면으로 맞는 것은?",
+      choices: ["추천과 검색의 유사도 계산", "CSS 여백 지정", "HTTP 상태 코드 이름짓기", "이미지 파일 삭제"],
+      correctIndex: 0,
+      explanation: "내적은 벡터 유사도와 선형 점수 계산의 기본 도구입니다.",
+      conceptTags: ["전공 연결"],
+      questionType: "cs-context",
+      reasonTags: ["내적 적용"],
+    },
+  ]}
+/>
+
+## 다음으로
+
+<NextChapterButton href="/chapters/matrices" label="다음 챕터로 가기" />

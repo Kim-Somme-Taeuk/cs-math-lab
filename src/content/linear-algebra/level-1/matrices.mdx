@@ -1,0 +1,216 @@
+## 왜 배우나
+
+행렬은 숫자를 행과 열로 정리한 표입니다. 단순한 표를 넘어서 여러 벡터를 한 번에 묶거나, 데이터를 변환하는 규칙을
+표현할 때 쓰입니다.
+
+이 장의 핵심은 <strong>행렬을 숫자 표, 데이터 묶음, 변환 규칙이라는 세 관점으로 읽는 법</strong>입니다.
+행렬식은 아직 다루지 않습니다.
+
+## 먼저 감 잡기
+
+이미지는 픽셀 값이 격자로 놓인 데이터입니다. 표 데이터는 행마다 하나의 샘플, 열마다 하나의 특징을 놓을 수 있습니다.
+
+```text
+[
+  [1, 2, 3],
+  [4, 5, 6]
+]
+```
+
+위 행렬은 2행 3열입니다.
+
+<MultipleChoiceQuiz
+  questions={[
+    {
+      prompt: "[[1, 2, 3], [4, 5, 6]]은 몇 행 몇 열인가?",
+      choices: ["2행 3열", "3행 2열", "1행 6열", "6행 1열"],
+      correctIndex: 0,
+      explanation: "가로 줄이 2개이고 각 줄에 숫자가 3개 있으므로 2행 3열입니다.",
+      conceptTags: ["행렬", "행", "열"],
+      questionType: "matrix-shape",
+      reasonTags: ["행과 열 구분"],
+    },
+  ]}
+/>
+
+## 핵심 정의
+
+### 행과 열
+
+행은 가로줄이고, 열은 세로줄입니다.
+
+```text
+2 x 3 행렬 = 2행 3열 행렬
+```
+
+### 숫자 표
+
+행렬은 데이터를 표처럼 정리합니다. 데이터 분석에서는 행을 샘플, 열을 특징으로 보는 경우가 많습니다.
+
+### 벡터 여러 개 묶기
+
+벡터를 여러 개 쌓으면 행렬이 됩니다.
+
+```text
+[1, 2]
+[3, 4]
+[5, 6]
+```
+
+세 개의 2차원 벡터를 묶은 표처럼 볼 수 있습니다.
+
+### 변환 규칙
+
+행렬은 벡터를 다른 벡터로 바꾸는 규칙도 표현합니다. 이 관점은 뒤의 행렬 곱셈과 선형변환에서 중요해집니다.
+
+<UnderstandingCheck
+  concept="행렬"
+  prompt="행렬이 숫자 표이면서 벡터 묶음이고, 나중에는 변환 규칙으로도 쓰인다는 점이 보이나요?"
+/>
+
+## 자주 헷갈리는 지점
+
+<strong>행과 열을 뒤집는 실수.</strong> 2 x 3은 2행 3열입니다.
+
+<strong>행렬을 무조건 어려운 공식으로만 보는 실수.</strong> 처음에는 숫자 표로 보면 충분합니다.
+
+<strong>모든 행렬이 정사각형이라고 생각하는 실수.</strong> 2 x 3, 10 x 4처럼 직사각형 행렬도 많습니다.
+
+<strong>행렬과 벡터의 관계를 끊어서 보는 실수.</strong> 행렬은 벡터 여러 개를 묶거나 벡터를 변환하는 데 쓰입니다.
+
+## 직접 실험하기
+
+아래 실험에서 행렬-벡터 곱 결과를 함께 보며 행렬이 벡터를 바꾸는 규칙이 될 수 있음을 미리 확인합니다.
+
+<LinearAlgebraPlayground mode="matrix" />
+
+## 코드로 읽기
+
+```python
+matrix = [
+    [1, 2, 3],
+    [4, 5, 6],
+]
+
+rows = len(matrix)
+cols = len(matrix[0])
+```
+
+이미지나 표 데이터도 내부적으로는 이런 숫자 배열로 다룰 수 있습니다.
+
+```python
+dataset = [
+    [height, weight, age],
+    [height, weight, age],
+]
+```
+
+## 전공에서 만나는 장면
+
+- 표 데이터와 데이터프레임
+- 흑백 이미지의 픽셀 격자
+- RGB 이미지의 채널 값
+- 여러 특징 벡터 묶음
+- 그래픽스 변환 행렬
+
+## 종합 점검
+
+<MultipleChoiceQuiz
+  title="종합 점검"
+  questions={[
+    {
+      prompt: "행렬에서 행은?",
+      choices: ["가로줄", "세로줄", "대각선", "항상 첫 번째 숫자"],
+      correctIndex: 0,
+      explanation: "행은 가로 방향 줄입니다.",
+      conceptTags: ["행"],
+      questionType: "row-column",
+      reasonTags: ["행/열 구분"],
+    },
+    {
+      prompt: "행렬에서 열은?",
+      choices: ["세로줄", "가로줄", "마지막 숫자", "행렬의 크기"],
+      correctIndex: 0,
+      explanation: "열은 세로 방향 줄입니다.",
+      conceptTags: ["열"],
+      questionType: "row-column",
+      reasonTags: ["행/열 구분"],
+    },
+    {
+      prompt: "3 x 2 행렬은?",
+      choices: ["3행 2열", "2행 3열", "3열 2행만 가능", "항상 정사각형"],
+      correctIndex: 0,
+      explanation: "m x n 행렬은 m행 n열입니다.",
+      conceptTags: ["행렬 크기"],
+      questionType: "matrix-shape",
+      reasonTags: ["행 먼저"],
+    },
+    {
+      prompt: "행렬을 데이터 관점에서 읽는 설명으로 맞는 것은?",
+      choices: ["행마다 샘플, 열마다 특징을 둘 수 있다.", "항상 숫자 하나만 저장한다.", "행렬은 이미지만 저장한다.", "열은 절대 의미가 없다."],
+      correctIndex: 0,
+      explanation: "표 데이터에서는 행을 샘플, 열을 특징으로 두는 표현이 흔합니다.",
+      conceptTags: ["데이터 행렬"],
+      questionType: "data-matrix",
+      reasonTags: ["샘플과 특징"],
+    },
+    {
+      prompt: "벡터 여러 개를 같은 길이로 쌓으면?",
+      choices: ["행렬로 볼 수 있다.", "항상 스칼라가 된다.", "내적이 사라진다.", "차원이 0이 된다."],
+      correctIndex: 0,
+      explanation: "같은 길이의 벡터들을 행이나 열로 쌓아 행렬을 만들 수 있습니다.",
+      conceptTags: ["벡터 묶음"],
+      questionType: "vectors-to-matrix",
+      reasonTags: ["벡터 쌓기"],
+    },
+    {
+      prompt: "이미지와 행렬의 연결로 맞는 것은?",
+      choices: ["픽셀 값을 격자로 놓은 숫자 데이터로 볼 수 있다.", "이미지는 절대 숫자가 아니다.", "이미지는 항상 1차원이다.", "행렬은 색을 표현할 수 없다."],
+      correctIndex: 0,
+      explanation: "이미지는 픽셀 값이 격자로 배치된 데이터로 볼 수 있습니다.",
+      conceptTags: ["이미지", "행렬"],
+      questionType: "image-matrix",
+      reasonTags: ["픽셀 격자"],
+    },
+    {
+      prompt: "모든 행렬이 정사각형인가?",
+      choices: ["아니다. 직사각형 행렬도 많다.", "그렇다.", "2 x 2만 행렬이다.", "열이 없으면 행렬이다."],
+      correctIndex: 0,
+      explanation: "행과 열의 개수가 다른 행렬도 흔합니다.",
+      conceptTags: ["행렬 형태"],
+      questionType: "rectangular-matrix",
+      reasonTags: ["정사각형 오해"],
+    },
+    {
+      prompt: "행렬을 변환 규칙으로 보는 관점은 뒤에서 무엇과 연결되는가?",
+      choices: ["선형변환", "문자열 정렬", "HTML 렌더링", "파일 압축"],
+      correctIndex: 0,
+      explanation: "행렬은 벡터를 다른 벡터로 보내는 선형변환을 표현할 수 있습니다.",
+      conceptTags: ["선형변환"],
+      questionType: "matrix-as-transform",
+      reasonTags: ["변환 규칙"],
+    },
+    {
+      prompt: "이 장에서 깊게 다루지 않는 것은?",
+      choices: ["행렬식", "행과 열", "숫자 표", "이미지 연결"],
+      correctIndex: 0,
+      explanation: "행렬식은 이후 주제이고, 여기서는 행렬을 읽는 관점에 집중합니다.",
+      conceptTags: ["범위 조절"],
+      questionType: "scope-boundary",
+      reasonTags: ["입문 난이도"],
+    },
+    {
+      prompt: "코드에서 행렬과 가장 가까운 표현은?",
+      choices: ["2차원 리스트나 배열", "if문 하나", "문자열 하나", "불리언 하나"],
+      correctIndex: 0,
+      explanation: "행렬은 리스트 안에 리스트가 있는 2차원 배열로 자주 표현합니다.",
+      conceptTags: ["코드 표현"],
+      questionType: "code-matrix",
+      reasonTags: ["2차원 배열"],
+    },
+  ]}
+/>
+
+## 다음으로
+
+<NextChapterButton href="/chapters/matrix-multiplication" label="다음 챕터로 가기" />

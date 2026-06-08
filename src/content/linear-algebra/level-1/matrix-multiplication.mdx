@@ -1,0 +1,210 @@
+## 왜 배우나
+
+행렬 곱셈은 행렬을 단순히 숫자 표로만 보지 않고, 벡터를 바꾸는 규칙과 그 규칙의 합성으로 읽게 해 줍니다.
+그래픽스, 머신러닝, 데이터 변환에서 매우 자주 등장합니다.
+
+이 장의 핵심은 <strong>행렬 곱셈을 차원이 맞을 때 가능한 변환 적용과 변환 합성으로 이해하는 것</strong>입니다.
+고급 블록 행렬은 다루지 않습니다.
+
+## 먼저 감 잡기
+
+행렬-벡터 곱은 벡터 하나를 새 벡터로 바꿉니다.
+
+```text
+[[2, 1],
+ [0, 1]] [3, 2] = [8, 2]
+```
+
+행렬-행렬 곱은 변환을 이어서 적용하는 것과 연결됩니다.
+
+<MultipleChoiceQuiz
+  questions={[
+    {
+      prompt: "2 x 3 행렬과 곱할 수 있는 벡터의 차원은?",
+      choices: ["3차원", "2차원", "1차원", "아무 차원"],
+      correctIndex: 0,
+      explanation: "행렬의 열 개수와 벡터의 성분 개수가 맞아야 합니다.",
+      conceptTags: ["차원 맞추기"],
+      questionType: "matrix-vector-dimension",
+      reasonTags: ["열 개수"],
+    },
+  ]}
+/>
+
+## 핵심 정의
+
+### 행렬-벡터 곱
+
+행렬의 각 행과 벡터를 내적해서 결과 벡터의 각 성분을 만듭니다.
+
+```text
+2 x 2 행렬 * 2차원 벡터 = 2차원 벡터
+```
+
+### 행렬-행렬 곱
+
+행렬-행렬 곱은 왼쪽 행렬의 행과 오른쪽 행렬의 열을 내적해 새 행렬을 만듭니다.
+
+```text
+(m x n) * (n x k) = (m x k)
+```
+
+가운데 차원 n이 맞아야 합니다.
+
+### 변환의 합성
+
+행렬 A와 B를 곱한다는 것은 변환 B를 적용한 뒤 A를 적용하는 것처럼 읽을 수 있습니다. 순서가 중요합니다.
+
+### 차원 맞추기
+
+곱셈이 가능한지 보려면 숫자를 계산하기 전에 모양부터 봅니다.
+
+<UnderstandingCheck
+  concept="행렬 곱셈"
+  prompt="행렬 곱셈에서 가운데 차원이 맞아야 하고, 결과 모양은 바깥 차원으로 정해진다는 점이 보이나요?"
+/>
+
+## 자주 헷갈리는 지점
+
+<strong>행렬 곱셈을 성분별 곱으로 착각하는 실수.</strong> 행렬 곱셈은 행과 열의 내적입니다.
+
+<strong>차원 확인을 나중에 하는 실수.</strong> 먼저 `(m x n) * (n x k)` 형태인지 봐야 합니다.
+
+<strong>곱셈 순서가 바뀌어도 같다고 보는 실수.</strong> 행렬 곱셈은 보통 순서가 바뀌면 결과가 달라집니다.
+
+<strong>행렬-벡터 곱과 행렬-행렬 곱을 끊어서 보는 실수.</strong> 둘 다 변환 적용이라는 관점으로 이어집니다.
+
+## 직접 실험하기
+
+아래 실험에서 행렬-벡터 곱 결과가 입력 벡터를 어떻게 바꾸는지 확인합니다.
+
+<LinearAlgebraPlayground mode="matrix-multiplication" />
+
+## 코드로 읽기
+
+```python
+def mat_vec_mul(A, x):
+    return [
+        sum(A[row][col] * x[col] for col in range(len(x)))
+        for row in range(len(A))
+    ]
+```
+
+라이브러리에서는 보통 다음처럼 씁니다.
+
+```python
+y = A @ x
+z = A @ B
+```
+
+`@`는 Python/NumPy에서 행렬 곱셈을 나타냅니다.
+
+## 전공에서 만나는 장면
+
+- 그래픽스 변환 합성
+- 신경망 레이어 계산
+- 데이터 차원 변환
+- 좌표계 변환
+- 여러 선형 규칙을 한 번에 적용하기
+
+## 종합 점검
+
+<MultipleChoiceQuiz
+  title="종합 점검"
+  questions={[
+    {
+      prompt: "(2 x 3) * (3 x 4)의 결과 모양은?",
+      choices: ["2 x 4", "3 x 3", "2 x 3", "곱할 수 없음"],
+      correctIndex: 0,
+      explanation: "가운데 3이 맞고 결과는 바깥 차원인 2 x 4입니다.",
+      conceptTags: ["차원 맞추기"],
+      questionType: "matrix-shape",
+      reasonTags: ["바깥 차원"],
+    },
+    {
+      prompt: "(2 x 3) * (2 x 4)는?",
+      choices: ["곱할 수 없음", "2 x 4", "3 x 2", "4 x 3"],
+      correctIndex: 0,
+      explanation: "왼쪽 열 3과 오른쪽 행 2가 맞지 않습니다.",
+      conceptTags: ["차원 맞추기"],
+      questionType: "incompatible-shape",
+      reasonTags: ["가운데 차원 불일치"],
+    },
+    {
+      prompt: "행렬-벡터 곱에서 각 결과 성분은 어떻게 만들어지나?",
+      choices: ["행과 벡터의 내적", "열끼리 문자열 합치기", "행렬식 계산", "항상 0"],
+      correctIndex: 0,
+      explanation: "각 행과 입력 벡터를 내적해 결과 성분을 만듭니다.",
+      conceptTags: ["행렬-벡터 곱"],
+      questionType: "matvec",
+      reasonTags: ["행과 벡터 내적"],
+    },
+    {
+      prompt: "행렬 곱셈에서 먼저 확인할 것은?",
+      choices: ["차원이 맞는지", "색상이 예쁜지", "파일 이름이 짧은지", "항상 정사각형인지"],
+      correctIndex: 0,
+      explanation: "곱셈 가능 여부는 차원으로 먼저 판단합니다.",
+      conceptTags: ["차원"],
+      questionType: "dimension-first",
+      reasonTags: ["곱셈 가능성"],
+    },
+    {
+      prompt: "행렬 곱셈을 변환 관점에서 읽으면?",
+      choices: ["변환을 적용하거나 합성하는 것", "숫자를 무조건 정렬하는 것", "행을 삭제하는 것", "벡터를 문자열로 만드는 것"],
+      correctIndex: 0,
+      explanation: "행렬 곱셈은 벡터 변환과 변환의 합성으로 읽을 수 있습니다.",
+      conceptTags: ["변환 합성"],
+      questionType: "composition",
+      reasonTags: ["변환 관점"],
+    },
+    {
+      prompt: "행렬 곱셈의 흔한 오해는?",
+      choices: ["성분별 곱이라고 생각하는 것", "내적을 쓴다고 생각하는 것", "차원을 본다는 것", "결과 모양이 정해진다는 것"],
+      correctIndex: 0,
+      explanation: "행렬 곱셈은 같은 위치끼리만 곱하는 연산이 아닙니다.",
+      conceptTags: ["행렬 곱셈"],
+      questionType: "common-mistake",
+      reasonTags: ["성분별 곱 오해"],
+    },
+    {
+      prompt: "A @ B와 B @ A는 보통?",
+      choices: ["다를 수 있다.", "항상 같다.", "항상 불가능하다.", "항상 0이다."],
+      correctIndex: 0,
+      explanation: "행렬 곱셈은 일반적으로 순서가 중요합니다.",
+      conceptTags: ["곱셈 순서"],
+      questionType: "order",
+      reasonTags: ["비가환"],
+    },
+    {
+      prompt: "NumPy에서 행렬 곱셈에 자주 쓰는 연산자는?",
+      choices: ["@", "+", "%", "and"],
+      correctIndex: 0,
+      explanation: "Python/NumPy에서는 @를 행렬 곱셈에 씁니다.",
+      conceptTags: ["코드 표현"],
+      questionType: "operator",
+      reasonTags: ["NumPy 문법"],
+    },
+    {
+      prompt: "이 장에서 깊게 다루지 않는 것은?",
+      choices: ["고급 블록 행렬", "행렬-벡터 곱", "변환 합성", "차원 맞추기"],
+      correctIndex: 0,
+      explanation: "Level 1에서는 고급 블록 행렬보다 기본 곱셈 의미를 봅니다.",
+      conceptTags: ["범위 조절"],
+      questionType: "scope-boundary",
+      reasonTags: ["입문 난이도"],
+    },
+    {
+      prompt: "행렬 곱셈이 쓰이는 장면으로 맞는 것은?",
+      choices: ["신경망 레이어와 그래픽스 변환", "HTML 줄바꿈만 처리", "파일 확장자 검사", "CSS 클래스 이름 정하기"],
+      correctIndex: 0,
+      explanation: "행렬 곱셈은 데이터 변환, 좌표 변환, 신경망 계산에 자주 등장합니다.",
+      conceptTags: ["전공 연결"],
+      questionType: "cs-context",
+      reasonTags: ["행렬 곱셈 적용"],
+    },
+  ]}
+/>
+
+## 다음으로
+
+<NextChapterButton href="/chapters/linear-transformations" label="다음 챕터로 가기" />

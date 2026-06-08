@@ -1,0 +1,288 @@
+## 왜 배우나
+
+모듈러 연산은 어떤 수를 나눈 뒤의 나머지에 집중합니다. 코딩테스트에서는 큰 수 계산, 반복 주기, 배열 인덱스 순환,
+해시 버킷, 시계 산술 같은 문제에서 자주 나옵니다.
+
+정수론 기초에서 본 나눗셈 정리 $a = bq + r$ 중에서, 여기서는 나머지 r을 중심으로 봅니다.
+핵심은 <strong>큰 수를 그대로 들고 가지 않고, 필요한 나머지만 남겨서 구조를 읽는 법</strong>입니다.
+
+이 장에서는 모듈러 역원 심화나 중국인의 나머지 정리는 다루지 않습니다.
+
+## 먼저 감 잡기
+
+17을 5로 나누면 몫은 3이고 나머지는 2입니다. 그래서 다음처럼 씁니다.
+
+$$
+17 \bmod 5 = 2
+$$
+
+이 말은 17이 5로 나눴을 때 나머지 2 그룹에 들어간다는 뜻입니다. 2, 7, 12, 17, 22는 모두 5로 나누면
+나머지가 2입니다.
+
+시계도 같은 구조입니다. 14시는 12시간 시계에서는 2시와 같은 위치입니다.
+
+<MultipleChoiceQuiz
+  questions={[
+    {
+      prompt: "17 mod 5의 값은?",
+      choices: ["2", "3", "5", "17"],
+      correctIndex: 0,
+      explanation: "17 = 5 x 3 + 2이므로 나머지는 2입니다.",
+      conceptTags: ["모듈러 연산"],
+      questionType: "modulo-basic",
+      reasonTags: ["몫과 나머지 분리"],
+    },
+  ]}
+/>
+
+## 핵심 정의
+
+### 나머지 연산의 의미
+
+`a % m`은 a를 m으로 나눴을 때의 나머지입니다. 보통 나머지는 0 이상 m 미만의 값으로 봅니다.
+
+```python
+17 % 5  # 2
+20 % 5  # 0
+```
+
+나머지가 같으면 같은 모듈러 그룹에 들어갑니다. 예를 들어 mod 5에서 2, 7, 12, 17은 모두 나머지가 2입니다.
+
+### 합에서 먼저 나머지를 취하기
+
+큰 수를 더할 때는 먼저 나머지만 남겨도 됩니다.
+
+$$
+(a + b) \bmod m = ((a \bmod m) + (b \bmod m)) \bmod m
+$$
+
+예를 들어 17과 23을 mod 5에서 더해 봅시다.
+
+- 17 mod 5 = 2
+- 23 mod 5 = 3
+- 17 + 23 = 40, 40 mod 5 = 0
+- 2 + 3 = 5, 5 mod 5 = 0
+
+### 곱에서 먼저 나머지를 취하기
+
+곱도 같은 방식으로 줄일 수 있습니다.
+
+$$
+(a \times b) \bmod m = ((a \bmod m) \times (b \bmod m)) \bmod m
+$$
+
+이 성질 덕분에 큰 거듭제곱을 계산할 때도 중간 결과를 계속 작게 유지할 수 있습니다.
+
+### 음수 나머지 주의
+
+수학에서는 보통 나머지를 0 이상 m 미만으로 잡습니다. 하지만 프로그래밍 언어마다 음수에 대한 `%` 결과가 다를 수
+있습니다.
+
+```python
+(-7) % 5  # Python에서는 3
+```
+
+언어 결과가 음수로 나올 수 있는 환경에서는 보통 다음처럼 보정합니다.
+
+```python
+def mod(a, m):
+    return ((a % m) + m) % m
+```
+
+### 순환 구조
+
+mod 5에서는 나머지가 0, 1, 2, 3, 4를 반복합니다.
+
+```text
+0, 1, 2, 3, 4, 0, 1, 2, 3, 4, ...
+```
+
+배열을 원형으로 돌거나, 요일을 계산하거나, 해시 버킷 번호를 정할 때 이 순환 감각이 필요합니다.
+
+<UnderstandingCheck
+  concept="모듈러 연산"
+  prompt="모듈러 연산이 값을 버리는 게 아니라, 같은 나머지 그룹으로 묶는 과정이라는 점이 보이나요?"
+/>
+
+## 자주 헷갈리는 지점
+
+<strong>몫과 나머지를 섞는 실수.</strong> 17을 5로 나누면 몫은 3이고 나머지는 2입니다. mod는 나머지를 봅니다.
+
+<strong>한 번만 줄이고 끝내는 실수.</strong> 합이나 곱을 한 뒤 결과가 m 이상이면 다시 mod를 해야 합니다.
+
+<strong>음수 나머지를 그대로 믿는 실수.</strong> 언어별 `%` 동작을 확인하고, 필요하면 0 이상 m 미만으로 보정해야 합니다.
+
+<strong>나눗셈도 같은 방식으로 된다고 착각하는 실수.</strong> 합과 곱은 쉽게 줄일 수 있지만, 나눗셈은 모듈러 역원 문제가
+되어 훨씬 조심해야 합니다. 이 장에서는 깊게 다루지 않습니다.
+
+<strong>순환 길이를 보지 않는 실수.</strong> mod m에서는 가능한 나머지가 m개뿐이라 결국 반복됩니다.
+
+## 직접 실험하기
+
+아래 실험에서 a, b, m을 바꾸며 합과 곱을 먼저 줄여도 결과가 같은지 확인합니다. 음수 나머지와 순환 구조도 같이 봅니다.
+
+<ModularArithmeticPlayground />
+
+## 코드로 읽기
+
+### 기본 나머지
+
+```python
+def same_bucket(value, bucket_count):
+    return value % bucket_count
+```
+
+해시 테이블에서 해시값을 버킷 개수로 나눈 나머지는 들어갈 위치를 정합니다.
+
+### 음수 보정
+
+```python
+def normalize_mod(value, m):
+    return ((value % m) + m) % m
+```
+
+좌표 이동이나 회전 문제에서 음수가 나올 수 있으면 보정 함수를 따로 두는 편이 안전합니다.
+
+### 큰 수 계산
+
+```python
+def repeated_multiply(base, exponent, m):
+    result = 1
+
+    for _ in range(exponent):
+        result = (result * base) % m
+
+    return result
+```
+
+중간 결과를 계속 mod m으로 줄이면 값이 폭발하지 않습니다. 빠른 거듭제곱은 뒤에서 더 배울 수 있지만,
+지금은 "계산 중간에도 줄일 수 있다"는 감각이 중요합니다.
+
+## 전공에서 만나는 장면
+
+모듈러 연산은 다음 상황과 연결됩니다.
+
+- 배열 인덱스를 원형으로 순환시키기
+- 요일, 시간, 턴 순서 계산
+- 해시값을 버킷 번호로 바꾸기
+- 큰 수 덧셈/곱셈 결과를 특정 값으로 나눈 나머지로 유지하기
+- 난수 생성과 암호 기초에서 반복 구조 맛보기
+
+암호에서는 모듈러 연산이 훨씬 깊게 쓰이지만, 여기서는 "나머지로 구조를 읽는다" 정도까지만 잡습니다.
+
+## 종합 점검
+
+<MultipleChoiceQuiz
+  title="종합 점검"
+  questions={[
+    {
+      prompt: "23 mod 7의 값은?",
+      choices: ["2", "3", "7", "16"],
+      correctIndex: 0,
+      explanation: "23 = 7 x 3 + 2이므로 나머지는 2입니다.",
+      conceptTags: ["모듈러 연산"],
+      questionType: "modulo-basic",
+      reasonTags: ["몫과 나머지 계산"],
+    },
+    {
+      prompt: "mod 5에서 2와 같은 나머지 그룹에 있는 수는?",
+      choices: ["12", "10", "15", "21"],
+      correctIndex: 0,
+      explanation: "12를 5로 나누면 나머지가 2입니다.",
+      conceptTags: ["나머지 그룹"],
+      questionType: "same-residue",
+      reasonTags: ["같은 나머지 확인"],
+    },
+    {
+      prompt: "(17 + 23) mod 5의 값은?",
+      choices: ["0", "1", "2", "5"],
+      correctIndex: 0,
+      explanation: "17 + 23 = 40이고 40 mod 5는 0입니다.",
+      conceptTags: ["합의 모듈러"],
+      questionType: "modular-addition",
+      reasonTags: ["합을 나머지로 줄이기"],
+    },
+    {
+      prompt: "17 mod 5 = 2, 23 mod 5 = 3일 때 곱의 나머지는?",
+      choices: ["1", "0", "5", "6"],
+      correctIndex: 0,
+      explanation: "2 x 3 = 6이고 6 mod 5는 1입니다.",
+      conceptTags: ["곱의 모듈러"],
+      questionType: "modular-multiplication",
+      reasonTags: ["곱을 나머지로 줄이기"],
+    },
+    {
+      prompt: "음수 나머지를 0 이상 m 미만으로 보정하는 식으로 적절한 것은?",
+      choices: ["((a % m) + m) % m", "a / m", "a * m", "m - a"],
+      correctIndex: 0,
+      explanation: "한 번 m을 더한 뒤 다시 mod를 취하면 0 이상 m 미만 범위로 맞출 수 있습니다.",
+      conceptTags: ["음수 나머지"],
+      questionType: "negative-modulo",
+      reasonTags: ["언어별 나머지 차이 보정"],
+    },
+    {
+      prompt: "mod 4에서 나머지 순환으로 맞는 것은?",
+      choices: ["0, 1, 2, 3, 0, 1, ...", "0, 1, 2, 3, 4, ...", "1, 2, 3, 4, 5, ...", "4, 8, 12, ..."],
+      correctIndex: 0,
+      explanation: "mod 4에서 가능한 나머지는 0, 1, 2, 3뿐입니다.",
+      conceptTags: ["순환 구조"],
+      questionType: "residue-cycle",
+      reasonTags: ["가능한 나머지 개수"],
+    },
+    {
+      prompt: "큰 수 계산에서 매번 mod를 취하는 이유로 맞는 것은?",
+      choices: [
+        "필요한 나머지는 유지하면서 중간 값을 작게 만들기 위해",
+        "정확한 값을 일부러 틀리게 만들기 위해",
+        "나눗셈을 없애기 위해",
+        "항상 결과를 0으로 만들기 위해",
+      ],
+      correctIndex: 0,
+      explanation: "합과 곱에서는 중간 결과를 mod로 줄여도 최종 나머지가 유지됩니다.",
+      conceptTags: ["큰 수 계산"],
+      questionType: "large-number-mod",
+      reasonTags: ["중간 결과 축소"],
+    },
+    {
+      prompt: "배열 길이가 5일 때 index = (index + 1) % 5를 쓰는 이유는?",
+      choices: [
+        "4 다음에 0으로 돌아가게 하려고",
+        "항상 index를 5로 만들려고",
+        "배열을 정렬하려고",
+        "음수를 만들려고",
+      ],
+      correctIndex: 0,
+      explanation: "mod 5를 쓰면 인덱스가 0부터 4 사이에서 순환합니다.",
+      conceptTags: ["순환 인덱스"],
+      questionType: "circular-index",
+      reasonTags: ["배열 범위 유지"],
+    },
+    {
+      prompt: "합과 곱에 비해 모듈러 나눗셈을 조심해야 하는 이유는?",
+      choices: [
+        "나눗셈은 모듈러 역원 조건이 필요할 수 있기 때문",
+        "나눗셈은 항상 불가능하기 때문",
+        "나눗셈은 나머지를 만들지 않기 때문",
+        "나눗셈은 항상 O(2^n)이기 때문",
+      ],
+      correctIndex: 0,
+      explanation: "모듈러에서 나눗셈은 합/곱처럼 단순히 줄일 수 없고 역원 조건을 따져야 합니다.",
+      conceptTags: ["모듈러 나눗셈"],
+      questionType: "modular-division-caution",
+      reasonTags: ["모듈러 역원은 심화 주제"],
+    },
+    {
+      prompt: "모듈러 연산이 전공에서 쓰이는 장면으로 맞는 것은?",
+      choices: ["해시 버킷과 순환 인덱스", "HTML 제목 태그", "CSS 글꼴 크기", "이미지 색상 보정"],
+      correctIndex: 0,
+      explanation: "해시값을 버킷 번호로 바꾸거나 인덱스를 순환시킬 때 mod가 자주 쓰입니다.",
+      conceptTags: ["전공 연결"],
+      questionType: "cs-context",
+      reasonTags: ["모듈러 적용 장면"],
+    },
+  ]}
+/>
+
+## 다음으로
+
+<NextChapterButton href="/chapters/euclidean-algorithm" label="다음 챕터로 가기" />
