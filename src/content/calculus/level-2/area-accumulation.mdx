@@ -1,0 +1,83 @@
+## 왜 배우나
+
+넓이와 누적량은 적분을 실제 문제로 옮기는 관문입니다. 그래프 아래 넓이는 단순한 도형 문제가 아니라 시간에 따라 쌓인 거리, 비용, 사용량, 밀도 같은 총량으로 읽을 수 있습니다.
+
+이 장의 핵심은 <strong>그래프 아래 넓이를 문제 맥락의 누적값으로 해석하는 법</strong>입니다. 복잡한 영역 넓이 계산은 다루지 않습니다.
+
+## 먼저 감 잡기
+
+속도 그래프가 양수라면 시간이 지날수록 위치가 앞으로 쌓입니다. 그래프가 음수라면 반대 방향으로 움직인 것으로 볼 수 있습니다.
+
+비용 함수도 마찬가지입니다. 어떤 시간대의 비용률이 크면 그 구간이 총 비용에 더 크게 기여합니다.
+
+<MultipleChoiceQuiz
+  questions={[
+    { prompt: "그래프 아래 넓이를 컴공 맥락에서 읽는 좋은 관점은?", choices: ["시간에 따라 쌓인 누적량", "항상 CSS 색상", "무조건 정렬 횟수", "조건문의 개수"], correctIndex: 0, explanation: "넓이는 문제에 따라 거리, 비용, 사용량 같은 누적량으로 해석됩니다.", conceptTags: ["넓이", "누적량"], questionType: "area-meaning", reasonTags: ["맥락 해석"] },
+  ]}
+/>
+
+## 핵심 정의
+
+정적분의 값은 구간에서 함수가 만든 부호 있는 누적량입니다. 함수값이 양수인 곳은 누적값을 늘리고, 음수인 곳은 누적값을 줄일 수 있습니다.
+
+```text
+속도 > 0 -> 앞으로 이동한 양
+속도 < 0 -> 반대 방향 이동한 양
+```
+
+## 자주 헷갈리는 지점
+
+<strong>넓이는 항상 양수라고만 보는 실수.</strong> 정적분은 부호 있는 누적량으로 해석할 수 있습니다.
+
+<strong>단위 해석을 빼먹는 실수.</strong> 속도(m/s)를 시간(s)에 대해 적분하면 m가 됩니다.
+
+<strong>큰 높이만 보고 폭을 놓치는 실수.</strong> 총 기여량은 높이와 구간 길이가 함께 결정합니다.
+
+## 직접 판별하기
+
+다음 그래프의 x축과 y축 단위를 먼저 생각해 봅니다.
+
+- x축: 시간, y축: 초당 요청 수
+- x축: 시간, y축: 속도
+- x축: 위치, y축: 밀도
+
+<UnderstandingCheck concept="넓이와 단위 해석" prompt="그래프 아래 넓이를 단위까지 포함해 누적량으로 설명할 수 있나요?" />
+
+## 코드로 읽기
+
+```python
+usage = 0
+for rate in rates_per_second:
+    usage += rate * 1
+```
+
+`rate`가 초당 사용량이라면 `rate * 1초`는 그 1초 동안의 사용량입니다. 반복문은 이 작은 사용량을 전체 구간에서 더합니다.
+
+## 전공에서 만나는 장면
+
+- 초당 요청 수를 누적해 총 요청 수 계산
+- 속도 데이터를 누적해 이동 거리 추정
+- 시간별 전력 사용량에서 총 에너지 사용량 추정
+- 밀도 함수를 구간에서 합산해 총량 추정
+
+## 종합 점검
+
+<MultipleChoiceQuiz
+  title="종합 점검"
+  questions={[
+    { prompt: "정적분의 값은 기본적으로 무엇을 나타내는가?", choices: ["구간의 부호 있는 누적량", "항상 문자열", "정렬된 배열", "조건문 수"], correctIndex: 0, explanation: "정적분은 구간에서 함수값이 만든 누적량입니다.", conceptTags: ["정적분"], questionType: "core-meaning", reasonTags: ["부호 있는 누적"] },
+    { prompt: "속도를 시간에 대해 적분할 때 단위는 보통 어떻게 되는가?", choices: ["m/s 그대로", "m 같은 거리 단위", "초당 초", "단위 없음만"], correctIndex: 1, explanation: "속도(m/s)에 시간(s)이 곱해져 거리(m)가 됩니다.", conceptTags: ["단위"], questionType: "unit-analysis", reasonTags: ["속도 시간"] },
+    { prompt: "함수값이 음수인 구간은 정적분에서?", choices: ["항상 삭제된다", "항상 양수로 바뀐다", "누적값을 줄일 수 있다", "정의역이 아니다"], correctIndex: 2, explanation: "부호 있는 누적량에서는 음수 구간이 총합을 감소시킵니다.", conceptTags: ["음수 영역"], questionType: "signed-area", reasonTags: ["부호"] },
+    { prompt: "총 기여량을 볼 때 함께 봐야 하는 것은?", choices: ["색과 폰트", "파일명과 확장자", "정답 번호", "함수값 높이와 구간 폭"], correctIndex: 3, explanation: "높이가 커도 폭이 짧으면 전체 기여량은 제한적일 수 있습니다.", conceptTags: ["높이", "폭"], questionType: "area-factors", reasonTags: ["기여량"] },
+    { prompt: "초당 요청 수 그래프 아래 넓이는?", choices: ["총 요청 수", "항상 평균 속도", "정렬 횟수", "조건문 깊이"], correctIndex: 0, explanation: "요청률을 시간에 따라 누적하면 총 요청 수가 됩니다.", conceptTags: ["요청률"], questionType: "cs-context", reasonTags: ["요청 수 누적"] },
+    { prompt: "넓이와 누적량에서 먼저 확인할 것은?", choices: ["그래프 색", "x축과 y축이 무엇인지", "파일 위치", "컴포넌트 이름"], correctIndex: 1, explanation: "축의 의미와 단위를 알아야 넓이가 어떤 누적량인지 해석할 수 있습니다.", conceptTags: ["축 해석"], questionType: "graph-reading", reasonTags: ["단위"] },
+    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["속도 누적", "비용 누적", "사용량 누적", "복잡한 영역 넓이 계산"], correctIndex: 3, explanation: "복잡한 영역 계산보다 누적량 해석을 우선합니다.", conceptTags: ["범위 조절"], questionType: "scope-boundary", reasonTags: ["계산 제외"] },
+    { prompt: "`usage += rate * dt`에서 `dt`는 무엇을 뜻하는가?", choices: ["함수 이름", "조건문 결과", "그래프 색", "작은 시간 폭"], correctIndex: 3, explanation: "`dt`는 각 샘플이 대표하는 작은 시간 구간입니다.", conceptTags: ["수치 누적"], questionType: "code-reading", reasonTags: ["시간 폭"] },
+    { prompt: "전력 사용량 그래프를 시간에 대해 누적하면?", choices: ["총 에너지 사용량 감각", "정렬 알고리즘", "논리 동치", "항상 0"], correctIndex: 0, explanation: "전력률이 시간에 따라 쌓이면 에너지 사용량으로 해석할 수 있습니다.", conceptTags: ["에너지"], questionType: "application", reasonTags: ["전력 누적"] },
+    { prompt: "넓이를 도형 문제로만 보면 놓치는 것은?", choices: ["문제 맥락의 총량 해석", "항상 정답 번호", "문자열 길이", "배열 인덱스"], correctIndex: 0, explanation: "컴공에서는 넓이가 거리, 비용, 사용량 같은 실제 총량으로 자주 나타납니다.", conceptTags: ["전공 연결"], questionType: "pitfall", reasonTags: ["맥락 누락"] },
+  ]}
+/>
+
+## 다음으로
+
+<NextChapterButton href="/chapters/multivariable-functions" label="다음 챕터로 가기" />

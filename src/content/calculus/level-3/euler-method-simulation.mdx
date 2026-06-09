@@ -1,0 +1,75 @@
+## 왜 배우나
+
+오일러 방법은 변화율을 이용해 다음 상태를 조금씩 예측하는 가장 단순한 수치 시뮬레이션 방법입니다. 게임 물리, 입자 이동, 애니메이션처럼 시간에 따라 상태가 바뀌는 코드를 이해하는 데 유용합니다.
+
+이 장의 핵심은 <strong>next = current + rate * dt 구조로 연속 변화를 코드에서 근사하는 법</strong>입니다. Runge-Kutta와 안정성 이론은 다루지 않습니다.
+
+## 먼저 감 잡기
+
+현재 위치와 속도를 알고 있다면, 아주 짧은 시간 뒤 위치는 `현재 위치 + 속도 × 시간폭`으로 근사할 수 있습니다.
+
+dt가 작으면 더 촘촘히 따라가지만 계산이 많아지고, dt가 크면 빠르지만 부정확하거나 불안정해질 수 있습니다.
+
+<MultipleChoiceQuiz questions={[{ prompt: "오일러 방법의 기본 업데이트는?", choices: ["next = current + rate * dt", "next = current - file", "next = random", "next = 정렬"], correctIndex: 0, explanation: "현재 상태에 변화율과 작은 시간 폭을 곱한 값을 더해 다음 상태를 근사합니다.", conceptTags: ["오일러 방법"], questionType: "euler-update", reasonTags: ["rate dt"] }]} />
+
+## 핵심 정의
+
+오일러 방법은 변화율이 한 작은 구간 동안 거의 일정하다고 보고 다음 상태를 예측합니다.
+
+```text
+next = current + rate(current, time) * dt
+```
+
+정확한 미래를 한 번에 맞히는 것이 아니라, 작은 걸음을 여러 번 반복합니다.
+
+## 자주 헷갈리는 지점
+
+<strong>dt가 클수록 무조건 좋다고 보는 실수.</strong> 계산은 줄지만 오차와 불안정성이 커질 수 있습니다.
+
+<strong>rate와 변화량을 섞는 실수.</strong> rate는 변화율이고 `rate * dt`가 작은 변화량입니다.
+
+<strong>오일러 방법이 항상 충분히 정확하다고 보는 실수.</strong> 복잡하거나 민감한 시스템에서는 더 좋은 방법이 필요할 수 있습니다.
+
+## 직접 실험하기
+
+dt를 바꾸며 감쇠 모델의 오일러 근사값이 참고값과 얼마나 가까운지 봅니다.
+
+<EulerMethodPlayground />
+
+## 코드로 읽기
+
+```python
+position = position + velocity * dt
+velocity = velocity + acceleration * dt
+```
+
+게임 루프에서 자주 보이는 형태입니다. 변화율을 작은 시간 폭만큼 반영해 상태를 갱신합니다.
+
+## 전공에서 만나는 장면
+
+- 게임 물리 업데이트
+- 입자 이동
+- 애니메이션 보간
+- 간단한 냉각/감쇠 시뮬레이션
+
+## 종합 점검
+
+<MultipleChoiceQuiz
+  title="종합 점검"
+  questions={[
+    { prompt: "오일러 방법의 핵심은?", choices: ["변화율로 다음 상태를 조금 예측", "항상 정확한 공식", "문자열 합치기", "파일 삭제"], correctIndex: 0, explanation: "오일러 방법은 현재 변화율을 작은 시간 폭만큼 적용합니다.", conceptTags: ["오일러 방법"], questionType: "core-meaning", reasonTags: ["상태 업데이트"] },
+    { prompt: "`rate * dt`는 무엇인가?", choices: ["현재 상태", "작은 시간 동안의 변화량", "파일명", "정답 번호"], correctIndex: 1, explanation: "변화율에 시간 폭을 곱하면 작은 변화량이 됩니다.", conceptTags: ["dt"], questionType: "rate-dt", reasonTags: ["변화량"] },
+    { prompt: "dt가 너무 크면?", choices: ["항상 정확", "항상 느림", "부정확하거나 불안정해질 수 있다", "함수가 사라진다"], correctIndex: 2, explanation: "큰 시간 폭은 연속 변화를 거칠게 근사합니다.", conceptTags: ["dt"], questionType: "too-large-dt", reasonTags: ["불안정"] },
+    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["next=current+rate*dt", "dt 의미", "게임 물리", "Runge-Kutta"], correctIndex: 3, explanation: "Runge-Kutta는 더 정교한 수치해석 방법입니다.", conceptTags: ["범위 조절"], questionType: "scope-boundary", reasonTags: ["심화 제외"] },
+    { prompt: "게임 루프에서 `position += velocity * dt`는?", choices: ["오일러식 위치 업데이트", "정렬", "파일 압축", "논리 동치"], correctIndex: 0, explanation: "속도를 시간 폭만큼 반영해 위치를 갱신합니다.", conceptTags: ["게임 물리"], questionType: "code-reading", reasonTags: ["위치 업데이트"] },
+    { prompt: "오일러 방법은 미래를 어떻게 계산하는가?", choices: ["작은 걸음을 반복한다", "한 번에 완벽히 맞춘다", "항상 무작위", "현재를 삭제한다"], correctIndex: 0, explanation: "작은 시간 간격마다 상태를 갱신합니다.", conceptTags: ["반복"], questionType: "iteration", reasonTags: ["작은 걸음"] },
+    { prompt: "rate와 변화량의 차이는?", choices: ["rate는 변화율, 변화량은 rate*dt", "항상 같다", "rate는 파일명", "변화량은 정답"], correctIndex: 0, explanation: "변화율에 시간 폭을 곱해야 실제 작은 변화량이 됩니다.", conceptTags: ["변화율"], questionType: "distinction", reasonTags: ["rate vs delta"] },
+    { prompt: "dt를 줄이면 일반적으로?", choices: ["더 촘촘하지만 계산이 늘 수 있다", "항상 계산이 0", "무조건 불가능", "손실 함수가 사라짐"], correctIndex: 0, explanation: "작은 dt는 더 많은 업데이트를 요구합니다.", conceptTags: ["계산량"], questionType: "tradeoff", reasonTags: ["정확도 비용"] },
+    { prompt: "오일러 방법과 미분방정식의 관계는?", choices: ["변화율 식을 수치적으로 따라가는 방법", "무관하다", "항상 문자열이다", "정렬 방식이다"], correctIndex: 0, explanation: "미분방정식의 변화율 규칙을 작은 단계로 적용합니다.", conceptTags: ["미분방정식"], questionType: "connection", reasonTags: ["수치해법"] },
+    { prompt: "다음 장에서 전체로 연결할 흐름은?", choices: ["모델 출력, 손실, 그래디언트, 업데이트", "비둘기집", "집합 여집합", "파일 권한"], correctIndex: 0, explanation: "머신러닝에서 미적분은 손실과 그래디언트 업데이트 흐름으로 연결됩니다.", conceptTags: ["머신러닝"], questionType: "next-concept", reasonTags: ["전체 흐름"] },
+  ]}
+/>
+
+## 다음으로
+
+<NextChapterButton href="/chapters/calculus-in-machine-learning" label="다음 챕터로 가기" />

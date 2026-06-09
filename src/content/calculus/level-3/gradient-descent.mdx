@@ -1,0 +1,77 @@
+## 왜 배우나
+
+경사하강법은 손실을 줄이는 가장 기본적인 최적화 아이디어입니다. 현재 위치에서 함수가 가장 빨리 증가하는 방향을 그래디언트가 알려 주면, 최소화를 위해 그 반대 방향으로 조금 움직입니다.
+
+이 장의 핵심은 <strong>현재 위치, 그래디언트, 학습률로 업데이트가 만들어지는 흐름</strong>입니다. Adam, RMSProp 같은 고급 optimizer는 다루지 않습니다.
+
+## 먼저 감 잡기
+
+산에서 내려가려면 가장 가파르게 올라가는 방향의 반대로 움직이면 됩니다. 손실 함수도 비슷하게 생각할 수 있습니다.
+
+업데이트는 보통 `x = x - learning_rate * gradient` 형태입니다. 기울기가 크면 더 강한 신호가 있고, 학습률은 그 신호를 얼마나 반영할지 정합니다.
+
+<MultipleChoiceQuiz questions={[{ prompt: "경사하강법에서 최소화를 위해 움직이는 방향은?", choices: ["그래디언트의 반대 방향", "항상 그래디언트 방향", "항상 오른쪽", "무조건 멈춤"], correctIndex: 0, explanation: "그래디언트는 증가 방향이므로 최소화에서는 반대 방향으로 이동합니다.", conceptTags: ["경사하강법"], questionType: "descent-direction", reasonTags: ["반대 방향"] }]} />
+
+## 핵심 정의
+
+경사하강법의 기본 업데이트는 다음과 같습니다.
+
+```text
+next = current - learning_rate * gradient
+```
+
+여기서 `current`는 현재 입력 또는 파라미터, `gradient`는 현재 위치의 변화율, `learning_rate`는 이동 크기 조절값입니다.
+
+## 자주 헷갈리는 지점
+
+<strong>그래디언트 방향으로 가면 손실이 줄어든다고 보는 실수.</strong> 그래디언트는 증가 방향입니다.
+
+<strong>한 번 업데이트하면 최적값에 도착한다고 보는 실수.</strong> 보통 여러 번 반복해 조금씩 개선합니다.
+
+<strong>학습률을 무시하는 실수.</strong> 같은 그래디언트라도 학습률에 따라 결과가 크게 달라집니다.
+
+## 직접 실험하기
+
+시작점과 학습률을 바꾸며 손실 함수 위에서 이동 경로가 어떻게 변하는지 봅니다.
+
+<GradientDescentPlayground />
+
+## 코드로 읽기
+
+```python
+x = start
+for step in range(100):
+    grad = gradient(x)
+    x = x - learning_rate * grad
+```
+
+이 반복문은 현재 위치의 기울기를 계산하고, 손실이 줄어드는 방향으로 위치를 갱신합니다.
+
+## 전공에서 만나는 장면
+
+- 선형 회귀 파라미터 학습
+- 신경망 손실 최소화
+- 비용 함수 기반 튜닝
+- 시뮬레이션 파라미터 보정
+
+## 종합 점검
+
+<MultipleChoiceQuiz
+  title="종합 점검"
+  questions={[
+    { prompt: "경사하강법의 목표는?", choices: ["함수값을 줄이는 방향으로 반복 이동", "항상 값 증가", "파일 복사", "그래프 삭제"], correctIndex: 0, explanation: "경사하강법은 최소화를 위해 반복적으로 파라미터를 갱신합니다.", conceptTags: ["경사하강법"], questionType: "goal", reasonTags: ["반복 개선"] },
+    { prompt: "업데이트 `x = x - lr * grad`에서 `grad`는?", choices: ["학습률", "현재 위치의 기울기", "정답 번호", "파일명"], correctIndex: 1, explanation: "grad는 현재 위치에서의 변화율입니다.", conceptTags: ["그래디언트"], questionType: "update-term", reasonTags: ["기울기"] },
+    { prompt: "왜 그래디언트를 빼는가?", choices: ["문자열이라서", "항상 0이라서", "증가 방향의 반대로 가기 위해", "정렬하려고"], correctIndex: 2, explanation: "그래디언트가 증가 방향이므로 빼면 감소 방향으로 움직입니다.", conceptTags: ["감소 방향"], questionType: "minus-gradient", reasonTags: ["반대 방향"] },
+    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["기본 업데이트", "현재 위치", "학습률", "Adam optimizer"], correctIndex: 3, explanation: "고급 optimizer는 응용 심화 주제입니다.", conceptTags: ["범위 조절"], questionType: "scope-boundary", reasonTags: ["심화 제외"] },
+    { prompt: "경사하강법은 보통 몇 번 실행하는가?", choices: ["여러 번 반복", "반드시 한 번", "0번", "항상 무한히"], correctIndex: 0, explanation: "보통 조금씩 개선하기 위해 반복합니다.", conceptTags: ["반복"], questionType: "iteration", reasonTags: ["점진 개선"] },
+    { prompt: "학습률이 하는 역할은?", choices: ["한 번에 움직일 크기 조절", "함수 삭제", "정답 숨김", "타입 변경"], correctIndex: 0, explanation: "학습률은 그래디언트를 얼마나 반영해 이동할지 정합니다.", conceptTags: ["학습률"], questionType: "learning-rate-role", reasonTags: ["이동 크기"] },
+    { prompt: "머신러닝 학습과 연결하면 경사하강법은?", choices: ["손실을 줄이도록 파라미터를 갱신", "항상 데이터를 삭제", "HTML 렌더링", "모듈러 연산"], correctIndex: 0, explanation: "모델 파라미터를 손실 감소 방향으로 갱신합니다.", conceptTags: ["머신러닝"], questionType: "ml-context", reasonTags: ["파라미터 갱신"] },
+    { prompt: "그래디언트가 양수이고 lr도 양수면 1차원 업데이트는?", choices: ["x가 감소한다", "x가 항상 증가한다", "x가 문자열이 된다", "x가 사라진다"], correctIndex: 0, explanation: "x - lr * 양수이므로 x는 작아집니다.", conceptTags: ["업데이트"], questionType: "sign", reasonTags: ["부호"] },
+    { prompt: "경사하강법을 이해할 때 필요한 Level 2 개념은?", choices: ["그래디언트", "비둘기집", "문자열 인코딩", "집합 여집합"], correctIndex: 0, explanation: "그래디언트가 감소 방향을 정하는 기반입니다.", conceptTags: ["그래디언트"], questionType: "prerequisite", reasonTags: ["선수 개념"] },
+    { prompt: "다음 장의 핵심 질문은?", choices: ["얼마나 크게 움직일 것인가", "어떤 CSS를 쓸 것인가", "파일명을 어떻게 바꿀 것인가", "그래프를 지울 것인가"], correctIndex: 0, explanation: "학습률은 업데이트 크기와 안정성을 다룹니다.", conceptTags: ["학습률"], questionType: "next-concept", reasonTags: ["이동 크기"] },
+  ]}
+/>
+
+## 다음으로
+
+<NextChapterButton href="/chapters/learning-rate" label="다음 챕터로 가기" />

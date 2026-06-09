@@ -1,0 +1,85 @@
+## 왜 배우나
+
+실제 프로그램과 모델은 함수 하나로 끝나지 않고 여러 변환이 이어진 구조입니다. 입력이 전처리를 거쳐 모델로 들어가고, 모델 출력이 손실 함수로 들어가는 식입니다. 이런 합성 구조의 변화율을 읽는 규칙이 연쇄법칙입니다.
+
+이 장의 핵심은 <strong>함수 안에 함수가 들어간 계산 흐름에서 변화율이 어떻게 전달되는지 읽는 법</strong>입니다. 역전파 전체 유도와 자동미분 내부 구현은 다루지 않습니다.
+
+## 먼저 감 잡기
+
+`y = f(g(x))`에서는 x가 먼저 `g`를 지나고, 그 결과가 다시 `f`의 입력이 됩니다. x를 조금 바꾸면 `g`의 출력이 바뀌고, 그 변화가 다시 `f`의 출력 변화로 이어집니다.
+
+연쇄법칙은 각 단계의 변화율을 이어 곱해 전체 변화율을 읽는 규칙입니다.
+
+<MultipleChoiceQuiz
+  questions={[
+    { prompt: "연쇄법칙이 필요한 상황은?", choices: ["함수 안에 함수가 들어간 합성 구조", "항상 상수 함수만", "조건문 하나만", "그래프가 없는 경우만"], correctIndex: 0, explanation: "합성함수의 변화율을 읽을 때 연쇄법칙이 필요합니다.", conceptTags: ["연쇄법칙"], questionType: "chain-rule-meaning", reasonTags: ["합성함수"] },
+  ]}
+/>
+
+## 핵심 정의
+
+합성함수는 한 함수의 출력이 다른 함수의 입력으로 들어가는 구조입니다.
+
+```text
+x -> g(x) -> f(g(x)) -> output
+전체 변화율 = 바깥 변화율 * 안쪽 변화율
+```
+
+계산 그래프에서는 각 노드의 변화율이 다음 노드로 전달된다고 볼 수 있습니다.
+
+## 자주 헷갈리는 지점
+
+<strong>바깥 함수만 미분하는 실수.</strong> 안쪽 함수가 얼마나 변하는지도 함께 곱해야 합니다.
+
+<strong>합성 순서를 거꾸로 읽는 실수.</strong> 데이터가 어떤 함수 순서로 흐르는지 먼저 봐야 합니다.
+
+<strong>역전파 전체를 여기서 다 이해해야 한다고 생각하는 실수.</strong> 지금은 변화율이 단계별로 전달된다는 감각만 잡습니다.
+
+## 직접 판별하기
+
+아래 흐름에서 어떤 함수가 먼저 적용되는지 표시해 봅니다.
+
+```text
+raw input -> normalize -> model -> loss
+```
+
+<UnderstandingCheck concept="합성함수와 변화율 전달" prompt="함수들이 이어진 구조에서 변화율이 단계별로 전달된다고 설명할 수 있나요?" />
+
+## 코드로 읽기
+
+```python
+z = normalize(x)
+y = model(z)
+loss = squared_error(y, target)
+```
+
+x가 조금 바뀌면 `normalize`의 출력 z가 바뀌고, z 변화가 모델 출력 y를 바꾸며, y 변화가 손실을 바꿉니다. 연쇄법칙은 이 연결된 변화율을 따라갑니다.
+
+## 전공에서 만나는 장면
+
+- 신경망 역전파의 핵심 아이디어
+- 데이터 전처리와 모델 출력의 변화 연결
+- 그래픽스 변환 파이프라인
+- 여러 함수 호출로 이어진 계산 흐름 분석
+
+## 종합 점검
+
+<MultipleChoiceQuiz
+  title="종합 점검"
+  questions={[
+    { prompt: "합성함수는 어떤 구조인가?", choices: ["한 함수의 출력이 다른 함수의 입력으로 들어간다", "함수가 항상 없다", "배열만 정렬한다", "조건문만 반복한다"], correctIndex: 0, explanation: "합성함수는 함수들이 순서대로 연결된 구조입니다.", conceptTags: ["합성함수"], questionType: "composition", reasonTags: ["출력 입력 연결"] },
+    { prompt: "연쇄법칙의 핵심 감각은?", choices: ["바깥 함수만 본다", "단계별 변화율이 이어져 전체 변화율이 된다", "항상 적분만 한다", "그래프를 지운다"], correctIndex: 1, explanation: "각 단계의 변화율이 연결되어 전체 변화율을 만듭니다.", conceptTags: ["연쇄법칙"], questionType: "core-meaning", reasonTags: ["변화율 전달"] },
+    { prompt: "`x -> g(x) -> f(g(x))`에서 먼저 적용되는 함수는?", choices: ["f", "둘 다 동시에 없음", "g", "loss"], correctIndex: 2, explanation: "x는 먼저 g를 지나고 그 결과가 f로 들어갑니다.", conceptTags: ["합성 순서"], questionType: "order", reasonTags: ["안쪽 함수"] },
+    { prompt: "바깥 함수만 미분하면 생기는 문제는?", choices: ["항상 정확하다", "코드가 빨라진다", "입력이 사라진다", "안쪽 함수의 변화율을 놓친다"], correctIndex: 3, explanation: "합성함수에서는 안쪽 함수가 입력을 얼마나 바꾸는지도 필요합니다.", conceptTags: ["안쪽 함수"], questionType: "pitfall", reasonTags: ["누락"] },
+    { prompt: "계산 그래프 관점에서 노드는 무엇으로 볼 수 있는가?", choices: ["중간 계산 단계", "항상 파일", "정답 번호", "CSS 클래스"], correctIndex: 0, explanation: "계산 그래프의 노드는 입력, 중간값, 출력 같은 계산 단계를 나타냅니다.", conceptTags: ["계산 그래프"], questionType: "computation-graph", reasonTags: ["중간값"] },
+    { prompt: "역전파와 연쇄법칙의 관계는?", choices: ["무관하다", "역전파는 연쇄법칙 감각을 핵심으로 쓴다", "역전파는 정렬이다", "연쇄법칙은 그래프 금지다"], correctIndex: 1, explanation: "신경망 역전파는 변화율을 단계별로 전달하는 연쇄법칙 아이디어와 연결됩니다.", conceptTags: ["역전파"], questionType: "cs-context", reasonTags: ["변화율 전달"] },
+    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["합성함수", "계산 그래프 맛보기", "변화율 전달", "자동미분 내부 구현"], correctIndex: 3, explanation: "자동미분 구현 세부는 이 챕터의 범위를 넘습니다.", conceptTags: ["범위 조절"], questionType: "scope-boundary", reasonTags: ["심화 제외"] },
+    { prompt: "`normalize -> model -> loss`에서 x 변화는 어떻게 이어지는가?", choices: ["중간값을 거쳐 손실 변화로 전달된다", "항상 차단된다", "문자열이 된다", "정렬만 한다"], correctIndex: 0, explanation: "입력 변화가 전처리, 모델 출력, 손실로 단계별 영향을 줍니다.", conceptTags: ["파이프라인"], questionType: "code-reading", reasonTags: ["계산 흐름"] },
+    { prompt: "연쇄법칙을 읽기 전에 먼저 해야 할 일은?", choices: ["함수 적용 순서를 파악한다", "모든 변수를 삭제한다", "정답을 고정한다", "그래프를 금지한다"], correctIndex: 0, explanation: "어떤 함수가 먼저 적용되고 다음에 어디로 흐르는지 알아야 합니다.", conceptTags: ["합성 순서"], questionType: "strategy", reasonTags: ["흐름 파악"] },
+    { prompt: "Level 2에서 연쇄법칙을 배우는 목표는?", choices: ["역전파 전체를 엄밀히 유도하기", "계산 흐름에서 변화율 전달 감각 잡기", "모든 적분 공식 암기", "DAG 정렬 구현"], correctIndex: 1, explanation: "이번 장은 신경망과 자동미분으로 이어질 직관을 준비하는 단계입니다.", conceptTags: ["학습 목표"], questionType: "goal", reasonTags: ["직관 준비"] },
+  ]}
+/>
+
+## 다음으로
+
+<NextChapterButton href="/subjects/calculus" label="다음 챕터로 가기" />

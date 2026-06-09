@@ -1,0 +1,81 @@
+## 왜 배우나
+
+현대 딥러닝 코드는 복잡한 합성함수의 미분을 사람이 손으로 전부 계산하지 않습니다. 자동미분은 계산 과정을 그래프로 추적하고, 연쇄법칙을 이용해 필요한 그래디언트를 계산합니다.
+
+이 장의 핵심은 <strong>자동미분을 마법이 아니라 계산 그래프와 연쇄법칙의 조합으로 보는 법</strong>입니다. reverse-mode autodiff 전체 구현은 다루지 않습니다.
+
+## 먼저 감 잡기
+
+forward pass는 입력에서 출력과 손실을 계산하는 과정입니다. 그 과정에서 어떤 중간값이 어떤 연산으로 만들어졌는지 기록하면, 나중에 변화율을 뒤로 전달할 수 있습니다.
+
+연쇄법칙은 각 단계의 변화율을 연결합니다. 자동미분은 이 연결을 코드가 대신 추적하는 감각입니다.
+
+<MultipleChoiceQuiz questions={[{ prompt: "자동미분의 핵심 기반은?", choices: ["계산 그래프와 연쇄법칙", "항상 랜덤 선택", "파일 압축", "정렬 알고리즘"], correctIndex: 0, explanation: "자동미분은 계산 흐름을 기록하고 연쇄법칙으로 변화율을 연결합니다.", conceptTags: ["자동미분"], questionType: "autodiff-meaning", reasonTags: ["계산 그래프"] }]} />
+
+## 핵심 정의
+
+계산 그래프는 입력, 중간값, 출력이 어떤 연산으로 이어지는지 나타냅니다.
+
+```text
+x -> multiply -> add -> loss
+```
+
+자동미분은 이 그래프에서 각 노드의 변화율을 추적해 최종 손실이 입력이나 파라미터에 얼마나 민감한지 계산합니다.
+
+## 자주 헷갈리는 지점
+
+<strong>자동미분을 수치미분과 같은 것으로 보는 실수.</strong> 자동미분은 작은 h로 근사하는 방식이 아니라 연산 규칙과 연쇄법칙을 추적합니다.
+
+<strong>forward pass만 있으면 학습이 끝난다고 보는 실수.</strong> 학습에는 손실의 그래디언트가 필요합니다.
+
+<strong>역전파 전체 구현을 지금 다 알아야 한다고 생각하는 실수.</strong> 여기서는 계산 그래프와 연쇄법칙 연결만 잡습니다.
+
+## 직접 판별하기
+
+다음 계산에서 중간값을 표시해 봅니다.
+
+```text
+z = w * x + b
+loss = (z - target)^2
+```
+
+<UnderstandingCheck concept="자동미분과 계산 그래프" prompt="forward pass와 gradient 계산이 어떻게 연결되는지 큰 흐름을 설명할 수 있나요?" />
+
+## 코드로 읽기
+
+```python
+z = w * x + b
+loss = (z - target) ** 2
+loss.backward()
+```
+
+실제 프레임워크에서는 `backward()` 같은 호출이 계산 그래프를 따라 그래디언트를 채웁니다. 핵심은 손실에서 파라미터까지 변화율을 거슬러 추적한다는 점입니다.
+
+## 전공에서 만나는 장면
+
+- PyTorch, TensorFlow의 gradient 계산
+- 신경망 역전파
+- 손실 함수와 파라미터 업데이트 연결
+- 복잡한 모델의 미분 자동화
+
+## 종합 점검
+
+<MultipleChoiceQuiz
+  title="종합 점검"
+  questions={[
+    { prompt: "forward pass는 무엇인가?", choices: ["입력에서 출력과 손실을 계산하는 과정", "항상 파일 삭제", "정답 숨김", "그래프 금지"], correctIndex: 0, explanation: "forward pass는 계산 그래프를 따라 값을 계산합니다.", conceptTags: ["forward pass"], questionType: "forward", reasonTags: ["값 계산"] },
+    { prompt: "자동미분이 추적하는 것은?", choices: ["CSS 색", "연산 흐름과 변화율", "파일명", "정답 번호"], correctIndex: 1, explanation: "자동미분은 계산 그래프와 각 연산의 변화율을 추적합니다.", conceptTags: ["자동미분"], questionType: "tracking", reasonTags: ["연산 흐름"] },
+    { prompt: "자동미분과 수치미분의 차이로 맞는 것은?", choices: ["완전히 같다", "자동미분은 항상 h 근사만 쓴다", "자동미분은 연쇄법칙 기반으로 연산을 추적한다", "수치미분은 그래디언트가 없다"], correctIndex: 2, explanation: "자동미분은 작은 h로만 근사하는 방식이 아닙니다.", conceptTags: ["수치미분", "자동미분"], questionType: "compare", reasonTags: ["방법 구분"] },
+    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["계산 그래프", "연쇄법칙 연결", "forward pass", "reverse-mode 전체 구현"], correctIndex: 3, explanation: "reverse-mode 구현 세부는 심화 주제입니다.", conceptTags: ["범위 조절"], questionType: "scope-boundary", reasonTags: ["심화 제외"] },
+    { prompt: "`loss.backward()`의 감각은?", choices: ["손실에서 파라미터로 변화율을 추적", "HTML을 렌더링", "정렬 완료", "파일 압축"], correctIndex: 0, explanation: "손실을 기준으로 각 파라미터의 그래디언트를 계산하는 흐름입니다.", conceptTags: ["backward"], questionType: "code-reading", reasonTags: ["그래디언트"] },
+    { prompt: "자동미분이 연쇄법칙과 연결되는 이유는?", choices: ["합성된 연산의 변화율을 단계별로 연결하기 때문", "문자열을 합치기 때문", "항상 적분하기 때문", "정답 위치 때문"], correctIndex: 0, explanation: "복잡한 계산은 작은 연산들의 합성이므로 연쇄법칙이 핵심입니다.", conceptTags: ["연쇄법칙"], questionType: "chain-rule", reasonTags: ["합성 연산"] },
+    { prompt: "계산 그래프의 노드는 무엇을 나타낼 수 있는가?", choices: ["입력, 중간값, 출력", "파일 권한", "CSS 클래스만", "정답 번호"], correctIndex: 0, explanation: "계산 그래프는 값과 연산의 연결을 나타냅니다.", conceptTags: ["계산 그래프"], questionType: "node", reasonTags: ["중간값"] },
+    { prompt: "학습에 그래디언트가 필요한 이유는?", choices: ["파라미터를 어느 방향으로 바꿀지 알기 위해", "파일을 열기 위해", "문자열 길이를 재기 위해", "정답을 숨기기 위해"], correctIndex: 0, explanation: "그래디언트가 손실 감소 방향 업데이트의 기준이 됩니다.", conceptTags: ["그래디언트"], questionType: "training", reasonTags: ["업데이트 방향"] },
+    { prompt: "자동미분을 마법으로 보면 놓치는 것은?", choices: ["연산 기록과 연쇄법칙이라는 구조", "항상 랜덤", "CSS 색상", "파일명"], correctIndex: 0, explanation: "자동미분은 계산 그래프와 미분 규칙을 체계적으로 적용합니다.", conceptTags: ["구조 이해"], questionType: "pitfall", reasonTags: ["마법화"] },
+    { prompt: "다음 장과 연결되는 계산 주제는?", choices: ["원시함수를 몰라도 누적량을 근사하는 법", "DAG 정렬", "비둘기집", "모듈러 역원"], correctIndex: 0, explanation: "수치적분은 연속 누적량을 코드로 근사합니다.", conceptTags: ["수치적분"], questionType: "next-concept", reasonTags: ["근사 계산"] },
+  ]}
+/>
+
+## 다음으로
+
+<NextChapterButton href="/chapters/numerical-integration" label="다음 챕터로 가기" />

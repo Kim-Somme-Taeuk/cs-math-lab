@@ -1,18 +1,8 @@
 import Link from "next/link";
-import { ReadyChapterLevelCarousel } from "@/components/home/ReadyChapterLevelCarousel";
-import { roadmapSubjects, type RoadmapLevelId } from "@/lib/chapters";
+import { ReadySubjectSummary } from "@/components/home/ReadySubjectSummary";
+import { roadmapSubjects } from "@/lib/chapters";
 
 const activeSubjects = roadmapSubjects.filter((subject) => subject.status === "active");
-const readyLevels = ([1, 2, 3] satisfies RoadmapLevelId[]).map((levelId) => ({
-  level: levelId,
-  title: `Level ${levelId}. 전체 공개 챕터`,
-  description: "현재 공개 중인 모든 active 과목 챕터입니다.",
-  chapters: activeSubjects.flatMap((subject) =>
-    subject.levels
-      .find((level) => level.level === levelId)
-      ?.chapters.filter((chapter) => chapter.status === "ready") ?? [],
-  ),
-}));
 
 export default function Home() {
   return (
@@ -40,7 +30,7 @@ export default function Home() {
               </Link>
             </div>
           </div>
-          <ReadyChapterLevelCarousel subjectTitle="전체" levels={readyLevels} />
+          <ReadySubjectSummary subjects={activeSubjects} />
         </div>
       </section>
 

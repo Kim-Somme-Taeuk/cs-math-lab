@@ -1,11 +1,22 @@
 import type { ReactNode } from "react";
 import type { MDXComponents } from "mdx/types";
 import BooleanAlgebraPlayground from "@/components/interactive/BooleanAlgebraPlayground";
+import {
+  PartialDerivativePlayground,
+  RiemannSumPlayground,
+} from "@/components/interactive/CalculusLevelTwoPlaygrounds";
+import {
+  EulerMethodPlayground,
+  GradientDescentPlayground,
+  LearningRatePlayground,
+} from "@/components/interactive/CalculusLevelThreePlaygrounds";
 import ConditionalPlayground from "@/components/interactive/ConditionalPlayground";
 import CountingPlayground from "@/components/interactive/CountingPlayground";
 import CounterexamplePlayground from "@/components/interactive/CounterexamplePlayground";
+import DifferenceQuotientPlayground from "@/components/interactive/DifferenceQuotientPlayground";
 import EuclideanAlgorithmPlayground from "@/components/interactive/EuclideanAlgorithmPlayground";
 import FunctionMappingPlayground from "@/components/interactive/FunctionMappingPlayground";
+import FunctionGraphPlayground from "@/components/interactive/FunctionGraphPlayground";
 import GeneratedReviewQuiz from "@/components/interactive/GeneratedReviewQuiz";
 import GraphTraversalPlayground from "@/components/interactive/GraphTraversalPlayground";
 import InductionVisualizer from "@/components/interactive/InductionVisualizer";
@@ -25,6 +36,7 @@ import {
 } from "@/components/interactive/LevelTwoPlaygrounds";
 import MultipleChoiceQuiz from "@/components/interactive/MultipleChoiceQuiz";
 import NextChapterButton from "@/components/interactive/NextChapterButton";
+import NumericalDerivativePlayground from "@/components/interactive/NumericalDerivativePlayground";
 import NumberTheoryPlayground from "@/components/interactive/NumberTheoryPlayground";
 import ProbabilityPlayground from "@/components/interactive/ProbabilityPlayground";
 import RelationPlayground from "@/components/interactive/RelationPlayground";
@@ -74,14 +86,19 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ConditionalPlayground,
     CountingPlayground,
     CounterexamplePlayground,
+    DifferenceQuotientPlayground,
+    EulerMethodPlayground,
     EuclideanAlgorithmPlayground,
+    FunctionGraphPlayground,
     FunctionMappingPlayground,
     GeneratedReviewQuiz,
+    GradientDescentPlayground,
     GraphTraversalPlayground,
     InductionVisualizer,
     LinearAlgebraPlayground,
     LinearAlgebraLevelTwoPlayground,
     LinearAlgebraLevelThreePlayground,
+    LearningRatePlayground,
     EquivalenceRelationPlayground,
     InclusionExclusionPlayground,
     LogicalEquivalencePlayground,
@@ -93,10 +110,13 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     TreePlayground,
     MultipleChoiceQuiz,
     NextChapterButton,
+    NumericalDerivativePlayground,
     NumberTheoryPlayground,
+    PartialDerivativePlayground,
     ProbabilityPlayground,
     RelationPlayground,
     RecurrenceTracePlayground,
+    RiemannSumPlayground,
     TruthTablePlayground,
     SetVennPlayground,
     ShortestPathPlayground,

@@ -1,0 +1,75 @@
+## 왜 배우나
+
+학습률은 경사하강법에서 한 번에 얼마나 움직일지 정하는 값입니다. 너무 작으면 안정적이지만 오래 걸리고, 너무 크면 최솟값을 지나쳐 튀거나 발산할 수 있습니다.
+
+이 장의 핵심은 <strong>학습률이 최적화의 속도와 안정성을 동시에 좌우한다는 감각</strong>입니다. learning rate scheduling 심화는 다루지 않습니다.
+
+## 먼저 감 잡기
+
+내리막길에서 발걸음이 너무 작으면 천천히 내려갑니다. 반대로 너무 크게 뛰면 목표 지점을 지나치거나 넘어질 수 있습니다.
+
+학습률은 그래디언트가 알려 준 방향으로 얼마나 크게 움직일지 정하는 발걸음 크기입니다.
+
+<MultipleChoiceQuiz questions={[{ prompt: "학습률은 무엇을 정하는가?", choices: ["업데이트 한 번의 이동 크기", "목적 함수 이름", "파일 확장자", "항상 정답"], correctIndex: 0, explanation: "학습률은 그래디언트 방향 신호를 얼마나 크게 반영할지 정합니다.", conceptTags: ["학습률"], questionType: "learning-rate-meaning", reasonTags: ["이동 크기"] }]} />
+
+## 핵심 정의
+
+학습률은 업데이트 식에서 그래디언트 앞에 곱해지는 값입니다.
+
+```text
+next = current - learning_rate * gradient
+```
+
+작은 학습률은 느리지만 안정적일 수 있고, 큰 학습률은 빠를 수 있지만 불안정해질 수 있습니다.
+
+## 자주 헷갈리는 지점
+
+<strong>학습률은 클수록 무조건 좋다고 보는 실수.</strong> 너무 크면 최솟값을 지나치며 발산할 수 있습니다.
+
+<strong>작으면 항상 좋다고 보는 실수.</strong> 너무 작으면 학습이 지나치게 느려집니다.
+
+<strong>손실 함수 모양과 무관하다고 보는 실수.</strong> 함수의 기울기와 곡률에 따라 적절한 크기가 달라집니다.
+
+## 직접 실험하기
+
+같은 시작점에서 학습률만 바꿔 마지막 손실과 움직임 해석이 어떻게 달라지는지 봅니다.
+
+<LearningRatePlayground />
+
+## 코드로 읽기
+
+```python
+for lr in [0.001, 0.01, 0.1, 1.0]:
+    train(model, learning_rate=lr)
+```
+
+실험에서는 여러 학습률을 비교하며 손실이 안정적으로 줄어드는지 확인합니다.
+
+## 전공에서 만나는 장면
+
+- 모델 학습 튜닝
+- 손실 발산 원인 분석
+- 학습 속도와 안정성 비교
+- 실험 로그에서 loss curve 해석
+
+## 종합 점검
+
+<MultipleChoiceQuiz
+  title="종합 점검"
+  questions={[
+    { prompt: "학습률이 너무 작으면?", choices: ["학습이 매우 느릴 수 있다", "항상 발산한다", "그래디언트가 사라진다", "모델이 삭제된다"], correctIndex: 0, explanation: "작은 학습률은 안정적일 수 있지만 업데이트 폭이 작아 느립니다.", conceptTags: ["학습률"], questionType: "too-small", reasonTags: ["느림"] },
+    { prompt: "학습률이 너무 크면?", choices: ["항상 최적", "튀거나 발산할 수 있다", "무조건 정답", "기울기가 0"], correctIndex: 1, explanation: "큰 업데이트는 최솟값 주변을 지나쳐 불안정해질 수 있습니다.", conceptTags: ["발산"], questionType: "too-large", reasonTags: ["불안정"] },
+    { prompt: "학습률은 업데이트 식에서 어디에 들어가는가?", choices: ["목적 함수 이름", "정답 배열", "그래디언트에 곱해지는 값", "파일 경로"], correctIndex: 2, explanation: "`lr * gradient`가 실제 이동량을 만듭니다.", conceptTags: ["업데이트"], questionType: "formula", reasonTags: ["이동량"] },
+    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["이동 크기", "발산", "느린 수렴", "learning rate scheduling"], correctIndex: 3, explanation: "스케줄링은 학습률을 시간에 따라 조절하는 심화 주제입니다.", conceptTags: ["범위 조절"], questionType: "scope-boundary", reasonTags: ["심화 제외"] },
+    { prompt: "좋은 학습률을 판단할 때 보는 것은?", choices: ["손실이 안정적으로 줄어드는지", "파일명 길이", "HTML 태그 수", "정답 위치"], correctIndex: 0, explanation: "손실 곡선이 안정적으로 감소하는지 확인합니다.", conceptTags: ["손실 곡선"], questionType: "diagnosis", reasonTags: ["안정성"] },
+    { prompt: "같은 그래디언트라도 업데이트가 달라지는 이유는?", choices: ["학습률이 이동량을 조절하기 때문", "그래디언트가 문자열이라서", "항상 랜덤이라서", "함수가 없어서"], correctIndex: 0, explanation: "이동량은 학습률과 그래디언트의 곱입니다.", conceptTags: ["이동량"], questionType: "update-size", reasonTags: ["lr"] },
+    { prompt: "학습률이 너무 큰 loss curve는 어떻게 보일 수 있는가?", choices: ["위아래로 크게 튀거나 커짐", "항상 완벽한 직선 감소", "항상 0 유지", "출력이 없음"], correctIndex: 0, explanation: "큰 학습률은 손실을 불안정하게 만들 수 있습니다.", conceptTags: ["loss curve"], questionType: "visual-diagnosis", reasonTags: ["진동"] },
+    { prompt: "작은 학습률의 장점은?", choices: ["상대적으로 안정적일 수 있다", "항상 가장 빠르다", "목적 함수가 필요 없다", "그래디언트를 무시한다"], correctIndex: 0, explanation: "작게 움직이면 지나칠 위험은 줄어들 수 있습니다.", conceptTags: ["안정성"], questionType: "tradeoff", reasonTags: ["작은 이동"] },
+    { prompt: "학습률은 무엇과 함께 봐야 하는가?", choices: ["함수의 기울기와 손실 변화", "파일 권한만", "정답 번호만", "CSS 색상만"], correctIndex: 0, explanation: "같은 학습률도 함수 모양과 기울기 크기에 따라 다르게 작동합니다.", conceptTags: ["함수 모양"], questionType: "context", reasonTags: ["곡률"] },
+    { prompt: "다음 장에서 학습률이 적용될 대상은?", choices: ["손실 함수", "비둘기집", "문자열 압축", "라우터"], correctIndex: 0, explanation: "손실 함수는 모델이 얼마나 틀렸는지 나타내며 최적화 대상이 됩니다.", conceptTags: ["손실 함수"], questionType: "next-concept", reasonTags: ["최적화 대상"] },
+  ]}
+/>
+
+## 다음으로
+
+<NextChapterButton href="/chapters/loss-functions" label="다음 챕터로 가기" />

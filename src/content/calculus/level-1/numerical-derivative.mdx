@@ -1,0 +1,69 @@
+## 왜 배우나
+
+수치미분은 공식을 모르더라도 작은 변화량으로 기울기를 근사하는 방법입니다. 자동미분과 경사하강법으로 가기 전에, 코드로 변화율을 직접 찍어 보는 다리 역할을 합니다.
+
+## 먼저 감 잡기
+
+`h`를 작게 잡고 `f(x+h) - f(x)`를 `h`로 나누면 x 근처의 기울기를 대략 알 수 있습니다. 중앙 차분은 x의 양쪽 값을 써서 더 균형 있게 근사합니다.
+
+<MultipleChoiceQuiz
+  questions={[
+    { prompt: "수치미분의 핵심 감각은?", choices: ["작은 입력 변화로 기울기를 근사한다", "항상 공식을 외운다", "함수값을 삭제한다", "그래프를 금지한다"], correctIndex: 0, explanation: "수치미분은 작은 h를 이용해 변화율을 근사합니다.", conceptTags: ["수치미분"], questionType: "numerical-derivative-meaning", reasonTags: ["작은 변화량"] },
+  ]}
+/>
+
+## 핵심 정의
+
+전진 차분은 `(f(x+h) - f(x)) / h`입니다. 중앙 차분은 `(f(x+h) - f(x-h)) / (2h)`입니다. h가 너무 크면 근사가 거칠고, 너무 작으면 컴퓨터의 숫자 오차가 커질 수 있습니다.
+
+## 자주 헷갈리는 지점
+
+<strong>h는 작을수록 무조건 좋다고 보는 실수.</strong> 너무 작으면 부동소수점 오차가 커질 수 있습니다.
+
+<strong>전진 차분과 중앙 차분을 같은 것으로 보는 실수.</strong> 중앙 차분은 양쪽 정보를 씁니다.
+
+<strong>수치미분을 자동미분과 같은 것으로 보는 실수.</strong> 자동미분은 내부 방식이 다르며 여기서는 다루지 않습니다.
+
+## 직접 실험하기
+
+h와 x를 바꾸며 전진 차분, 중앙 차분, 참고 기울기를 비교합니다.
+
+<NumericalDerivativePlayground />
+
+## 코드로 읽기
+
+```python
+def numerical_derivative(f, x, h=1e-3):
+    return (f(x + h) - f(x)) / h
+```
+
+이 코드는 함수를 값으로 받아 x 근처의 기울기를 근사합니다. 공식이 없어도 함수값을 계산할 수 있으면 근사를 시도할 수 있습니다.
+
+## 전공에서 만나는 장면
+
+- 시뮬레이션 함수의 변화율 대략 보기
+- 손실 함수 기울기 검산
+- 자동미분을 배우기 전 기울기 감각 만들기
+- 수치 계산에서 h 선택의 민감도 이해하기
+
+## 종합 점검
+
+<MultipleChoiceQuiz
+  title="종합 점검"
+  questions={[
+    { prompt: "전진 차분 공식은?", choices: ["(f(x+h)-f(x))/h", "f(x)+h", "f(h)/x", "x+h"], correctIndex: 0, explanation: "전진 차분은 x와 x+h의 함수값 차이를 h로 나눕니다.", conceptTags: ["전진 차분"], questionType: "forward-difference", reasonTags: ["공식 구조"] },
+    { prompt: "중앙 차분은 어떤 값을 사용하는가?", choices: ["x 양쪽의 f(x+h), f(x-h)", "f(x)만", "h만", "정의역 이름"], correctIndex: 0, explanation: "중앙 차분은 기준점 양쪽의 값을 함께 사용합니다.", conceptTags: ["중앙 차분"], questionType: "central-difference", reasonTags: ["양쪽 값"] },
+    { prompt: "h가 너무 크면?", choices: ["한 점 근처 기울기라기보다 넓은 구간 평균이 된다", "항상 정확해진다", "함수가 사라진다", "입력이 없다"], correctIndex: 0, explanation: "큰 h는 근처의 순간 변화율을 보기엔 거칠 수 있습니다.", conceptTags: ["h 선택"], questionType: "large-h", reasonTags: ["거친 근사"] },
+    { prompt: "h가 너무 작으면 생길 수 있는 문제는?", choices: ["부동소수점 오차 영향이 커질 수 있다", "항상 완벽해진다", "함수값이 문자열이 된다", "그래프가 사라진다"], correctIndex: 0, explanation: "컴퓨터 숫자 표현 한계 때문에 너무 작은 h도 문제가 될 수 있습니다.", conceptTags: ["수치 오차"], questionType: "small-h", reasonTags: ["부동소수점"] },
+    { prompt: "수치미분이 유용한 이유는?", choices: ["공식을 몰라도 함수값으로 기울기를 근사할 수 있다", "함수값을 몰라도 된다", "입력을 삭제한다", "항상 0을 만든다"], correctIndex: 0, explanation: "함수값을 계산할 수 있으면 차분으로 변화율을 근사할 수 있습니다.", conceptTags: ["근사"], questionType: "usefulness", reasonTags: ["공식 없이 근사"] },
+    { prompt: "수치미분과 자동미분의 관계로 맞는 것은?", choices: ["수치미분은 감각을 주지만 자동미분 내부 구현 자체는 아니다", "완전히 같은 말", "수치미분은 함수가 없다", "자동미분은 h만 바꾼다"], correctIndex: 0, explanation: "자동미분은 계산 그래프 기반으로 정확한 미분을 추적하는 방식이며 여기서는 다루지 않습니다.", conceptTags: ["자동미분"], questionType: "autodiff-bridge", reasonTags: ["개념 구분"] },
+    { prompt: "손실 함수 기울기 검산에 수치미분을 쓰는 이유는?", choices: ["직접 계산한 기울기와 근사값을 비교할 수 있어서", "항상 학습이 끝나서", "데이터가 필요 없어서", "그래프가 필요 없어서"], correctIndex: 0, explanation: "간단한 gradient check 감각과 연결됩니다.", conceptTags: ["검산"], questionType: "gradient-check", reasonTags: ["근사 비교"] },
+    { prompt: "중앙 차분이 전진 차분보다 균형 잡힌 이유는?", choices: ["x의 양쪽 정보를 쓰기 때문", "항상 h가 0이라서", "함수값을 하나만 써서", "입력을 무시해서"], correctIndex: 0, explanation: "기준점 양쪽을 함께 보므로 한쪽만 보는 전진 차분보다 균형 잡힌 근사가 됩니다.", conceptTags: ["중앙 차분"], questionType: "central-advantage", reasonTags: ["양쪽 근사"] },
+    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["전진 차분", "중앙 차분 맛보기", "h 선택 감각", "자동미분 내부 구현"], correctIndex: 3, explanation: "자동미분 내부 구현은 Level 1 범위를 넘습니다.", conceptTags: ["범위 조절"], questionType: "scope-boundary", reasonTags: ["자동미분 제외"] },
+    { prompt: "수치미분이 경사하강법으로 이어지는 이유는?", choices: ["기울기 근사로 손실을 줄이는 방향을 생각할 수 있어서", "항상 최댓값만 찾아서", "입력이 없어져서", "함수값을 출력하지 않아서"], correctIndex: 0, explanation: "기울기 감각은 손실을 줄이는 업데이트 방향으로 이어집니다.", conceptTags: ["경사하강법"], questionType: "gradient-descent-bridge", reasonTags: ["기울기 방향"] },
+  ]}
+/>
+
+## 다음으로
+
+<NextChapterButton href="/subjects/calculus" label="미적분 로드맵으로 가기" />

@@ -1,0 +1,73 @@
+## 왜 배우나
+
+미분은 한 점 근처에서 함수가 얼마나 빠르게 변하는지 보는 도구입니다. 위치가 시간에 따라 변하면 속도, 손실 함수가 파라미터에 따라 변하면 학습 방향을 읽는 데 연결됩니다.
+
+## 먼저 감 잡기
+
+평균 변화율은 두 점 사이 기울기입니다. 두 점 사이 간격을 점점 줄이면 한 점에서의 순간 변화율을 생각할 수 있습니다. 그래프에서는 그 점에 닿는 접선의 기울기로 봅니다.
+
+<MultipleChoiceQuiz
+  questions={[
+    { prompt: "미분의 기본 의미로 가장 알맞은 것은?", choices: ["순간 변화율", "항상 면적", "입력 개수", "그래프 제목"], correctIndex: 0, explanation: "미분은 한 점 근처의 순간 변화율을 읽는 도구입니다.", conceptTags: ["미분"], questionType: "derivative-meaning", reasonTags: ["순간 변화율"] },
+  ]}
+/>
+
+## 핵심 정의
+
+도함수는 각 입력 위치에서의 순간 변화율을 알려 주는 함수입니다. `f'(x)`는 `x`에서의 기울기라고 읽을 수 있습니다.
+
+접선은 한 점 근처에서 그래프가 향하는 방향을 보여 주는 직선입니다. 접선의 기울기가 그 점의 미분값입니다.
+
+## 자주 헷갈리는 지점
+
+<strong>미분을 공식 계산으로만 보는 실수.</strong> 공식보다 먼저 순간 변화율이라는 의미가 중요합니다.
+
+<strong>평균 변화율과 순간 변화율을 섞는 실수.</strong> 평균은 구간, 순간은 한 점 근처입니다.
+
+<strong>미분값을 함수값으로 착각하는 실수.</strong> 함수값은 높이이고 미분값은 그 위치의 기울기입니다.
+
+## 직접 실험하기
+
+평균 변화율 실험을 다시 보며 간격이 작아질수록 한 점 근처의 기울기에 가까워지는 감각을 확인합니다.
+
+<DifferenceQuotientPlayground />
+
+## 코드로 읽기
+
+```python
+def loss(w):
+    return (w - 3) ** 2
+
+gradient_near_1 = (loss(1.01) - loss(1.0)) / 0.01
+```
+
+공식을 몰라도 작은 차이를 이용하면 한 점 근처에서 손실이 어느 방향으로 변하는지 근사할 수 있습니다.
+
+## 전공에서 만나는 장면
+
+- 위치 함수의 도함수로 속도 읽기
+- 손실 함수의 기울기로 학습 방향 정하기
+- 그래픽스 곡선의 접선 방향 구하기
+- 센서 데이터의 순간 변화 감지하기
+
+## 종합 점검
+
+<MultipleChoiceQuiz
+  title="종합 점검"
+  questions={[
+    { prompt: "미분값은 그래프에서 무엇과 연결되는가?", choices: ["접선의 기울기", "그래프 색", "x축 이름", "파일 경로"], correctIndex: 0, explanation: "한 점에서의 미분값은 접선의 기울기입니다.", conceptTags: ["접선"], questionType: "tangent-slope", reasonTags: ["기울기 해석"] },
+    { prompt: "평균 변화율과 순간 변화율의 차이는?", choices: ["평균은 구간, 순간은 한 점 근처", "둘은 항상 같다", "순간은 그래프 색", "평균은 입력 없음"], correctIndex: 0, explanation: "평균 변화율은 두 점 사이이고 순간 변화율은 한 점 근처입니다.", conceptTags: ["변화율"], questionType: "average-vs-instant", reasonTags: ["구간과 한 점"] },
+    { prompt: "`f'(x)`는 보통 무엇을 뜻하는가?", choices: ["x에서의 기울기", "x축 삭제", "함수 이름 변경", "항상 함수값"], correctIndex: 0, explanation: "`f'(x)`는 x에서 함수가 얼마나 빠르게 변하는지 나타냅니다.", conceptTags: ["도함수"], questionType: "prime-notation", reasonTags: ["기호 의미"] },
+    { prompt: "함수값과 미분값을 구분하면?", choices: ["함수값은 높이, 미분값은 기울기", "둘 다 파일명", "함수값은 항상 0", "미분값은 항상 문자열"], correctIndex: 0, explanation: "그래프에서 함수값은 y값이고 미분값은 그 점의 변화율입니다.", conceptTags: ["함수값과 미분값"], questionType: "value-vs-derivative", reasonTags: ["높이와 기울기"] },
+    { prompt: "위치의 미분은 어떤 물리량과 연결되는가?", choices: ["속도", "색상", "문자열 길이", "파일 개수"], correctIndex: 0, explanation: "위치가 시간에 따라 변할 때 순간 변화율은 속도입니다.", conceptTags: ["속도"], questionType: "position-velocity", reasonTags: ["위치 시간"] },
+    { prompt: "손실 함수에서 미분을 보는 이유는?", choices: ["손실이 어느 방향으로 얼마나 변하는지 보기 위해", "HTML을 줄이기 위해", "이미지를 저장하기 위해", "입력을 삭제하기 위해"], correctIndex: 0, explanation: "최적화에서는 기울기로 손실을 줄이는 방향을 찾습니다.", conceptTags: ["손실 함수"], questionType: "loss-gradient", reasonTags: ["최적화 방향"] },
+    { prompt: "미분의 의미를 놓치고 공식만 외우면 생기는 문제는?", choices: ["기울기가 무엇을 뜻하는지 해석하기 어렵다", "코드가 항상 빨라진다", "그래프가 사라진다", "입력이 모두 문자열이 된다"], correctIndex: 0, explanation: "공식 계산보다 기울기 해석이 먼저입니다.", conceptTags: ["개념 해석"], questionType: "formula-only", reasonTags: ["의미 부족"] },
+    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["순간 변화율", "접선", "위치-속도 관계", "복잡한 도함수 계산"], correctIndex: 3, explanation: "복잡한 계산은 기본 규칙 이후에 다룹니다.", conceptTags: ["범위 조절"], questionType: "scope-boundary", reasonTags: ["계산 심화 제외"] },
+    { prompt: "두 점 간격을 줄이는 과정은 무엇을 이해하는 데 도움이 되는가?", choices: ["순간 변화율", "공역 이름", "파일 압축", "색상 선택"], correctIndex: 0, explanation: "평균 변화율의 구간을 줄이면 한 점 근처 변화율 감각으로 이어집니다.", conceptTags: ["극한과 미분"], questionType: "limit-to-derivative", reasonTags: ["간격 줄이기"] },
+    { prompt: "접선을 가장 잘 설명한 것은?", choices: ["한 점 근처 그래프의 진행 방향을 보여 주는 직선", "항상 y축", "그래프 밖의 표", "출력 후보 전체"], correctIndex: 0, explanation: "접선은 한 점 근처에서 그래프가 향하는 방향을 나타냅니다.", conceptTags: ["접선"], questionType: "tangent-line", reasonTags: ["진행 방향"] },
+  ]}
+/>
+
+## 다음으로
+
+<NextChapterButton href="/chapters/basic-derivative-rules" label="다음 챕터로 가기" />

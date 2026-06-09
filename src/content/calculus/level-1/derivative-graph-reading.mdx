@@ -1,0 +1,71 @@
+## 왜 배우나
+
+도함수는 그래프가 어디서 증가하고 감소하는지 알려 주는 신호입니다. 데이터를 볼 때도 값 자체뿐 아니라 변하는 방향과 속도가 중요합니다.
+
+## 먼저 감 잡기
+
+도함수가 양수면 함수는 보통 증가하고, 음수면 감소합니다. 도함수의 크기가 크면 더 가파르게 변합니다. 도함수가 0인 지점은 꼭대기나 바닥 후보가 될 수 있습니다.
+
+<MultipleChoiceQuiz
+  questions={[
+    { prompt: "도함수가 양수이면 보통 어떤 의미인가?", choices: ["함수가 증가하는 방향", "항상 멈춤", "그래프가 없음", "입력이 문자열"], correctIndex: 0, explanation: "기울기가 양수이면 입력이 증가할 때 출력도 증가하는 흐름입니다.", conceptTags: ["도함수 부호"], questionType: "positive-derivative", reasonTags: ["증가"] },
+  ]}
+/>
+
+## 핵심 정의
+
+도함수의 부호는 증가와 감소를 읽게 해 줍니다. 도함수의 크기는 변화 속도를 나타냅니다. 도함수가 0인 지점은 평평한 지점이며, 극대나 극소 후보가 될 수 있습니다.
+
+## 자주 헷갈리는 지점
+
+<strong>도함수 0이면 무조건 최댓값이라고 보는 실수.</strong> 후보일 뿐이고 주변 변화를 봐야 합니다.
+
+<strong>함수값과 도함수값을 섞는 실수.</strong> 높은 위치라도 기울기는 0일 수 있습니다.
+
+<strong>부호보다 공식 계산만 보는 실수.</strong> 그래프 해석에서는 양수, 음수, 0의 의미가 중요합니다.
+
+## 직접 판별하기
+
+<UnderstandingCheck concept="도함수 부호" prompt="도함수의 부호로 증가/감소 구간을 읽을 수 있나요?" />
+
+## 코드로 읽기
+
+```python
+def trend(derivative_value):
+    if derivative_value > 0:
+        return "increasing"
+    if derivative_value < 0:
+        return "decreasing"
+    return "flat"
+```
+
+기울기 값을 신호처럼 읽으면 그래프의 움직임을 분류할 수 있습니다.
+
+## 전공에서 만나는 장면
+
+- 성능 지표가 개선 중인지 악화 중인지 판별
+- 손실 함수가 줄어드는 방향 확인
+- 센서 값이 빠르게 변하는 구간 찾기
+- 게임 난이도 곡선의 급격한 변화 확인
+
+## 종합 점검
+
+<MultipleChoiceQuiz
+  title="종합 점검"
+  questions={[
+    { prompt: "도함수가 음수이면 보통?", choices: ["함수가 감소하는 흐름", "항상 증가", "항상 최댓값", "함수가 아님"], correctIndex: 0, explanation: "기울기가 음수이면 입력 증가에 따라 출력이 줄어드는 흐름입니다.", conceptTags: ["도함수 부호"], questionType: "negative-derivative", reasonTags: ["감소"] },
+    { prompt: "도함수의 절댓값이 크면?", choices: ["더 가파르게 변한다", "항상 0", "입력이 없다", "연속이 아니다"], correctIndex: 0, explanation: "기울기 크기가 클수록 같은 입력 변화에 출력이 크게 변합니다.", conceptTags: ["도함수 크기"], questionType: "derivative-size", reasonTags: ["가파름"] },
+    { prompt: "도함수가 0인 지점은?", choices: ["평평한 지점이며 극값 후보일 수 있다", "무조건 최댓값", "무조건 불연속", "함수값이 없다"], correctIndex: 0, explanation: "기울기 0은 평평한 지점이지만 주변 부호를 더 봐야 합니다.", conceptTags: ["기울기 0"], questionType: "zero-derivative", reasonTags: ["극값 후보"] },
+    { prompt: "극대 후보를 찾을 때 보는 변화는?", choices: ["도함수가 양수에서 음수로 바뀌는지", "항상 음수에서 음수", "함수 이름", "공역 이름"], correctIndex: 0, explanation: "증가하다 감소하면 꼭대기 후보가 됩니다.", conceptTags: ["극대"], questionType: "local-maximum", reasonTags: ["부호 변화"] },
+    { prompt: "극소 후보를 찾을 때 보는 변화는?", choices: ["도함수가 음수에서 양수로 바뀌는지", "항상 양수에서 양수", "문자열 길이", "파일 수"], correctIndex: 0, explanation: "감소하다 증가하면 바닥 후보가 됩니다.", conceptTags: ["극소"], questionType: "local-minimum", reasonTags: ["부호 변화"] },
+    { prompt: "함수값과 도함수값의 차이는?", choices: ["함수값은 높이, 도함수값은 기울기", "둘 다 제목", "둘 다 항상 0", "도함수값은 색상"], correctIndex: 0, explanation: "그래프 해석에서 높이와 기울기를 구분해야 합니다.", conceptTags: ["함수값과 도함수"], questionType: "value-vs-derivative", reasonTags: ["높이 기울기"] },
+    { prompt: "도함수 부호를 코드로 분류하면 좋은 점은?", choices: ["증가/감소/평평함을 신호처럼 처리할 수 있다", "그래프를 숨긴다", "함수를 삭제한다", "항상 정답을 0으로 만든다"], correctIndex: 0, explanation: "기울기 부호는 상태 분류에 쓸 수 있습니다.", conceptTags: ["코드 판별"], questionType: "code-classification", reasonTags: ["부호 분류"] },
+    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["증가 감소", "기울기 0", "극대 극소 맛보기", "이계도함수 판정 심화"], correctIndex: 3, explanation: "이계도함수 판정은 심화로 미룹니다.", conceptTags: ["범위 조절"], questionType: "scope-boundary", reasonTags: ["이계도함수 제외"] },
+    { prompt: "성능 지표 그래프에서 도함수 감각이 필요한 이유는?", choices: ["개선 속도나 악화 속도를 보기 위해", "HTML 문법 검사만", "색상표 만들기", "파일명 압축"], correctIndex: 0, explanation: "값 자체뿐 아니라 변하는 방향과 속도가 중요합니다.", conceptTags: ["전공 연결"], questionType: "metric-trend", reasonTags: ["추세 해석"] },
+    { prompt: "도함수가 양수지만 작다면?", choices: ["천천히 증가하는 흐름", "급격히 감소", "항상 멈춤", "불연속"], correctIndex: 0, explanation: "양수는 증가, 크기가 작다는 것은 완만한 변화를 뜻합니다.", conceptTags: ["도함수 크기"], questionType: "small-positive", reasonTags: ["완만한 증가"] },
+  ]}
+/>
+
+## 다음으로
+
+<NextChapterButton href="/chapters/optimization-intro" label="다음 챕터로 가기" />

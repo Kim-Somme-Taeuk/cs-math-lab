@@ -1,0 +1,79 @@
+## 왜 배우나
+
+시뮬레이션에서는 값 자체보다 “지금 상태에서 얼마나 변하는가”를 아는 경우가 많습니다. 미분방정식은 현재 상태와 시간에 따라 변화율이 정해지는 관계를 표현합니다.
+
+이 장의 핵심은 <strong>해석적으로 푸는 법보다, 변화율 규칙을 상태 업데이트의 출발점으로 읽는 법</strong>입니다. 해석적 풀이 기법은 다루지 않습니다.
+
+## 먼저 감 잡기
+
+위치의 변화율은 속도입니다. 온도의 변화율은 현재 온도와 주변 온도 차이에 영향을 받을 수 있습니다.
+
+`dy/dt = f(y, t)`는 y가 시간에 따라 어떻게 변하는지 변화율 규칙으로 말해 줍니다.
+
+<MultipleChoiceQuiz questions={[{ prompt: "미분방정식을 처음 볼 때 좋은 관점은?", choices: ["변화율이 현재 상태에 의해 정해지는 식", "항상 정답 공식", "문자열 연결", "파일 경로"], correctIndex: 0, explanation: "미분방정식은 상태와 변화율의 관계를 표현합니다.", conceptTags: ["미분방정식"], questionType: "ode-meaning", reasonTags: ["상태 변화율"] }]} />
+
+## 핵심 정의
+
+미분방정식은 함수와 그 변화율이 함께 등장하는 식입니다.
+
+```text
+dy/dt = f(y, t)
+```
+
+여기서 `dy/dt`는 시간에 따른 y의 변화율이고, 오른쪽은 그 변화율을 정하는 규칙입니다.
+
+## 자주 헷갈리는 지점
+
+<strong>반드시 손으로 정확히 풀어야 한다고 보는 실수.</strong> 컴공에서는 수치적으로 다음 상태를 근사하는 일이 많습니다.
+
+<strong>상태와 변화율을 섞는 실수.</strong> y는 현재 값이고 dy/dt는 그 값이 변하는 속도입니다.
+
+<strong>dt를 무시하는 실수.</strong> 변화율을 실제 변화량으로 바꾸려면 작은 시간 폭이 필요합니다.
+
+## 직접 판별하기
+
+다음 중 상태와 변화율을 구분해 봅니다.
+
+- 위치와 속도
+- 온도와 냉각 속도
+- 인구 수와 증가율
+
+<UnderstandingCheck concept="상태와 변화율" prompt="현재 상태 y와 변화율 dy/dt를 구분해서 설명할 수 있나요?" />
+
+## 코드로 읽기
+
+```python
+def rate(y, t):
+    return -0.7 * y
+```
+
+이 함수는 현재 상태 `y`가 클수록 더 빠르게 줄어드는 변화율 규칙을 나타냅니다. 다음 장에서는 이 규칙으로 상태를 조금씩 업데이트합니다.
+
+## 전공에서 만나는 장면
+
+- 위치와 속도 기반 물리
+- 냉각과 감쇠
+- 인구 증가 모델
+- 게임 상태나 애니메이션 값의 시간 변화
+
+## 종합 점검
+
+<MultipleChoiceQuiz
+  title="종합 점검"
+  questions={[
+    { prompt: "미분방정식은 무엇을 표현하는가?", choices: ["상태와 변화율의 관계", "항상 파일명", "정렬된 배열", "CSS 규칙"], correctIndex: 0, explanation: "미분방정식은 현재 상태가 어떻게 변하는지 나타냅니다.", conceptTags: ["미분방정식"], questionType: "definition", reasonTags: ["상태 변화율"] },
+    { prompt: "`dy/dt`는 무엇인가?", choices: ["현재 값", "시간에 따른 y의 변화율", "파일 경로", "정답 번호"], correctIndex: 1, explanation: "`dy/dt`는 y가 시간에 따라 변하는 속도입니다.", conceptTags: ["변화율"], questionType: "dy-dt", reasonTags: ["시간 변화"] },
+    { prompt: "위치의 변화율은 보통 무엇인가?", choices: ["온도", "파일 크기", "속도", "정답"], correctIndex: 2, explanation: "시간에 따른 위치 변화율은 속도입니다.", conceptTags: ["위치", "속도"], questionType: "application", reasonTags: ["물리"] },
+    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["상태", "변화율", "dy/dt 감각", "해석적 풀이 기법"], correctIndex: 3, explanation: "정확한 해법을 구하는 기법은 심화 내용입니다.", conceptTags: ["범위 조절"], questionType: "scope-boundary", reasonTags: ["풀이 제외"] },
+    { prompt: "컴공에서 미분방정식을 자주 쓰는 방식은?", choices: ["수치적으로 다음 상태를 근사", "항상 손으로 닫힌해 계산", "HTML 삭제", "정답 고정"], correctIndex: 0, explanation: "시뮬레이션에서는 변화율로 다음 상태를 근사합니다.", conceptTags: ["시뮬레이션"], questionType: "cs-context", reasonTags: ["수치 근사"] },
+    { prompt: "`rate(y, t)` 함수는 무엇을 돌려주는가?", choices: ["현재 상태의 변화율", "항상 정답", "파일명", "그래프 색"], correctIndex: 0, explanation: "rate 함수는 현재 상태에서 얼마나 변하는지 나타냅니다.", conceptTags: ["rate 함수"], questionType: "code-reading", reasonTags: ["변화율 규칙"] },
+    { prompt: "상태와 변화율을 섞으면 생기는 문제는?", choices: ["현재 값과 바뀌는 속도를 혼동한다", "항상 빨라진다", "파일이 커진다", "정렬된다"], correctIndex: 0, explanation: "상태 y와 변화율 dy/dt는 다른 역할입니다.", conceptTags: ["상태"], questionType: "pitfall", reasonTags: ["역할 구분"] },
+    { prompt: "냉각 모델에서 변화율은 무엇에 영향을 받을 수 있는가?", choices: ["현재 온도와 주변 온도 차이", "파일 확장자", "정답 위치", "HTML 태그"], correctIndex: 0, explanation: "온도 차이가 클수록 빠르게 식는 모델을 만들 수 있습니다.", conceptTags: ["냉각"], questionType: "example", reasonTags: ["상태 의존"] },
+    { prompt: "변화율을 실제 변화량으로 바꿀 때 필요한 것은?", choices: ["작은 시간 폭 dt", "정답 번호", "파일명", "CSS 색"], correctIndex: 0, explanation: "변화량은 대략 rate * dt로 근사할 수 있습니다.", conceptTags: ["dt"], questionType: "dt", reasonTags: ["변화량"] },
+    { prompt: "다음 장에서 다룰 방법은?", choices: ["오일러 방법", "비둘기집", "행렬식", "문자열 정렬"], correctIndex: 0, explanation: "오일러 방법은 변화율로 다음 상태를 예측합니다.", conceptTags: ["오일러 방법"], questionType: "next-concept", reasonTags: ["상태 업데이트"] },
+  ]}
+/>
+
+## 다음으로
+
+<NextChapterButton href="/chapters/euler-method-simulation" label="다음 챕터로 가기" />

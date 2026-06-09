@@ -1,0 +1,83 @@
+## 왜 배우나
+
+모델을 학습하려면 “얼마나 틀렸는지”를 숫자로 표현해야 합니다. 손실 함수는 예측과 정답의 차이를 하나의 값으로 만들고, 최적화가 줄여야 할 대상을 제공합니다.
+
+이 장의 핵심은 <strong>손실 함수를 모델 학습의 목적 함수로 읽는 법</strong>입니다. cross entropy 유도는 다루지 않습니다.
+
+## 먼저 감 잡기
+
+예측값이 정답과 가까우면 손실은 작아야 하고, 멀면 손실은 커야 합니다. 평균제곱오차 MSE는 차이를 제곱해서 평균내는 가장 직관적인 손실 중 하나입니다.
+
+모델 파라미터가 바뀌면 예측이 바뀌고, 예측이 바뀌면 손실도 바뀝니다.
+
+<MultipleChoiceQuiz questions={[{ prompt: "손실 함수의 역할은?", choices: ["예측이 얼마나 틀렸는지 숫자로 표현", "항상 정답 출력", "파일 저장", "그래프 삭제"], correctIndex: 0, explanation: "손실 함수는 모델의 오차를 최적화 가능한 숫자로 만듭니다.", conceptTags: ["손실 함수"], questionType: "loss-meaning", reasonTags: ["오차 숫자화"] }]} />
+
+## 핵심 정의
+
+MSE는 예측과 정답의 차이를 제곱한 뒤 평균내는 방식입니다.
+
+```text
+오차 = 예측 - 정답
+MSE = 오차^2의 평균
+```
+
+제곱을 쓰면 큰 오차가 더 크게 벌점을 받습니다.
+
+## 자주 헷갈리는 지점
+
+<strong>손실이 정확도와 항상 같은 값이라고 보는 실수.</strong> 손실은 학습을 위한 연속적인 벌점이고 정확도는 별도 지표일 수 있습니다.
+
+<strong>손실 함수가 모델과 무관하다고 보는 실수.</strong> 파라미터가 예측을 바꾸고 손실도 바꿉니다.
+
+<strong>손실이 작으면 모든 것이 완벽하다고 보는 실수.</strong> 데이터 분포, 과적합, 평가 지표도 함께 봐야 합니다.
+
+## 직접 판별하기
+
+아래 상황에서 어떤 값이 손실이 될 수 있는지 생각해 봅니다.
+
+- 예측 온도와 실제 온도의 차이
+- 추천 점수와 사용자의 실제 반응 차이
+- 게임 AI가 목표 위치에서 벗어난 거리
+
+<UnderstandingCheck concept="손실 함수 해석" prompt="손실 함수를 최적화할 목적 함수로 설명할 수 있나요?" />
+
+## 코드로 읽기
+
+```python
+def mse(predictions, targets):
+    total = 0
+    for pred, target in zip(predictions, targets):
+        total += (pred - target) ** 2
+    return total / len(predictions)
+```
+
+이 코드는 예측 오차를 제곱해 평균냅니다. 학습은 이 값을 줄이는 방향으로 파라미터를 바꿉니다.
+
+## 전공에서 만나는 장면
+
+- 회귀 모델의 MSE
+- 신경망 학습 로그의 loss
+- 추천 모델의 예측 오차
+- 제어/게임 AI의 목표와 현재 상태 차이
+
+## 종합 점검
+
+<MultipleChoiceQuiz
+  title="종합 점검"
+  questions={[
+    { prompt: "손실 함수는 무엇을 제공하는가?", choices: ["최적화가 줄여야 할 숫자", "항상 정답 문자열", "파일 경로", "색상 코드"], correctIndex: 0, explanation: "손실은 모델이 얼마나 틀렸는지 나타내는 목적 함수입니다.", conceptTags: ["손실 함수"], questionType: "definition", reasonTags: ["목적 함수"] },
+    { prompt: "MSE에서 제곱을 쓰는 효과는?", choices: ["오차를 삭제한다", "큰 오차를 더 크게 벌점화한다", "항상 0을 만든다", "정렬한다"], correctIndex: 1, explanation: "제곱은 큰 차이에 더 큰 손실을 줍니다.", conceptTags: ["MSE"], questionType: "squared-error", reasonTags: ["큰 오차"] },
+    { prompt: "모델 파라미터와 손실의 관계는?", choices: ["무관하다", "항상 문자열이다", "파라미터가 예측을 바꿔 손실도 바꾼다", "손실이 파라미터를 삭제한다"], correctIndex: 2, explanation: "파라미터 변화는 예측과 손실 변화로 이어집니다.", conceptTags: ["파라미터"], questionType: "parameter-loss", reasonTags: ["예측 변화"] },
+    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["MSE 맛보기", "오차 숫자화", "파라미터와 손실", "cross entropy 유도"], correctIndex: 3, explanation: "cross entropy 유도는 분류 모델 심화 내용입니다.", conceptTags: ["범위 조절"], questionType: "scope-boundary", reasonTags: ["심화 제외"] },
+    { prompt: "손실과 정확도에 대한 설명으로 맞는 것은?", choices: ["항상 같은 값은 아니다", "무조건 같다", "정확도는 손실의 파일명", "손실은 정렬이다"], correctIndex: 0, explanation: "손실은 연속적인 학습 신호이고 정확도는 별도 평가 지표일 수 있습니다.", conceptTags: ["평가 지표"], questionType: "loss-vs-accuracy", reasonTags: ["지표 구분"] },
+    { prompt: "`(pred - target) ** 2`는 무엇을 나타내는가?", choices: ["제곱 오차", "정답 인덱스", "그래프 색", "학습률"], correctIndex: 0, explanation: "예측과 정답 차이를 제곱한 오차입니다.", conceptTags: ["제곱 오차"], questionType: "code-reading", reasonTags: ["오차 계산"] },
+    { prompt: "학습은 손실 함수에 대해 무엇을 하는가?", choices: ["손실이 줄어들도록 파라미터를 바꾼다", "항상 손실을 키운다", "손실을 무시한다", "데이터를 삭제한다"], correctIndex: 0, explanation: "최적화는 손실을 줄이는 방향으로 파라미터를 갱신합니다.", conceptTags: ["학습"], questionType: "training", reasonTags: ["손실 최소화"] },
+    { prompt: "손실이 작아도 추가로 봐야 할 수 있는 것은?", choices: ["평가 데이터와 과적합 여부", "파일 확장자만", "CSS 색만", "정답 위치만"], correctIndex: 0, explanation: "학습 데이터 손실만으로 일반화 성능을 보장할 수 없습니다.", conceptTags: ["일반화"], questionType: "risk", reasonTags: ["과적합"] },
+    { prompt: "추천 모델에서 손실은 무엇을 비교할 수 있는가?", choices: ["예측 반응과 실제 반응", "HTML 태그와 CSS", "파일명과 폴더명", "정답 번호"], correctIndex: 0, explanation: "추천 예측이 실제 사용자 반응과 얼마나 다른지 손실로 만들 수 있습니다.", conceptTags: ["추천"], questionType: "application", reasonTags: ["예측 오차"] },
+    { prompt: "다음 장과 연결되는 지점은?", choices: ["복잡한 손실의 그래디언트를 코드가 추적하는 법", "비둘기집 원리", "문자열 압축", "라우팅"], correctIndex: 0, explanation: "자동미분은 손실 계산 그래프에서 변화율을 추적합니다.", conceptTags: ["자동미분"], questionType: "next-concept", reasonTags: ["계산 그래프"] },
+  ]}
+/>
+
+## 다음으로
+
+<NextChapterButton href="/chapters/autodiff-intro" label="다음 챕터로 가기" />

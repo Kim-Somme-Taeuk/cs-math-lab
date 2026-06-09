@@ -1,0 +1,79 @@
+## 왜 배우나
+
+리만 합은 적분을 컴퓨터가 계산할 수 있는 합산 구조로 바꾸는 첫 감각입니다. 연속적인 그래프 아래 넓이를 한 번에 정확히 구하기 어렵다면, 구간을 잘게 나누고 각 조각의 직사각형 넓이를 더해 근사할 수 있습니다.
+
+이 장의 핵심은 <strong>구간을 나누고, 각 조각의 기여량을 더해 누적량을 근사하는 법</strong>입니다. 엄밀한 극한 증명은 뒤로 미룹니다.
+
+## 먼저 감 잡기
+
+곡선 아래 넓이를 직사각형 여러 개로 덮는다고 생각해 봅니다. 직사각형 폭은 구간의 작은 길이이고, 높이는 그 구간을 대표하는 함수값입니다.
+
+조각 수가 적으면 거칠게 보이고, 조각 수가 많아질수록 곡선의 모양을 더 잘 따라갑니다. 이 생각이 수치적분의 기본입니다.
+
+<MultipleChoiceQuiz
+  questions={[
+    { prompt: "리만 합에서 직사각형 하나가 나타내는 것은?", choices: ["작은 구간의 기여량", "정렬된 인덱스", "항상 0인 넓이", "조건문의 결과"], correctIndex: 0, explanation: "폭과 높이를 곱한 작은 넓이가 해당 구간의 기여량입니다.", conceptTags: ["리만 합"], questionType: "riemann-rectangle", reasonTags: ["폭과 높이"] },
+  ]}
+/>
+
+## 핵심 정의
+
+구간 `[a, b]`를 `n`개로 나누면 각 조각의 폭은 대략 `(b - a) / n`입니다. 각 조각에서 대표 높이를 고르고, `높이 × 폭`을 모두 더하면 곡선 아래 넓이의 근사가 됩니다.
+
+```text
+근사 넓이 = sum(대표 함수값 * 조각 폭)
+```
+
+## 자주 헷갈리는 지점
+
+<strong>조각 수가 늘면 항상 계산이 공짜라고 보는 실수.</strong> 근사는 좋아지지만 계산량도 늘어납니다.
+
+<strong>폭만 줄이고 높이를 보지 않는 실수.</strong> 각 조각의 기여량은 폭과 높이가 함께 결정합니다.
+
+<strong>리만 합을 적분과 별개로 보는 실수.</strong> 리만 합은 적분을 합산으로 이해하는 다리입니다.
+
+## 직접 실험하기
+
+조각 수를 바꿔 직사각형 합이 곡선 아래 넓이에 어떻게 가까워지는지 확인합니다.
+
+<RiemannSumPlayground />
+
+## 코드로 읽기
+
+```python
+area = 0
+for i in range(n):
+    x = a + (i + 0.5) * width
+    area += f(x) * width
+```
+
+이 코드는 각 구간의 가운데 값을 대표 높이로 잡고, 직사각형 넓이를 누적합니다. 조각 수 `n`이 커지면 더 촘촘한 근사가 됩니다.
+
+## 전공에서 만나는 장면
+
+- 샘플링된 센서값을 시간에 따라 누적
+- 게임 물리에서 속도를 짧은 시간 간격으로 더해 위치 갱신
+- 그래프 데이터의 면적을 근사하는 수치적분
+- 연속 모델을 이산 반복문으로 계산
+
+## 종합 점검
+
+<MultipleChoiceQuiz
+  title="종합 점검"
+  questions={[
+    { prompt: "리만 합의 기본 아이디어는?", choices: ["작은 직사각형 넓이를 더한다", "항상 미분만 한다", "문자열을 연결한다", "그래프를 지운다"], correctIndex: 0, explanation: "구간을 나누고 각 조각의 넓이를 더해 전체를 근사합니다.", conceptTags: ["리만 합"], questionType: "core-meaning", reasonTags: ["작은 합"] },
+    { prompt: "직사각형 폭은 보통 무엇과 관련 있는가?", choices: ["색상", "구간을 나눈 작은 길이", "정답 번호", "함수 이름"], correctIndex: 1, explanation: "폭은 전체 구간을 몇 조각으로 나누는지에 따라 정해지는 작은 길이입니다.", conceptTags: ["폭"], questionType: "width", reasonTags: ["구간 분할"] },
+    { prompt: "직사각형 높이는 무엇으로 잡는가?", choices: ["항상 1", "배열 길이", "대표 함수값", "파일 크기"], correctIndex: 2, explanation: "각 작은 구간에서 함수값 하나를 대표 높이로 고릅니다.", conceptTags: ["높이"], questionType: "height", reasonTags: ["함수값"] },
+    { prompt: "조각 수를 늘릴 때 생기는 일반적 변화는?", choices: ["항상 정확히 0", "근사가 거칠어진다", "정의역이 사라진다", "곡선을 더 촘촘하게 따라간다"], correctIndex: 3, explanation: "조각이 많을수록 직사각형들이 곡선 모양을 더 잘 따라갈 수 있습니다.", conceptTags: ["근사"], questionType: "slices", reasonTags: ["조각 수"] },
+    { prompt: "수치적분과 가장 가까운 코드 패턴은?", choices: ["반복문으로 작은 기여량을 누적", "항상 재귀 두 갈래", "무조건 해시 탐색", "조건문 삭제"], correctIndex: 0, explanation: "수치적분은 작은 구간의 기여량을 반복해서 더하는 구조가 많습니다.", conceptTags: ["수치적분"], questionType: "code-pattern", reasonTags: ["반복 합산"] },
+    { prompt: "리만 합에서 조각 수가 늘면 주의할 점은?", choices: ["항상 메모리가 0이 된다", "계산량도 늘 수 있다", "함수가 불연속이 된다", "정답이 문자열이 된다"], correctIndex: 1, explanation: "더 촘촘한 근사는 보통 더 많은 계산을 요구합니다.", conceptTags: ["계산량"], questionType: "tradeoff", reasonTags: ["정확도 비용"] },
+    { prompt: "`area += f(x) * width`에서 `f(x)`의 역할은?", choices: ["폭", "반복 횟수", "대표 높이", "정렬 기준"], correctIndex: 2, explanation: "함수값은 해당 작은 구간의 대표 높이로 쓰입니다.", conceptTags: ["대표값"], questionType: "code-reading", reasonTags: ["높이 해석"] },
+    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["직사각형 근사", "폭과 높이", "수치적분 감각", "엄밀한 극한 증명"], correctIndex: 3, explanation: "엄밀한 극한 정의보다 근사와 합산 감각을 먼저 봅니다.", conceptTags: ["범위 조절"], questionType: "scope-boundary", reasonTags: ["증명 제외"] },
+    { prompt: "리만 합을 배우면 적분을 어떻게 볼 수 있는가?", choices: ["연속량을 이산 합산으로 근사할 수 있다", "항상 그래프를 못 그린다", "모든 함수가 상수다", "합산과 무관하다"], correctIndex: 0, explanation: "연속적인 누적량을 작은 조각의 합으로 계산하는 감각을 얻습니다.", conceptTags: ["이산화"], questionType: "interpretation", reasonTags: ["연속 이산 연결"] },
+    { prompt: "게임 물리에서 `position += velocity * dt`가 리만 합과 닮은 이유는?", choices: ["색을 바꾸기 때문에", "작은 시간의 이동량을 더하기 때문에", "항상 랜덤이라서", "함수값을 버리기 때문에"], correctIndex: 1, explanation: "짧은 시간마다 속도에 시간 폭을 곱한 이동량을 누적합니다.", conceptTags: ["시뮬레이션"], questionType: "cs-context", reasonTags: ["dt 누적"] },
+  ]}
+/>
+
+## 다음으로
+
+<NextChapterButton href="/chapters/basic-integral-rules" label="다음 챕터로 가기" />

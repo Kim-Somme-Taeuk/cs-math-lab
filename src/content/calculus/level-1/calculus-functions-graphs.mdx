@@ -1,0 +1,86 @@
+## 왜 배우나
+
+미적분에서 함수는 변화율을 읽기 위한 출발점입니다. 컴퓨터공학에서는 함수가 데이터 변환, 그래픽스 좌표 변환, 모델의 입력과 출력처럼 계속 등장합니다.
+
+이 장의 핵심은 <strong>함수를 공식 암기 대상이 아니라 입력을 출력으로 보내는 규칙으로 읽는 법</strong>입니다. 역함수와 합성함수 심화는 뒤로 미룹니다.
+
+## 먼저 감 잡기
+
+함수는 입력 하나를 받으면 정해진 출력 하나를 돌려주는 규칙입니다. 예를 들어 `f(x) = 2x + 1`은 입력 `x`를 두 배로 키우고 1을 더합니다.
+
+그래프는 입력과 출력의 관계를 그림으로 펼친 것입니다. x축은 입력, y축은 출력으로 보면 됩니다. 선형 함수는 일정하게 늘고, 이차 함수는 휘어지며, 지수 함수는 점점 더 빠르게 커집니다.
+
+<MultipleChoiceQuiz
+  questions={[
+    { prompt: "함수를 가장 알맞게 설명한 것은?", choices: ["입력을 출력으로 보내는 규칙", "항상 원", "무조건 표", "참/거짓만 저장하는 값"], correctIndex: 0, explanation: "함수는 입력과 출력의 대응 규칙입니다.", conceptTags: ["함수"], questionType: "function-meaning", reasonTags: ["입출력 대응"] },
+  ]}
+/>
+
+## 핵심 정의
+
+정의역은 넣을 수 있는 입력의 범위입니다. 공역은 출력이 들어갈 수 있다고 정한 전체 범위이고, 치역은 실제로 나오는 출력들의 모음입니다.
+
+```text
+f(x) = x + 2
+입력 3 -> 출력 5
+```
+
+코드의 함수는 수학 함수와 비슷하지만 완전히 같지는 않습니다. 코드 함수는 파일을 읽거나 화면을 바꾸는 부수 효과를 만들 수 있지만, 수학 함수는 같은 입력에 같은 출력을 주는 규칙으로 먼저 봅니다.
+
+## 자주 헷갈리는 지점
+
+<strong>함수를 코드 문법으로만 보는 실수.</strong> 수학에서는 입력과 출력의 관계가 먼저입니다.
+
+<strong>그래프를 그림 모양 암기로 보는 실수.</strong> 그래프는 x가 바뀔 때 y가 어떻게 바뀌는지 보여 줍니다.
+
+<strong>공역과 치역을 섞는 실수.</strong> 공역은 미리 정한 출력 후보 전체, 치역은 실제 출력입니다.
+
+<strong>입력 하나에 출력 여러 개가 나와도 함수라고 보는 실수.</strong> 입문 단계에서는 입력 하나에 출력 하나라는 규칙을 먼저 잡습니다.
+
+## 직접 실험하기
+
+함수 종류와 입력값을 바꾸며 그래프 위 점이 어떻게 움직이는지 확인합니다.
+
+<FunctionGraphPlayground />
+
+## 코드로 읽기
+
+```python
+def score_to_grade(score):
+    if score >= 90:
+        return "A"
+    if score >= 80:
+        return "B"
+    return "C"
+```
+
+이 코드는 점수를 등급으로 보내는 규칙입니다. 수학 함수처럼 읽으려면 먼저 입력이 무엇이고 출력이 무엇인지 정해야 합니다.
+
+## 전공에서 만나는 장면
+
+- 점수를 등급으로 바꾸는 규칙
+- 픽셀 좌표를 화면 위치로 바꾸는 규칙
+- 입력 데이터에서 예측값을 만드는 모델
+- 시간 값을 애니메이션 위치로 바꾸는 함수
+
+## 종합 점검
+
+<MultipleChoiceQuiz
+  title="종합 점검"
+  questions={[
+    { prompt: "함수에서 정의역은 무엇인가?", choices: ["넣을 수 있는 입력의 범위", "실제 나온 출력만", "그래프 색", "코드 파일명"], correctIndex: 0, explanation: "정의역은 함수에 넣을 수 있는 입력들의 범위입니다.", conceptTags: ["정의역"], questionType: "domain", reasonTags: ["입력 범위"] },
+    { prompt: "치역을 가장 잘 설명한 것은?", choices: ["출력 후보 전체", "실제로 나오는 출력들의 모음", "입력 이름", "항상 모든 실수"], correctIndex: 1, explanation: "치역은 정의역의 입력을 넣었을 때 실제로 얻는 출력입니다.", conceptTags: ["치역"], questionType: "range", reasonTags: ["공역 치역 구분"] },
+    { prompt: "그래프를 읽는 기본 관점은?", choices: ["색만 본다", "x축 입력과 y축 출력의 관계를 본다", "항상 직선인지 본다", "코드 줄 수를 본다"], correctIndex: 1, explanation: "그래프는 입력 x와 출력 y의 관계를 시각화합니다.", conceptTags: ["그래프"], questionType: "graph-reading", reasonTags: ["축 해석"] },
+    { prompt: "선형 함수의 기본 느낌은?", choices: ["일정한 비율로 변한다", "항상 끊어진다", "입력이 없어도 된다", "출력이 여러 개다"], correctIndex: 0, explanation: "선형 함수는 입력이 일정하게 변할 때 출력도 일정한 비율로 변합니다.", conceptTags: ["선형 함수"], questionType: "linear-function", reasonTags: ["일정한 변화"] },
+    { prompt: "이차 함수 그래프에서 먼저 보는 감각은?", choices: ["항상 수평선", "휘어진 모양과 변화율 변화", "항상 점 하나", "문자열 길이"], correctIndex: 1, explanation: "이차 함수는 직선이 아니라 휘어지며 기울기도 위치에 따라 달라집니다.", conceptTags: ["이차 함수"], questionType: "quadratic-function", reasonTags: ["휘어진 그래프"] },
+    { prompt: "지수 함수 맛보기에서 중요한 감각은?", choices: ["점점 더 빠르게 커질 수 있다", "항상 0이다", "입력이 하나면 출력이 없다", "그래프를 그릴 수 없다"], correctIndex: 0, explanation: "지수 함수는 입력이 커질수록 증가 속도가 커지는 대표 예시입니다.", conceptTags: ["지수 함수"], questionType: "exponential-function", reasonTags: ["빠른 증가"] },
+    { prompt: "수학 함수와 코드 함수의 차이로 맞는 것은?", choices: ["코드 함수는 부수 효과가 있을 수 있다", "수학 함수는 파일을 삭제한다", "수학 함수는 입력이 없다", "코드 함수는 출력이 없다"], correctIndex: 0, explanation: "코드 함수는 화면 변경, 파일 입출력 같은 부수 효과를 가질 수 있습니다.", conceptTags: ["코드 함수"], questionType: "code-vs-math", reasonTags: ["부수 효과"] },
+    { prompt: "입력 하나에 출력이 두 개로 갈라지면 입문 관점에서?", choices: ["함수라고 보기 어렵다", "항상 선형 함수다", "정의역이 없다", "그래프가 필요 없다"], correctIndex: 0, explanation: "입문 단계에서는 입력 하나에 출력 하나가 함수의 핵심 규칙입니다.", conceptTags: ["함수 조건"], questionType: "function-rule", reasonTags: ["출력 하나"] },
+    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["입출력 관계", "그래프 해석", "정의역", "역함수와 합성함수 심화"], correctIndex: 3, explanation: "역함수와 합성함수 심화는 뒤 챕터에서 다룰 내용입니다.", conceptTags: ["범위 조절"], questionType: "scope-boundary", reasonTags: ["심화 제외"] },
+    { prompt: "컴공에서 함수 그래프 감각이 쓰이는 장면은?", choices: ["모델 입력과 예측값 관계", "HTML 태그 닫기만", "파일 이름 정렬만", "키보드 색상만"], correctIndex: 0, explanation: "입력 변화가 출력 예측에 어떤 영향을 주는지 볼 때 함수 그래프 감각이 쓰입니다.", conceptTags: ["전공 연결"], questionType: "cs-context", reasonTags: ["모델 입출력"] },
+  ]}
+/>
+
+## 다음으로
+
+<NextChapterButton href="/chapters/rate-of-change" label="다음 챕터로 가기" />

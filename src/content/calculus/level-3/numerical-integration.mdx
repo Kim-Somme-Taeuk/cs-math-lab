@@ -1,0 +1,81 @@
+## 왜 배우나
+
+원시함수를 모르거나 데이터가 샘플로만 주어진 경우에도 누적량을 구해야 할 때가 많습니다. 수치적분은 직사각형이나 사다리꼴 같은 근사로 넓이와 총량을 계산합니다.
+
+이 장의 핵심은 <strong>연속적인 누적량을 코드에서 작은 조각의 합으로 근사하는 법</strong>입니다. Simpson 공식과 오차항 이론은 다루지 않습니다.
+
+## 먼저 감 잡기
+
+직사각형 방법은 각 구간을 하나의 높이로 대표합니다. 사다리꼴 방법은 구간 양끝 높이를 연결해 평균 높이로 근사합니다.
+
+step size가 작아지면 보통 더 정확해지지만 계산량이 늘어납니다.
+
+<MultipleChoiceQuiz questions={[{ prompt: "수치적분이 필요한 대표 상황은?", choices: ["원시함수를 모르지만 누적량을 근사해야 할 때", "항상 정답을 알 때", "파일명을 바꿀 때", "조건문이 없을 때"], correctIndex: 0, explanation: "수치적분은 정확한 원시함수 없이도 샘플과 근사로 누적량을 계산합니다.", conceptTags: ["수치적분"], questionType: "numerical-integration-meaning", reasonTags: ["근사"] }]} />
+
+## 핵심 정의
+
+직사각형 방법은 `높이 × 폭`을 더합니다. 사다리꼴 방법은 양끝 높이의 평균에 폭을 곱합니다.
+
+```text
+rectangle = f(x) * dx
+trapezoid = (f(left) + f(right)) / 2 * dx
+```
+
+## 자주 헷갈리는 지점
+
+<strong>step size를 줄이면 공짜로 정확해진다고 보는 실수.</strong> 정확도는 좋아질 수 있지만 계산량도 늘어납니다.
+
+<strong>샘플 데이터와 함수식을 같은 방식으로만 보는 실수.</strong> 실제 데이터는 불규칙한 간격이나 노이즈가 있을 수 있습니다.
+
+<strong>근사를 정확값으로 착각하는 실수.</strong> 수치적분은 오차를 가진 계산입니다.
+
+## 직접 판별하기
+
+다음 중 수치적분이 어울리는 상황을 골라 봅니다.
+
+- 센서가 0.1초마다 기록한 속도에서 이동 거리 추정
+- 시간별 서버 비용률에서 총 비용 추정
+- 샘플링된 전력 사용량에서 총 에너지 추정
+
+<UnderstandingCheck concept="수치적분 근사" prompt="직사각형 방법과 사다리꼴 방법의 차이를 설명할 수 있나요?" />
+
+## 코드로 읽기
+
+```python
+area = 0
+for i in range(len(xs) - 1):
+    width = xs[i + 1] - xs[i]
+    height = (ys[i] + ys[i + 1]) / 2
+    area += width * height
+```
+
+이 코드는 인접한 두 샘플을 사다리꼴로 보고 넓이를 누적합니다.
+
+## 전공에서 만나는 장면
+
+- 센서 데이터 누적
+- 물리 시뮬레이션의 이동 거리 추정
+- 시간별 비용/트래픽 총량 계산
+- 실험 데이터의 곡선 아래 면적 계산
+
+## 종합 점검
+
+<MultipleChoiceQuiz
+  title="종합 점검"
+  questions={[
+    { prompt: "수치적분의 핵심은?", choices: ["누적량을 작은 조각 합으로 근사", "항상 정확한 공식 암기", "문자열 정렬", "그래프 삭제"], correctIndex: 0, explanation: "수치적분은 작은 구간의 기여량을 더해 전체 누적량을 근사합니다.", conceptTags: ["수치적분"], questionType: "core-meaning", reasonTags: ["조각 합"] },
+    { prompt: "사다리꼴 방법은 높이를 어떻게 잡는가?", choices: ["항상 왼쪽만", "양끝 높이의 평균", "항상 0", "정답 번호"], correctIndex: 1, explanation: "사다리꼴은 구간 양끝 높이를 평균내어 근사합니다.", conceptTags: ["사다리꼴 방법"], questionType: "trapezoid", reasonTags: ["평균 높이"] },
+    { prompt: "step size를 줄이면 일반적으로?", choices: ["계산량이 0이 된다", "항상 불가능", "정확도는 좋아질 수 있지만 계산량이 늘 수 있다", "함수가 사라진다"], correctIndex: 2, explanation: "더 촘촘한 계산은 많은 샘플과 연산을 요구합니다.", conceptTags: ["step size"], questionType: "tradeoff", reasonTags: ["정확도 비용"] },
+    { prompt: "이 장에서 깊게 다루지 않는 것은?", choices: ["직사각형 방법", "사다리꼴 방법", "step size", "Simpson 공식과 오차항 이론"], correctIndex: 3, explanation: "고급 공식과 오차 이론은 수치해석 심화입니다.", conceptTags: ["범위 조절"], questionType: "scope-boundary", reasonTags: ["심화 제외"] },
+    { prompt: "센서 속도 데이터를 적분하면?", choices: ["이동 거리 추정", "파일명", "정렬 횟수", "논리값"], correctIndex: 0, explanation: "속도를 시간에 대해 누적하면 이동 거리를 추정할 수 있습니다.", conceptTags: ["센서 데이터"], questionType: "application", reasonTags: ["속도 거리"] },
+    { prompt: "`width * height`를 반복해서 더하는 코드는?", choices: ["작은 넓이 누적", "문자열 파싱", "정답 숨김", "파일 삭제"], correctIndex: 0, explanation: "각 구간의 근사 넓이를 총합에 더합니다.", conceptTags: ["코드 해석"], questionType: "code-reading", reasonTags: ["넓이 합"] },
+    { prompt: "수치적분 결과를 볼 때 주의할 점은?", choices: ["근사 오차가 있을 수 있다", "항상 완벽하다", "항상 0이다", "샘플과 무관하다"], correctIndex: 0, explanation: "근사 방법과 step size에 따라 오차가 생깁니다.", conceptTags: ["오차"], questionType: "pitfall", reasonTags: ["근사"] },
+    { prompt: "직사각형 방법과 리만 합의 관계는?", choices: ["서로 관련 없다", "직사각형 기여량을 더한다는 점에서 연결된다", "항상 반대다", "리만 합은 코드가 아니다"], correctIndex: 1, explanation: "리만 합은 직사각형 근사로 적분을 이해하는 핵심 모델입니다.", conceptTags: ["리만 합"], questionType: "connection", reasonTags: ["직사각형"] },
+    { prompt: "시간별 서버 비용률에서 총 비용을 구하는 방법은?", choices: ["비용률을 시간에 따라 누적", "파일명 변경", "조건문 삭제", "정답 위치 고정"], correctIndex: 0, explanation: "비용률과 시간 폭의 곱을 합산하면 총 비용을 추정합니다.", conceptTags: ["비용 누적"], questionType: "cs-context", reasonTags: ["총 비용"] },
+    { prompt: "다음 장으로 이어지는 변화율 주제는?", choices: ["변화율이 현재 상태에 의해 정해지는 식", "비둘기집", "행렬식", "HTML"], correctIndex: 0, explanation: "미분방정식은 상태와 변화율의 관계를 다룹니다.", conceptTags: ["미분방정식"], questionType: "next-concept", reasonTags: ["상태 변화율"] },
+  ]}
+/>
+
+## 다음으로
+
+<NextChapterButton href="/chapters/differential-equations-intro" label="다음 챕터로 가기" />

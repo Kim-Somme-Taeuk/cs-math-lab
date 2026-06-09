@@ -18,6 +18,7 @@ import {
   getReadyChaptersInSameLevel,
   roadmapSubjects,
 } from "../src/lib/chapters";
+import { chapterContentLoaders } from "../src/lib/content";
 import { generateSetReviewQuestions } from "../src/lib/generatedReview";
 import { evaluateLogic } from "../src/lib/logic";
 import {
@@ -101,6 +102,16 @@ function correctIndexesInMdx(slug: string) {
   return Array.from(text.matchAll(/correctIndex:\s*([0-3])/g), (match) => Number(match[1]));
 }
 
+function mdxTextForSlug(slug: string) {
+  const contentRoot = join(process.cwd(), "src", "content");
+  const subjects = ["discrete-math", "linear-algebra", "calculus", "probability-statistics"];
+  const levels = ["level-1", "level-2", "level-3"];
+  const paths = subjects.flatMap((subject) => levels.map((level) => join(contentRoot, subject, level, `${slug}.mdx`)));
+  const path = paths.find((candidate) => existsSync(candidate));
+
+  return path ? readFileSync(path, "utf8") : "";
+}
+
 describe("review question counts", () => {
   it("keeps every ready chapter review quiz at ten questions", () => {
     const readyChapters = roadmapSubjects
@@ -136,6 +147,115 @@ describe("review question counts", () => {
     for (const chapter of linearAlgebraChapters) {
       const chapterIndexes = correctIndexesInMdx(chapter.slug);
       expect(new Set(chapterIndexes).size, `${chapter.slug} should mix answer positions`).toBeGreaterThanOrEqual(3);
+    }
+  });
+
+  it("registers every calculus level 1 chapter with content and valid next links", () => {
+    const calculusLevelOne = getReadyChaptersBySubjectAndLevel("calculus", 1);
+
+    expect(calculusLevelOne.map((chapter) => chapter.slug)).toEqual([
+      "calculus-functions-graphs",
+      "rate-of-change",
+      "limits",
+      "continuity",
+      "meaning-of-derivative",
+      "basic-derivative-rules",
+      "derivative-graph-reading",
+      "optimization-intro",
+      "numerical-derivative",
+    ]);
+
+    for (const chapter of calculusLevelOne) {
+      expect(chapterContentLoaders[chapter.slug], `${chapter.slug} needs a content loader`).toBeTypeOf("function");
+      const text = mdxTextForSlug(chapter.slug);
+      expect(text, `${chapter.slug} needs MDX content`).toContain("## 종합 점검");
+
+      const chapterLinks = Array.from(text.matchAll(/href="\/chapters\/([^"]+)"/g), (match) => match[1]);
+      for (const linkedSlug of chapterLinks) {
+        expect(chapterContentLoaders[linkedSlug], `${chapter.slug} links to missing chapter ${linkedSlug}`).toBeTypeOf("function");
+      }
+
+      expect(new Set(correctIndexesInMdx(chapter.slug)).size, `${chapter.slug} should mix answer positions`).toBeGreaterThanOrEqual(2);
+    }
+  });
+
+  it("registers every calculus level 2 chapter with content, metadata, and valid next links", () => {
+    const calculusLevelTwo = getReadyChaptersBySubjectAndLevel("calculus", 2);
+
+    expect(calculusLevelTwo.map((chapter) => chapter.slug)).toEqual([
+      "meaning-of-integral",
+      "riemann-sums",
+      "basic-integral-rules",
+      "fundamental-theorem-calculus",
+      "area-accumulation",
+      "multivariable-functions",
+      "partial-derivatives",
+      "gradient",
+      "chain-rule",
+    ]);
+
+    for (const chapter of calculusLevelTwo) {
+      expect(chapter.subjectId, `${chapter.slug} needs subject metadata`).toBe("calculus");
+      expect(chapter.conceptTags?.length, `${chapter.slug} needs concept tags`).toBeGreaterThan(0);
+      expect(chapter.prerequisites, `${chapter.slug} needs prerequisites metadata`).toBeDefined();
+      expect(chapterContentLoaders[chapter.slug], `${chapter.slug} needs a content loader`).toBeTypeOf("function");
+
+      const text = mdxTextForSlug(chapter.slug);
+      expect(text, `${chapter.slug} needs MDX content`).toContain("## 왜 배우나");
+      expect(text, `${chapter.slug} needs MDX content`).toContain("## 종합 점검");
+      expect(text.match(/conceptTags:/g)?.length ?? 0, `${chapter.slug} should annotate quiz concept tags`).toBeGreaterThanOrEqual(10);
+      expect(text.match(/questionType:/g)?.length ?? 0, `${chapter.slug} should annotate quiz question types`).toBeGreaterThanOrEqual(10);
+      expect(text.match(/reasonTags:/g)?.length ?? 0, `${chapter.slug} should annotate quiz reason tags`).toBeGreaterThanOrEqual(10);
+
+      const chapterLinks = Array.from(text.matchAll(/href="\/chapters\/([^"]+)"/g), (match) => match[1]);
+      for (const linkedSlug of chapterLinks) {
+        expect(chapterContentLoaders[linkedSlug], `${chapter.slug} links to missing chapter ${linkedSlug}`).toBeTypeOf("function");
+      }
+
+      expect(reviewQuestionCountInMdx(chapter.slug), `${chapter.slug} should define ten review questions`).toBe(10);
+      expect(new Set(correctIndexesInMdx(chapter.slug)).size, `${chapter.slug} should mix answer positions`).toBeGreaterThanOrEqual(3);
+    }
+  });
+
+  it("registers every calculus level 3 chapter with content, metadata, and valid next links", () => {
+    const calculusLevelThree = getReadyChaptersBySubjectAndLevel("calculus", 3);
+
+    expect(calculusLevelThree.map((chapter) => chapter.slug)).toEqual([
+      "optimization-problems",
+      "gradient-descent",
+      "learning-rate",
+      "loss-functions",
+      "autodiff-intro",
+      "numerical-integration",
+      "differential-equations-intro",
+      "euler-method-simulation",
+      "calculus-in-machine-learning",
+    ]);
+
+    for (const chapter of calculusLevelThree) {
+      expect(chapter.subjectId, `${chapter.slug} needs subject metadata`).toBe("calculus");
+      expect(chapter.conceptTags?.length, `${chapter.slug} needs concept tags`).toBeGreaterThan(0);
+      expect(chapter.prerequisites, `${chapter.slug} needs prerequisites metadata`).toBeDefined();
+      expect(chapterContentLoaders[chapter.slug], `${chapter.slug} needs a content loader`).toBeTypeOf("function");
+
+      const text = mdxTextForSlug(chapter.slug);
+      expect(text, `${chapter.slug} needs MDX content`).toContain("## 왜 배우나");
+      expect(text, `${chapter.slug} needs MDX content`).toContain("## 종합 점검");
+      expect(text.match(/conceptTags:/g)?.length ?? 0, `${chapter.slug} should annotate quiz concept tags`).toBeGreaterThanOrEqual(10);
+      expect(text.match(/questionType:/g)?.length ?? 0, `${chapter.slug} should annotate quiz question types`).toBeGreaterThanOrEqual(10);
+      expect(text.match(/reasonTags:/g)?.length ?? 0, `${chapter.slug} should annotate quiz reason tags`).toBeGreaterThanOrEqual(10);
+
+      const chapterLinks = Array.from(text.matchAll(/href="\/chapters\/([^"]+)"/g), (match) => match[1]);
+      for (const linkedSlug of chapterLinks) {
+        expect(chapterContentLoaders[linkedSlug], `${chapter.slug} links to missing chapter ${linkedSlug}`).toBeTypeOf("function");
+      }
+
+      if (chapter.slug === "calculus-in-machine-learning") {
+        expect(text).toContain('href="/subjects/calculus"');
+      }
+
+      expect(reviewQuestionCountInMdx(chapter.slug), `${chapter.slug} should define ten review questions`).toBe(10);
+      expect(new Set(correctIndexesInMdx(chapter.slug)).size, `${chapter.slug} should mix answer positions`).toBeGreaterThanOrEqual(3);
     }
   });
 });

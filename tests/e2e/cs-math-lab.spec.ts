@@ -28,7 +28,7 @@ test("subject page shows discrete math level 3 chapters as ready", async ({ page
 test("subject cards open the matching roadmap subject", async ({ page }) => {
   await page.goto("/");
 
-  await page.getByRole("link", { name: /선형대수/ }).click();
+  await page.getByRole("link", { name: /선형대수/ }).first().click();
 
   await expect(page).toHaveURL(/\/subjects\/linear-algebra$/);
   await expect(page.getByRole("heading", { name: "선형대수" })).toBeVisible();
@@ -36,23 +36,90 @@ test("subject cards open the matching roadmap subject", async ({ page }) => {
   await expect(page.getByRole("link", { name: /벡터/ }).first().getByText("공개 중")).toBeVisible();
 });
 
-test("home ready chapters switch across all public subject levels", async ({ page }) => {
+test("home summarizes public chapters by subject", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.getByRole("heading", { name: "전체 공개 챕터" })).toBeVisible();
-  await expect(page.getByText("Level 1. 전체 공개 챕터")).toBeVisible();
-  await expect(page.getByRole("link", { name: "Level 1-1 명제와 논리" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Level 1-1 벡터" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "공개 학습 트랙" })).toBeVisible();
+  await expect(page.getByText("80개 챕터")).toBeVisible();
 
-  await page.getByRole("button", { name: "다음 레벨" }).click();
-  await expect(page.getByText("Level 2. 전체 공개 챕터")).toBeVisible();
-  await expect(page.getByRole("link", { name: "Level 2-1 증명 기법" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Level 2-1 선형결합과 span" })).toBeVisible();
+  const discreteMath = page.getByRole("link", { name: /이산수학/ }).first();
+  await expect(discreteMath).toHaveAttribute("href", "/subjects/discrete-math");
+  await expect(discreteMath.getByText("26개")).toBeVisible();
+  await expect(discreteMath.getByText("Level 1")).toBeVisible();
+  await expect(discreteMath.getByText("8개 공개")).toBeVisible();
+  await expect(discreteMath.getByText("Level 2")).toBeVisible();
+  await expect(discreteMath.getByText("9개 공개").first()).toBeVisible();
+  await expect(discreteMath.getByText("Level 3")).toBeVisible();
 
-  await page.getByRole("button", { name: "다음 레벨" }).click();
-  await expect(page.getByText("Level 3. 전체 공개 챕터")).toBeVisible();
-  await expect(page.getByRole("link", { name: "Level 3-1 점근적 분석" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Level 3-1 좌표계와 변환 행렬" })).toBeVisible();
+  const linearAlgebra = page.getByRole("link", { name: /선형대수/ }).first();
+  await expect(linearAlgebra).toHaveAttribute("href", "/subjects/linear-algebra");
+  await expect(linearAlgebra.getByText("27개")).toBeVisible();
+  await expect(linearAlgebra.getByText("9개 공개")).toHaveCount(3);
+
+  const calculus = page.getByRole("link", { name: /미적분/ }).first();
+  await expect(calculus).toHaveAttribute("href", "/subjects/calculus");
+  await expect(calculus.getByText("27개", { exact: true })).toBeVisible();
+  await expect(calculus.getByText("Level 1")).toBeVisible();
+  await expect(calculus.getByText("Level 2")).toBeVisible();
+  await expect(calculus.getByText("Level 3")).toBeVisible();
+  await expect(calculus.getByText("9개 공개")).toHaveCount(3);
+});
+
+test("calculus level 1, level 2, and level 3 chapters are public", async ({ page }) => {
+  await page.goto("/subjects/calculus");
+
+  await expect(page.getByRole("heading", { name: "미적분", exact: true })).toBeVisible();
+  await expect(page.getByText("진행 중")).toBeVisible();
+  await expect(page.getByText("Level 1. 함수와 변화율")).toBeVisible();
+  await expect(page.getByText("Level 2. 누적량과 다변수 변화율")).toBeVisible();
+  await expect(page.getByText("Level 3. 최적화와 수치 시뮬레이션")).toBeVisible();
+  await expect(page.locator('a[href="/chapters/calculus-functions-graphs"]').getByText("공개 중")).toBeVisible();
+  await expect(page.locator('a[href="/chapters/numerical-derivative"]').getByText("공개 중")).toBeVisible();
+  await expect(page.locator('a[href="/chapters/meaning-of-integral"]').getByText("공개 중")).toBeVisible();
+  await expect(page.locator('a[href="/chapters/chain-rule"]').getByText("공개 중")).toBeVisible();
+  await expect(page.locator('a[href="/chapters/gradient-descent"]').getByText("공개 중")).toBeVisible();
+  await expect(page.locator('a[href="/chapters/calculus-in-machine-learning"]').getByText("공개 중")).toBeVisible();
+});
+
+test("calculus function graph chapter is available", async ({ page }) => {
+  await page.goto("/chapters/calculus-functions-graphs");
+
+  await expect(page.getByRole("heading", { name: "함수와 그래프" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "함수 그래프 실험" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "문제 풀기" }).last()).toBeVisible();
+});
+
+test("calculus level 2 integral and gradient chapters are available", async ({ page }) => {
+  await page.goto("/chapters/riemann-sums");
+
+  await expect(page.getByRole("heading", { name: "리만 합", exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "리만 합 실험" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "문제 풀기" }).last().getByText("0 / 10 응답")).toBeVisible();
+
+  await page.goto("/chapters/gradient");
+
+  await expect(page.getByRole("heading", { name: "그래디언트", exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "편미분과 그래디언트 실험" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "문제 풀기" }).last().getByText("0 / 10 응답")).toBeVisible();
+});
+
+test("calculus level 3 optimization and simulation chapters are available", async ({ page }) => {
+  await page.goto("/chapters/gradient-descent");
+
+  await expect(page.getByRole("heading", { name: "경사하강법", exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "경사하강법 실험" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "문제 풀기" }).last().getByText("0 / 10 응답")).toBeVisible();
+
+  await page.goto("/chapters/euler-method-simulation");
+
+  await expect(page.getByRole("heading", { name: "시뮬레이션과 오일러 방법", exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "오일러 방법 실험" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "문제 풀기" }).last().getByText("0 / 10 응답")).toBeVisible();
+
+  await page.goto("/chapters/calculus-in-machine-learning");
+
+  await expect(page.getByRole("heading", { name: "머신러닝에서의 미적분", exact: true })).toBeVisible();
+  await expect(page.locator('a[href="/subjects/calculus"]').last()).toBeVisible();
 });
 
 test("asymptotic analysis chapter is available", async ({ page }) => {
