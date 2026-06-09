@@ -9,6 +9,8 @@ import {
   EulerMethodPlayground,
   GradientDescentPlayground,
   LearningRatePlayground,
+  LossFunctionPlayground,
+  NumericalIntegrationPlayground,
 } from "@/components/interactive/CalculusLevelThreePlaygrounds";
 import ConditionalPlayground from "@/components/interactive/ConditionalPlayground";
 import CountingPlayground from "@/components/interactive/CountingPlayground";
@@ -99,6 +101,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     LinearAlgebraLevelTwoPlayground,
     LinearAlgebraLevelThreePlayground,
     LearningRatePlayground,
+    LossFunctionPlayground,
     EquivalenceRelationPlayground,
     InclusionExclusionPlayground,
     LogicalEquivalencePlayground,
@@ -111,6 +114,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     MultipleChoiceQuiz,
     NextChapterButton,
     NumericalDerivativePlayground,
+    NumericalIntegrationPlayground,
     NumberTheoryPlayground,
     PartialDerivativePlayground,
     ProbabilityPlayground,

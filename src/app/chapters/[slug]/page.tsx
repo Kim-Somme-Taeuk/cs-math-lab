@@ -14,6 +14,7 @@ const sectionLinks = [
   { id: "code", label: "코드로 읽기" },
   { id: "cs-context", label: "전공 맥락" },
   { id: "review", label: "종합 점검" },
+  { id: "next", label: "다음으로" },
 ];
 
 type ChapterPageProps = {

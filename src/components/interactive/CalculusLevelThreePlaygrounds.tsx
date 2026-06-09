@@ -37,6 +37,10 @@ function curvePoints() {
   }).join(" ");
 }
 
+function integrationFunction(x: number) {
+  return 1 + (x * x) / 4;
+}
+
 export function GradientDescentPlayground() {
   const [start, setStart] = useState(-3);
   const [rate, setRate] = useState(0.2);
@@ -89,6 +93,133 @@ export function GradientDescentPlayground() {
               return <circle key={index} cx={point.x} cy={point.y} r={index === path.length - 1 ? 5 : 3.5} fill={index === 0 ? "#f97316" : "#14b8a6"} />;
             })}
           </svg>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function LossFunctionPlayground() {
+  const [prediction, setPrediction] = useState(6);
+  const [target, setTarget] = useState(3);
+  const error = prediction - target;
+  const mse = error * error;
+
+  return (
+    <section aria-label="손실 함수 실험" className="mt-3 mb-7 rounded-lg border border-slate-200 bg-slate-50 p-3 sm:p-4">
+      <div>
+        <h3 className="m-0 text-lg font-black text-slate-950">손실 함수 실험</h3>
+        <p className="mt-1 text-sm leading-6 text-slate-600">
+          예측값과 정답의 거리를 바꾸며 제곱 오차가 어떻게 커지는지 확인합니다.
+        </p>
+      </div>
+      <div className="mt-4 grid gap-3 rounded-lg border border-slate-200 bg-white p-4 lg:grid-cols-[1fr_0.9fr]">
+        <div className="grid gap-3">
+          <label className="grid gap-1 text-sm font-bold text-slate-700">
+            예측값: {prediction.toFixed(1)}
+            <input type="range" min="-2" max="8" step="0.5" value={prediction} onChange={(event) => setPrediction(Number(event.target.value))} />
+          </label>
+          <label className="grid gap-1 text-sm font-bold text-slate-700">
+            정답: {target.toFixed(1)}
+            <input type="range" min="-2" max="8" step="0.5" value={target} onChange={(event) => setTarget(Number(event.target.value))} />
+          </label>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-3 lg:grid-cols-1">
+          <div className="rounded-md bg-slate-50 p-3">
+            <p className="text-xs font-bold text-slate-500">오차</p>
+            <p className="mt-1 text-lg font-black text-slate-950">{error.toFixed(1)}</p>
+          </div>
+          <div className="rounded-md bg-teal-50 p-3">
+            <p className="text-xs font-bold text-teal-700">제곱 오차</p>
+            <p className="mt-1 text-lg font-black text-slate-950">{mse.toFixed(2)}</p>
+          </div>
+          <div className="rounded-md bg-amber-50 p-3">
+            <p className="text-xs font-bold text-amber-700">해석</p>
+            <p className="mt-1 text-sm font-bold leading-6 text-slate-800">
+              차이가 커질수록 손실은 더 빠르게 커집니다.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function NumericalIntegrationPlayground() {
+  const [slices, setSlices] = useState(6);
+  const [method, setMethod] = useState<"rectangle" | "trapezoid">("trapezoid");
+  const dx = 4 / slices;
+  const estimate = useMemo(() => {
+    let total = 0;
+
+    for (let index = 0; index < slices; index += 1) {
+      const left = index * dx;
+      const right = left + dx;
+      const height = method === "rectangle" ? integrationFunction(left) : (integrationFunction(left) + integrationFunction(right)) / 2;
+      total += height * dx;
+    }
+
+    return total;
+  }, [dx, method, slices]);
+  const exact = 4 + 16 / 3;
+  const error = Math.abs(estimate - exact);
+
+  return (
+    <section aria-label="수치적분 실험" className="mt-3 mb-7 rounded-lg border border-slate-200 bg-slate-50 p-3 sm:p-4">
+      <div>
+        <h3 className="m-0 text-lg font-black text-slate-950">수치적분 실험</h3>
+        <p className="mt-1 text-sm leading-6 text-slate-600">
+          구간 수와 근사 방법을 바꾸며 작은 넓이의 합이 전체 누적량에 가까워지는지 봅니다.
+        </p>
+      </div>
+      <div className="mt-4 grid gap-3 lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="grid gap-3 rounded-lg border border-slate-200 bg-white p-4">
+          <label className="grid gap-1 text-sm font-bold text-slate-700">
+            구간 수: {slices}
+            <input type="range" min="2" max="16" step="1" value={slices} onChange={(event) => setSlices(Number(event.target.value))} />
+          </label>
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { value: "rectangle", label: "직사각형" },
+              { value: "trapezoid", label: "사다리꼴" },
+            ].map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setMethod(option.value as "rectangle" | "trapezoid")}
+                className={`rounded-md border px-3 py-2 text-sm font-black ${
+                  method === option.value ? "border-slate-950 bg-slate-950 text-white" : "border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <div className="rounded-md bg-teal-50 p-3">
+              <p className="text-xs font-bold text-teal-700">근사값</p>
+              <p className="mt-1 text-lg font-black text-slate-950">{estimate.toFixed(3)}</p>
+            </div>
+            <div className="rounded-md bg-slate-50 p-3">
+              <p className="text-xs font-bold text-slate-500">오차</p>
+              <p className="mt-1 text-lg font-black text-slate-950">{error.toFixed(3)}</p>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-end gap-1 rounded-lg border border-slate-200 bg-white px-4 pb-4 pt-8">
+          {Array.from({ length: slices }).map((_, index) => {
+            const left = index * dx;
+            const right = left + dx;
+            const height = method === "rectangle" ? integrationFunction(left) : (integrationFunction(left) + integrationFunction(right)) / 2;
+            return (
+              <span
+                key={index}
+                className="flex-1 rounded-t border border-teal-500 bg-teal-50"
+                style={{ height: `${Math.max(18, height * 16)}px` }}
+                aria-hidden="true"
+              />
+            );
+          })}
         </div>
       </div>
     </section>

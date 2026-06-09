@@ -90,17 +90,19 @@ export default function MultipleChoiceQuiz({ questions, title = "연습 문제" 
       </div>
 
       {paged ? (
-        <div className="mt-4 flex gap-1.5" aria-label="문제 진행 상황">
+        <div className="mt-4 grid grid-cols-5 gap-1.5 sm:flex" aria-label="문제 진행 상황">
           {normalizedQuestions.map((_, index) => (
             <button
               key={index}
               type="button"
               onClick={() => setCurrentIndex(index)}
-              className={`h-2 flex-1 rounded-full ${
+              className={`flex h-9 min-w-8 flex-1 items-center justify-center rounded-md text-xs font-black ${
                 index === currentIndex ? "bg-slate-950" : answers[index] !== undefined ? "bg-teal-500" : "bg-slate-200"
-              }`}
+              } ${index === currentIndex ? "text-white" : answers[index] !== undefined ? "text-white" : "text-slate-600"}`}
               aria-label={`문제 ${index + 1}로 이동`}
-            />
+            >
+              {index + 1}
+            </button>
           ))}
         </div>
       ) : null}

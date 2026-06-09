@@ -84,7 +84,20 @@ export default async function SubjectPage({ params }: SubjectPageProps) {
                 시작
               </Link>
           </div>
-        ) : null}
+        ) : (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 sm:min-w-80">
+            <p className="text-xs font-bold text-amber-700">아직 공개 전</p>
+            <p className="mt-1 text-sm font-bold leading-6 text-slate-800">
+              이 과목은 준비 중입니다. 지금은 공개된 과목부터 학습할 수 있습니다.
+            </p>
+            <Link
+              href="/roadmap"
+              className="mt-3 inline-flex rounded-md bg-slate-950 px-3 py-2 text-sm font-black text-white hover:bg-slate-800"
+            >
+              공개 과목 보기
+            </Link>
+          </div>
+        )}
       </section>
 
       <section className="mt-4">
@@ -185,6 +198,8 @@ function ChapterVisual({ chapter }: { chapter: Chapter }) {
         <LevelTwoVisual slug={chapter.slug} stroke={stroke} fill={fill} softFill={softFill} text={text} />
       ) : chapter.subjectId === "linear-algebra" ? (
         <LinearAlgebraVisual slug={chapter.slug} level={chapter.level} stroke={stroke} fill={fill} softFill={softFill} text={text} />
+      ) : chapter.subjectId === "calculus" ? (
+        <CalculusVisual slug={chapter.slug} level={chapter.level} stroke={stroke} fill={fill} softFill={softFill} text={text} />
       ) : (
         <PlannedVisual order={chapter.order} stroke={stroke} fill={fill} softFill={softFill} text={text} />
       )}
@@ -390,6 +405,151 @@ function LinearAlgebraVisual({
   }
 
   return <MiniLayerVisual stroke={stroke} fill={fill} text={text} />;
+}
+
+function CalculusVisual({
+  slug,
+  level,
+  stroke,
+  fill,
+  softFill,
+  text,
+}: {
+  slug: string;
+  level: number;
+  stroke: string;
+  fill: string;
+  softFill: string;
+  text: string;
+}) {
+  if (level === 1) {
+    if (slug.includes("limits") || slug.includes("continuity")) {
+      return <MiniLimitVisual fill={fill} text={text} />;
+    }
+
+    if (slug.includes("derivative") || slug.includes("optimization")) {
+      return <MiniDerivativeVisual text={text} />;
+    }
+
+    return <MiniCurveVisual fill={fill} text={text} />;
+  }
+
+  if (level === 2) {
+    if (slug.includes("integral") || slug.includes("riemann") || slug.includes("area")) {
+      return <MiniIntegralVisual fill={fill} softFill={softFill} text={text} />;
+    }
+
+    return <MiniGradientFieldVisual fill={fill} text={text} />;
+  }
+
+  if (slug.includes("gradient") || slug.includes("loss") || slug.includes("learning")) {
+    return <MiniOptimizationPathVisual fill={fill} text={text} />;
+  }
+
+  if (slug.includes("integration") || slug.includes("euler") || slug.includes("differential")) {
+    return <MiniNumericalStepsVisual stroke={stroke} fill={fill} softFill={softFill} text={text} />;
+  }
+
+  return <MiniComputationGraphVisual stroke={stroke} fill={fill} text={text} />;
+}
+
+function MiniCurveVisual({ fill, text }: { fill: string; text: string }) {
+  return (
+    <div className={`flex h-full items-center justify-center ${text}`}>
+      <svg aria-hidden="true" viewBox="0 0 112 56" className="h-14 w-28">
+        <path d="M16 42 C34 12 50 12 66 30 S88 48 98 16" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2.6" />
+        <circle cx="66" cy="30" r="4" className={fill} />
+      </svg>
+    </div>
+  );
+}
+
+function MiniLimitVisual({ fill, text }: { fill: string; text: string }) {
+  return (
+    <div className={`flex h-full items-center justify-center gap-2 ${text}`}>
+      <span className="text-xs font-black">x</span>
+      <span className="h-px w-8 bg-current" />
+      <span className={`h-3 w-3 rounded-full ${fill}`} />
+      <span className="h-px w-8 bg-current" />
+      <span className="text-xs font-black">a</span>
+    </div>
+  );
+}
+
+function MiniDerivativeVisual({ text }: { text: string }) {
+  return (
+    <div className={`flex h-full items-center justify-center ${text}`}>
+      <svg aria-hidden="true" viewBox="0 0 112 56" className="h-14 w-28">
+        <path d="M18 43 C42 39 54 25 92 13" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2.4" opacity="0.7" />
+        <path d="M42 36 L82 18" stroke="currentColor" strokeLinecap="round" strokeWidth="3" />
+        <circle cx="62" cy="27" r="4" fill="currentColor" />
+      </svg>
+    </div>
+  );
+}
+
+function MiniIntegralVisual({ fill, softFill, text }: { fill: string; softFill: string; text: string }) {
+  return (
+    <div className={`flex h-full items-end justify-center gap-1 px-5 pb-3 ${text}`}>
+      {[18, 26, 34, 24, 16].map((height, index) => (
+        <span key={index} className={`w-4 rounded-t border border-current ${index === 2 ? fill : softFill}`} style={{ height }} />
+      ))}
+    </div>
+  );
+}
+
+function MiniGradientFieldVisual({ fill, text }: { fill: string; text: string }) {
+  return (
+    <div className={`grid h-full grid-cols-4 items-center gap-1 px-7 py-3 ${text}`}>
+      {["↗", "→", "↘", "↓", "↑", "↗", "→", "↘"].map((arrow, index) => (
+        <span key={index} className={`flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-black ${index % 3 === 0 ? fill : ""}`}>
+          {arrow}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function MiniOptimizationPathVisual({ fill, text }: { fill: string; text: string }) {
+  return (
+    <div className={`flex h-full items-center justify-center ${text}`}>
+      <svg aria-hidden="true" viewBox="0 0 112 56" className="h-14 w-28">
+        <path d="M18 14 C42 50 70 50 94 14" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2.4" />
+        <path d="M26 20 L43 35 L58 40 L72 35" fill="none" stroke="currentColor" strokeDasharray="4 4" strokeLinecap="round" strokeWidth="2.2" />
+        {[26, 43, 58, 72].map((cx, index) => (
+          <circle key={index} cx={cx} cy={[20, 35, 40, 35][index]} r={index === 3 ? 4 : 3} className={fill} />
+        ))}
+      </svg>
+    </div>
+  );
+}
+
+function MiniNumericalStepsVisual({ stroke, fill, softFill, text }: { stroke: string; fill: string; softFill: string; text: string }) {
+  return (
+    <div className={`flex h-full items-end justify-center gap-1.5 pb-3 ${text}`}>
+      {[0, 1, 2, 3].map((step) => (
+        <span key={step} className={`h-6 w-6 rounded border ${stroke} ${step === 3 ? fill : softFill}`} style={{ transform: `translateY(${-step * 3}px)` }} />
+      ))}
+    </div>
+  );
+}
+
+function MiniComputationGraphVisual({ stroke, fill, text }: { stroke: string; fill: string; text: string }) {
+  return (
+    <div className={`flex h-full items-center justify-center ${text}`}>
+      <svg aria-hidden="true" viewBox="0 0 112 56" className="h-14 w-28">
+        <g fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2.2">
+          <path d="M28 20 L54 28 L82 16" />
+          <path d="M28 38 L54 28 L82 40" />
+        </g>
+        {[28, 54, 82].map((cx, index) => (
+          <circle key={index} cx={cx} cy={index === 0 ? 20 : index === 1 ? 28 : 16} r="5" className={index === 1 ? fill : ""} fill={index === 1 ? undefined : "white"} stroke="currentColor" strokeWidth="2" />
+        ))}
+        <circle cx="28" cy="38" r="5" fill="white" stroke="currentColor" strokeWidth="2" className={stroke} />
+        <circle cx="82" cy="40" r="5" fill="white" stroke="currentColor" strokeWidth="2" />
+      </svg>
+    </div>
+  );
 }
 
 function MiniGraphVisual({ text }: { text: string }) {

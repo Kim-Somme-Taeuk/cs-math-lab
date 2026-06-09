@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { buildAiLearningContext } from "@/lib/aiLearningContext";
 import {
   aiCoachCacheStorageKey,
@@ -214,9 +214,6 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
   const [aiCoachLoading, setAiCoachLoading] = useState(false);
   const [aiCoachUsageCount, setAiCoachUsageCount] = useState(0);
   const [pathPageIndex, setPathPageIndex] = useState(0);
-  const [pathSlideDirection, setPathSlideDirection] = useState<"left" | "right" | "none">("none");
-  const pathViewportRef = useRef<HTMLOListElement>(null);
-  const pathItemRefs = useRef<Array<HTMLLIElement | null>>([]);
 
   useEffect(() => {
     const storedProfile = readProfile();
@@ -256,19 +253,6 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
     }
   }, [completedChapters, pathPageCount, recommendedChapters]);
 
-  useEffect(() => {
-    const viewport = pathViewportRef.current;
-    const target = pathItemRefs.current[pathPageIndex];
-    const first = pathItemRefs.current[0];
-
-    if (!viewport || !target || !first) return;
-
-    viewport.scrollTo({
-      left: target.offsetLeft - first.offsetLeft,
-      behavior: pathSlideDirection === "none" ? "auto" : "smooth",
-    });
-  }, [pathPageIndex, pathSlideDirection, recommendedChapters]);
-
   const aiLearningContext = useMemo(() => {
     return buildAiLearningContext({
       profile,
@@ -281,6 +265,7 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
   }, [completedChapters, conceptMastery, profile, quizResults, readyChapters, understandingChecks]);
 
   const aiContextHash = useMemo(() => hashText(JSON.stringify(aiLearningContext)), [aiLearningContext]);
+  const visibleRecommendedChapters = recommendedChapters.slice(pathPageIndex, pathPageIndex + pathPageSize);
 
   if (readyChapters.length === 0) {
     return null;
@@ -486,7 +471,6 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
                 type="button"
                 aria-label="이전 추천 경로"
                 onClick={() => {
-                  setPathSlideDirection("right");
                   setPathPageIndex((current) => Math.max(0, current - 1));
                 }}
                 disabled={pathPageIndex === 0}
@@ -495,19 +479,16 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
                 &lt;
               </button>
               <ol
-                ref={pathViewportRef}
-                className="flex touch-pan-x snap-x snap-mandatory gap-3 overflow-x-auto px-0 scroll-smooth [scrollbar-width:none] sm:overflow-hidden sm:px-8 [&::-webkit-scrollbar]:hidden"
+                className="grid gap-3 sm:grid-cols-3 sm:px-8"
               >
-                {recommendedChapters.map((chapter, index) => {
+                {visibleRecommendedChapters.map((chapter, index) => {
                   const completed = completedChapters.includes(chapter.slug);
+                  const recommendationIndex = pathPageIndex + index;
 
                   return (
                     <li
                       key={chapter.slug}
-                      ref={(element) => {
-                        pathItemRefs.current[index] = element;
-                      }}
-                      className="relative shrink-0 basis-[46%] snap-start rounded-md border border-slate-200 bg-white p-2 pb-10 sm:basis-[calc((100%_-_1.5rem)/3)] sm:p-3"
+                      className="relative min-h-36 rounded-md border border-slate-200 bg-white p-2 pb-10 sm:p-3"
                     >
                       <Link
                         href={`/chapters/${chapter.slug}`}
@@ -516,7 +497,7 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
                       />
                       <div className="flex items-center justify-between gap-2 sm:items-start">
                         <div className="min-w-0">
-                          <p className="text-[11px] font-black text-teal-700 sm:text-xs">추천 {index + 1}</p>
+                          <p className="text-[11px] font-black text-teal-700 sm:text-xs">추천 {recommendationIndex + 1}</p>
                           <h3 className="mt-0.5 line-clamp-2 text-sm font-black leading-5 text-slate-950 sm:truncate sm:text-base">
                             {chapter.title}
                           </h3>
@@ -564,7 +545,6 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
                 type="button"
                 aria-label="다음 추천 경로"
                 onClick={() => {
-                  setPathSlideDirection("left");
                   setPathPageIndex((current) => Math.min(pathPageCount - 1, current + 1));
                 }}
                 disabled={pathPageIndex >= pathPageCount - 1}
