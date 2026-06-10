@@ -2,6 +2,7 @@
 
 import { useId, useMemo, useState } from "react";
 import { useChapterSlug } from "@/components/interactive/ChapterSlugProvider";
+import { buildFallbackExplanation, type AiExplanationResponsePayload } from "@/lib/aiExplanation";
 import { getCurrentChapterSlug, getQuestionId, saveExplanationFeedback, saveQuizRecord } from "@/lib/learningRecords";
 import { getConceptIdForChapter, getConceptTagsForChapter } from "@/lib/personalization";
 import { normalizeReviewQuestions } from "@/lib/reviewQuestions";
@@ -41,6 +42,8 @@ export default function MultipleChoiceQuiz({ questions, title = "연습 문제" 
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [submitted, setSubmitted] = useState(false);
   const [visibleExplanations, setVisibleExplanations] = useState<Record<number, boolean>>({});
+  const [aiExplanations, setAiExplanations] = useState<Record<number, string>>({});
+  const [explanationLoading, setExplanationLoading] = useState<Record<number, boolean>>({});
   const [explanationFeedback, setExplanationFeedback] = useState<Record<number, "understood" | "confused">>({});
   const currentQuestion = normalizedQuestions[currentIndex];
   const selected = answers[currentIndex];
@@ -62,7 +65,7 @@ export default function MultipleChoiceQuiz({ questions, title = "연습 문제" 
   const currentConceptId = currentQuestion.conceptId ?? chapterConceptId;
   const currentConcept = (currentQuestion.conceptTags ?? fallbackConcepts)[0] ?? "문제 해설";
   const currentQuestionId = getQuestionId(slug, title, currentQuestion, currentIndex);
-  const explanationVisible = visibleExplanations[currentIndex] ?? (submitted && !isCorrect);
+  const explanationVisible = visibleExplanations[currentIndex] ?? false;
   const currentFeedback = explanationFeedback[currentIndex];
   const reviewHref = title === "종합 점검" ? "#review" : "#definition";
 
@@ -75,6 +78,55 @@ export default function MultipleChoiceQuiz({ questions, title = "연습 문제" 
       concept: currentConcept,
       status,
     });
+  }
+
+  async function toggleExplanation() {
+    if (explanationVisible) {
+      setVisibleExplanations((current) => ({ ...current, [currentIndex]: false }));
+      return;
+    }
+
+    setVisibleExplanations((current) => ({ ...current, [currentIndex]: true }));
+
+    if (selected === undefined || aiExplanations[currentIndex]) return;
+
+    const payload = {
+      slug,
+      title,
+      prompt: currentQuestion.prompt,
+      choices: currentQuestion.choices,
+      selectedIndex: selected,
+      correctIndex: currentQuestion.correctIndex,
+      explanation: currentQuestion.explanation,
+      conceptTags: currentQuestion.conceptTags ?? fallbackConcepts,
+      questionType: currentQuestion.questionType,
+      reasonTags: currentQuestion.reasonTags ?? [],
+    };
+
+    setExplanationLoading((current) => ({ ...current, [currentIndex]: true }));
+
+    try {
+      const response = await fetch("/api/ai/explanation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) throw new Error("AI explanation request failed.");
+
+      const result = (await response.json()) as AiExplanationResponsePayload;
+      setAiExplanations((current) => ({
+        ...current,
+        [currentIndex]: result.explanation || buildFallbackExplanation(payload),
+      }));
+    } catch {
+      setAiExplanations((current) => ({
+        ...current,
+        [currentIndex]: buildFallbackExplanation(payload),
+      }));
+    } finally {
+      setExplanationLoading((current) => ({ ...current, [currentIndex]: false }));
+    }
   }
 
   return (
@@ -132,6 +184,8 @@ export default function MultipleChoiceQuiz({ questions, title = "연습 문제" 
                   onChange={() => {
                     setSubmitted(false);
                     setVisibleExplanations({});
+                    setAiExplanations({});
+                    setExplanationLoading({});
                     setAnswers((current) => ({ ...current, [currentIndex]: choiceIndex }));
                   }}
                   className="mt-1 h-4 w-4 accent-slate-950"
@@ -151,7 +205,7 @@ export default function MultipleChoiceQuiz({ questions, title = "연습 문제" 
               <p className="font-black">{isCorrect ? "맞았습니다." : "틀렸습니다."}</p>
               <button
                 type="button"
-                onClick={() => setVisibleExplanations((current) => ({ ...current, [currentIndex]: !explanationVisible }))}
+                onClick={toggleExplanation}
                 className="rounded-md bg-white px-3 py-2 text-sm font-black text-slate-800 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
               >
                 {explanationVisible ? "해설 닫기" : "해설 보기"}
@@ -167,7 +221,11 @@ export default function MultipleChoiceQuiz({ questions, title = "연습 문제" 
                     선택한 답 {renderInlineCode(currentQuestion.choices[selected])}에서 헷갈린 지점을 기준으로 보면 됩니다.
                   </p>
                 ) : null}
-                <p className="mt-2">{renderInlineCode(currentQuestion.explanation)}</p>
+                <p className="mt-2">
+                  {explanationLoading[currentIndex]
+                    ? "선택한 답을 기준으로 해설을 만드는 중입니다."
+                    : renderInlineCode(aiExplanations[currentIndex] ?? currentQuestion.explanation)}
+                </p>
                 {!isCorrect ? (
                   <div className="mt-3 flex flex-wrap gap-2">
                     <a
@@ -245,12 +303,7 @@ export default function MultipleChoiceQuiz({ questions, title = "연습 문제" 
           disabled={!allAnswered}
           onClick={() => {
             setSubmitted(true);
-            setVisibleExplanations(
-              normalizedQuestions.reduce((next, question, index) => {
-                if (answers[index] !== question.correctIndex) next[index] = true;
-                return next;
-              }, {} as Record<number, boolean>),
-            );
+            setVisibleExplanations({});
             saveQuizRecord({ slug, title, questions: normalizedQuestions, answers });
           }}
           className="rounded-md bg-slate-950 px-5 py-3 text-sm font-black text-white hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 disabled:cursor-not-allowed disabled:bg-slate-300"
