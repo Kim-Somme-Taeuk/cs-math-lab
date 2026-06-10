@@ -15,6 +15,7 @@ import {
   validateAiChatPayload,
   type AiChatResponsePayload,
 } from "@/lib/aiChat";
+import { getTutorModel } from "@/lib/ai/config";
 import { getChapter, getReadyChaptersInSameLevel } from "@/lib/chapters";
 
 type OpenAiResponse = {
@@ -158,7 +159,7 @@ export async function POST(request: Request) {
   }
 
   const apiKey = process.env.OPENAI_API_KEY;
-  const model = process.env.OPENAI_MODEL ?? "gpt-4.1-mini";
+  const model = getTutorModel();
 
   if (!apiKey) {
     return NextResponse.json({

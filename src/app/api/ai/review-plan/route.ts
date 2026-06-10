@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getPlannerModel } from "@/lib/ai/config";
 import { setReviewTemplates } from "@/lib/generatedReview";
 import {
   sanitizeReviewPlanResponse,
@@ -59,7 +60,7 @@ export async function POST(request: Request) {
   }
 
   const apiKey = process.env.OPENAI_API_KEY;
-  const model = process.env.OPENAI_MODEL ?? "gpt-4.1-mini";
+  const model = getPlannerModel();
 
   if (!apiKey) return emptyPlan();
 

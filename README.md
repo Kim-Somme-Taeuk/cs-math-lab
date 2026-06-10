@@ -219,7 +219,11 @@ AI 코치 MVP는 `/roadmap` 개인화 패널의 "AI 코치 메모 생성" 버튼
 필요한 서버 환경변수:
 
 - `OPENAI_API_KEY`: OpenAI API 호출용 서버 전용 키
-- `OPENAI_MODEL`: 사용할 모델명. 운영 환경에서는 명시해야 하며, 없으면 fallback 메모를 반환합니다.
+- `OPENAI_MODEL_PLANNER`: 내부 판단/추천용 모델명. 선택값이며 없으면 `gpt-5.4-nano`를 사용합니다.
+- `OPENAI_MODEL_TUTOR`: 학습자에게 직접 보이는 설명/챗봇용 모델명. 선택값이며 없으면 `gpt-5.4-mini`를 사용합니다.
+
+`OPENAI_API_KEY`는 배포된 AI 기능에 필요합니다. 모델명은 기능 코드에 직접 쓰지 않고
+`src/lib/ai/config.ts`의 `getPlannerModel()`과 `getTutorModel()`에서 역할별로 고릅니다.
 
 AI 코치 요청에 전송되는 데이터:
 

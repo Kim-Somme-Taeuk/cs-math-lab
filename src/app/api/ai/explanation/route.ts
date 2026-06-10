@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getTutorModel } from "@/lib/ai/config";
 import {
   buildFallbackExplanation,
   normalizeAiExplanation,
@@ -45,7 +46,7 @@ export async function POST(request: Request) {
   }
 
   const apiKey = process.env.OPENAI_API_KEY;
-  const model = process.env.OPENAI_MODEL ?? "gpt-4.1-mini";
+  const model = getTutorModel();
 
   if (!apiKey) return fallbackResponse(body);
 

@@ -5,6 +5,7 @@ import {
   validateAiCoachPayload,
   type AiCoachResponsePayload,
 } from "@/lib/aiCoach";
+import { getPlannerModel } from "@/lib/ai/config";
 
 type OpenAiResponse = {
   output_text?: string;
@@ -45,7 +46,7 @@ export async function POST(request: Request) {
   }
 
   const apiKey = process.env.OPENAI_API_KEY;
-  const model = process.env.OPENAI_MODEL ?? "gpt-4.1-mini";
+  const model = getPlannerModel();
 
   if (!apiKey) {
     return fallbackResponse();

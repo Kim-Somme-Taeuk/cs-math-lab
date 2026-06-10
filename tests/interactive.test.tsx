@@ -31,6 +31,7 @@ import {
   getReadyChaptersInSameLevel,
   roadmapSubjects,
 } from "../src/lib/chapters";
+import { getPlannerModel, getTutorModel } from "../src/lib/ai/config";
 import { chapterContentLoaders } from "../src/lib/content";
 import { generateSetReviewQuestions, setReviewTemplates } from "../src/lib/generatedReview";
 import { evaluateLogic } from "../src/lib/logic";
@@ -157,6 +158,41 @@ describe("set helpers", () => {
     expect(secondAttempt.prompt).not.toBe(firstAttempt.prompt);
     expect(firstAttempt.choices[firstAttempt.correctIndex]).toBe("{ 3, 4 }");
     expect(secondAttempt.choices[secondAttempt.correctIndex]).toBe("{ 1, 2 }");
+  });
+});
+
+describe("AI model config", () => {
+  const originalPlannerModel = process.env.OPENAI_MODEL_PLANNER;
+  const originalTutorModel = process.env.OPENAI_MODEL_TUTOR;
+
+  afterEach(() => {
+    if (originalPlannerModel === undefined) {
+      delete process.env.OPENAI_MODEL_PLANNER;
+    } else {
+      process.env.OPENAI_MODEL_PLANNER = originalPlannerModel;
+    }
+
+    if (originalTutorModel === undefined) {
+      delete process.env.OPENAI_MODEL_TUTOR;
+    } else {
+      process.env.OPENAI_MODEL_TUTOR = originalTutorModel;
+    }
+  });
+
+  it("returns planner and tutor model defaults when optional env vars are missing", () => {
+    delete process.env.OPENAI_MODEL_PLANNER;
+    delete process.env.OPENAI_MODEL_TUTOR;
+
+    expect(getPlannerModel()).toBe("gpt-5.4-nano");
+    expect(getTutorModel()).toBe("gpt-5.4-mini");
+  });
+
+  it("uses optional env vars to override planner and tutor model defaults", () => {
+    process.env.OPENAI_MODEL_PLANNER = "planner-test-model";
+    process.env.OPENAI_MODEL_TUTOR = "tutor-test-model";
+
+    expect(getPlannerModel()).toBe("planner-test-model");
+    expect(getTutorModel()).toBe("tutor-test-model");
   });
 });
 
