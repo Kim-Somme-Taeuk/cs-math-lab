@@ -1,9 +1,27 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { generateSetReviewQuestions } from "@/lib/generatedReview";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { generateSetReviewQuestions, setReviewTemplates } from "@/lib/generatedReview";
 import { getQuestionId, saveExplanationFeedback, saveQuizRecord } from "@/lib/learningRecords";
-import { getConceptIdForChapter } from "@/lib/personalization";
+import {
+  conceptMasteryStorageKey,
+  getConceptIdForChapter,
+  questionAttemptsStorageKey,
+  quizResultsStorageKey,
+  understandingChecksStorageKey,
+  type ConceptMastery,
+  type QuestionAttempt,
+  type QuizResult,
+  type UnderstandingCheckResult,
+} from "@/lib/personalization";
+import {
+  buildReviewWeaknessProfile,
+  compactTemplatesForAi,
+  mergeAiReviewPlan,
+  rankReviewTemplates,
+  sanitizeReviewPlanResponse,
+  type PlannedReviewTemplate,
+} from "@/lib/reviewPlan";
 import { normalizeReviewQuestions } from "@/lib/reviewQuestions";
 
 function renderInlineCode(text: string) {
@@ -16,6 +34,32 @@ function renderInlineCode(text: string) {
   });
 }
 
+function readStoredValues<TValue>(key: string): TValue[] {
+  if (typeof window === "undefined") return [];
+
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(key) ?? "{}") as Record<string, TValue>;
+    return Object.values(stored);
+  } catch {
+    return [];
+  }
+}
+
+function buildLocalPlan() {
+  const weakness = buildReviewWeaknessProfile({
+    chapterSlug: "sets",
+    quizResults: readStoredValues<QuizResult>(quizResultsStorageKey),
+    questionAttempts: readStoredValues<QuestionAttempt>(questionAttemptsStorageKey),
+    conceptMastery: readStoredValues<ConceptMastery>(conceptMasteryStorageKey),
+    understandingChecks: readStoredValues<UnderstandingCheckResult>(understandingChecksStorageKey),
+  });
+
+  return {
+    weakness,
+    plan: rankReviewTemplates(setReviewTemplates, weakness),
+  };
+}
+
 export default function GeneratedReviewQuiz({ chapter }: { chapter: "sets" }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [variants, setVariants] = useState<number[]>([]);
@@ -23,12 +67,53 @@ export default function GeneratedReviewQuiz({ chapter }: { chapter: "sets" }) {
   const [submitted, setSubmitted] = useState(false);
   const [visibleExplanations, setVisibleExplanations] = useState<Record<number, boolean>>({});
   const [explanationFeedback, setExplanationFeedback] = useState<Record<number, "understood" | "confused">>({});
+  const localPlan = useMemo(() => buildLocalPlan(), []);
+  const [plannedTemplates, setPlannedTemplates] = useState<PlannedReviewTemplate[]>(localPlan.plan);
+  const answeredRef = useRef(answers);
+  answeredRef.current = answers;
+
+  useEffect(() => {
+    if (chapter !== "sets") return;
+
+    const controller = new AbortController();
+
+    async function loadAiPlan() {
+      try {
+        const response = await fetch("/api/ai/review-plan", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chapterSlug: "sets",
+            weakness: localPlan.weakness,
+            templates: compactTemplatesForAi(localPlan.plan.map((item) => item.template)),
+          }),
+          signal: controller.signal,
+        });
+
+        if (!response.ok || Object.keys(answeredRef.current).length > 0) return;
+
+        const aiPlan = sanitizeReviewPlanResponse(await response.json(), setReviewTemplates);
+        const nextPlan = mergeAiReviewPlan(localPlan.plan, aiPlan);
+
+        setPlannedTemplates(nextPlan);
+        setCurrentIndex((current) => Math.min(current, nextPlan.length - 1));
+      } catch {
+        // The local code-ranked plan is the primary path.
+      }
+    }
+
+    void loadAiPlan();
+
+    return () => controller.abort();
+  }, [chapter, localPlan]);
+
   const questions = useMemo(() => {
-    if (chapter === "sets") return generateSetReviewQuestions(variants);
+    if (chapter === "sets") return generateSetReviewQuestions(variants, plannedTemplates.map((item) => item.template.id));
     return [];
-  }, [chapter, variants]);
+  }, [chapter, plannedTemplates, variants]);
   const normalizedQuestions = useMemo(() => normalizeReviewQuestions(chapter, "종합 점검", questions), [chapter, questions]);
   const currentQuestion = normalizedQuestions[currentIndex];
+  const currentPlan = plannedTemplates[currentIndex];
   const selected = answers[currentIndex];
   const isCorrect = selected === currentQuestion.correctIndex;
   const answeredCount = normalizedQuestions.filter((_, index) => answers[index] !== undefined).length;
@@ -46,7 +131,8 @@ export default function GeneratedReviewQuiz({ chapter }: { chapter: "sets" }) {
   function retryCurrentQuestion() {
     setVariants((current) => {
       const next = [...current];
-      next[currentIndex] = (next[currentIndex] ?? 0) + 1;
+      const templateIndex = currentPlan?.template.variantSeed ?? currentIndex;
+      next[templateIndex] = (next[templateIndex] ?? 0) + 1;
       return next;
     });
     setAnswers((current) => {
@@ -101,6 +187,11 @@ export default function GeneratedReviewQuiz({ chapter }: { chapter: "sets" }) {
 
       <fieldset className="mt-4 rounded-lg border border-slate-200 bg-white p-3 sm:p-4">
         <legend className="px-1 text-sm font-bold text-slate-500">문제 {currentIndex + 1} / {normalizedQuestions.length}</legend>
+        {currentPlan ? (
+          <p className="mt-2 rounded-md bg-slate-50 px-3 py-2 text-sm font-bold leading-6 text-slate-700">
+            {renderInlineCode(currentPlan.reason)}
+          </p>
+        ) : null}
         <p className="mt-2 font-bold leading-7 text-slate-950">{renderInlineCode(currentQuestion.prompt)}</p>
         <div className="mt-3 grid gap-2 sm:mt-4">
           {currentQuestion.choices.map((choice, choiceIndex) => {

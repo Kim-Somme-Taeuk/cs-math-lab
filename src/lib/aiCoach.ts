@@ -1,4 +1,5 @@
 import type { AiLearningContext } from "@/lib/aiLearningContext";
+import { containsUnsafeAiText } from "@/lib/aiSafety";
 
 export const aiCoachFallbackMemo =
   "약한 개념을 복습한 뒤 다음 챕터로 이어가세요.";
@@ -91,6 +92,7 @@ export function validateAiCoachPayload(value: unknown): value is AiCoachRequestP
   const serialized = JSON.stringify(value);
 
   if (serialized.length > maxPayloadLength) return false;
+  if (containsUnsafeAiText(value)) return false;
 
   const { context } = value;
 

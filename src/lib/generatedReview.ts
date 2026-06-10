@@ -2,15 +2,98 @@ import type { QuizQuestion } from "@/components/interactive/MultipleChoiceQuiz";
 
 type SetReviewKind = "union" | "intersection" | "difference" | "complement" | "subset" | "order" | "pythonUnion" | "pythonIntersection";
 
-const setReviewKinds: SetReviewKind[] = [
-  "union",
-  "intersection",
-  "difference",
-  "complement",
-  "subset",
-  "order",
-  "pythonUnion",
-  "pythonIntersection",
+export type SetReviewTemplate = {
+  id: string;
+  chapterSlug: "sets";
+  kind: SetReviewKind;
+  conceptTags: string[];
+  questionType: string;
+  reasonTags: string[];
+  difficulty: 1 | 2 | 3;
+  variantSeed: number;
+};
+
+export const setReviewTemplates: SetReviewTemplate[] = [
+  {
+    id: "sets_union_basic_1",
+    chapterSlug: "sets",
+    kind: "union",
+    conceptTags: ["union-basic", "set-operation"],
+    questionType: "union-basic",
+    reasonTags: ["included-excluded-confusion"],
+    difficulty: 1,
+    variantSeed: 0,
+  },
+  {
+    id: "sets_intersection_basic_1",
+    chapterSlug: "sets",
+    kind: "intersection",
+    conceptTags: ["intersection-basic", "set-operation"],
+    questionType: "intersection-basic",
+    reasonTags: ["included-excluded-confusion"],
+    difficulty: 1,
+    variantSeed: 1,
+  },
+  {
+    id: "sets_difference_direction_1",
+    chapterSlug: "sets",
+    kind: "difference",
+    conceptTags: ["difference-direction", "set-operation"],
+    questionType: "direction-check",
+    reasonTags: ["difference-direction-confusion", "included-excluded-confusion"],
+    difficulty: 2,
+    variantSeed: 2,
+  },
+  {
+    id: "sets_complement_universe_1",
+    chapterSlug: "sets",
+    kind: "complement",
+    conceptTags: ["complement-universe", "set-operation"],
+    questionType: "universe-check",
+    reasonTags: ["universe-complement-confusion", "included-excluded-confusion"],
+    difficulty: 2,
+    variantSeed: 3,
+  },
+  {
+    id: "sets_subset_confusion_1",
+    chapterSlug: "sets",
+    kind: "subset",
+    conceptTags: ["subset-confusion"],
+    questionType: "subset-check",
+    reasonTags: ["subset-symbol-confusion"],
+    difficulty: 2,
+    variantSeed: 4,
+  },
+  {
+    id: "sets_order_ignored_1",
+    chapterSlug: "sets",
+    kind: "order",
+    conceptTags: ["element-vs-set", "notation-reading"],
+    questionType: "set-order",
+    reasonTags: ["element-symbol-confusion"],
+    difficulty: 1,
+    variantSeed: 5,
+  },
+  {
+    id: "sets_python_union_1",
+    chapterSlug: "sets",
+    kind: "pythonUnion",
+    conceptTags: ["union-basic", "notation-reading"],
+    questionType: "python-union",
+    reasonTags: ["included-excluded-confusion"],
+    difficulty: 1,
+    variantSeed: 6,
+  },
+  {
+    id: "sets_python_intersection_1",
+    chapterSlug: "sets",
+    kind: "pythonIntersection",
+    conceptTags: ["intersection-basic", "notation-reading"],
+    questionType: "python-intersection",
+    reasonTags: ["included-excluded-confusion"],
+    difficulty: 1,
+    variantSeed: 7,
+  },
 ];
 
 function uniqueSorted(values: number[]) {
@@ -33,6 +116,7 @@ function questionFromChoices(
   distractors: string[],
   explanation: string,
   seed: number,
+  templateId: string,
   questionType: string,
   conceptTags: string[],
   reasonTags: string[],
@@ -40,7 +124,7 @@ function questionFromChoices(
   const choices = rotateChoices(correct, distractors, seed);
 
   return {
-    questionId: `sets:review:${questionType}:${seed}`,
+    questionId: `sets:review:${templateId}:${seed}`,
     conceptId: "chapter:sets",
     prompt,
     choices,
@@ -69,6 +153,7 @@ function generateSetReviewQuestion(kind: SetReviewKind, kindIndex: number, varia
   const difference = a.filter((value) => !b.includes(value));
   const complement = universe.filter((value) => !a.includes(value));
   const seed = kindIndex + variant;
+  const template = setReviewTemplates[kindIndex];
 
   if (kind === "union") {
     return questionFromChoices(
@@ -77,9 +162,10 @@ function generateSetReviewQuestion(kind: SetReviewKind, kindIndex: number, varia
       [formatSet(intersection), formatSet(difference), formatSet(complement)],
       "합집합은 A 또는 B에 들어 있는 원소를 모두 모읍니다.",
       seed,
-      "union",
-      ["집합 연산", "합집합"],
-      ["합집합과 교집합 혼동"],
+      template.id,
+      template.questionType,
+      ["합집합", ...template.conceptTags],
+      template.reasonTags,
     );
   }
 
@@ -90,9 +176,10 @@ function generateSetReviewQuestion(kind: SetReviewKind, kindIndex: number, varia
       [formatSet(union), formatSet(difference), formatSet(b.filter((value) => !a.includes(value)))],
       "교집합은 A와 B에 동시에 들어 있는 원소만 남깁니다.",
       seed,
-      "intersection",
-      ["집합 연산", "교집합"],
-      ["공통 원소만 남기는 조건 혼동"],
+      template.id,
+      template.questionType,
+      ["교집합", ...template.conceptTags],
+      template.reasonTags,
     );
   }
 
@@ -103,9 +190,10 @@ function generateSetReviewQuestion(kind: SetReviewKind, kindIndex: number, varia
       [formatSet(b.filter((value) => !a.includes(value))), formatSet(intersection), formatSet(union)],
       "A - B는 A에는 있지만 B에는 없는 원소입니다.",
       seed,
-      "difference",
-      ["집합 연산", "차집합"],
-      ["차집합 방향 혼동"],
+      template.id,
+      template.questionType,
+      ["차집합", ...template.conceptTags],
+      template.reasonTags,
     );
   }
 
@@ -116,9 +204,10 @@ function generateSetReviewQuestion(kind: SetReviewKind, kindIndex: number, varia
       [formatSet(a), formatSet(intersection), formatSet(union)],
       "여집합은 전체집합 U에서 A에 들어 있지 않은 원소입니다.",
       seed,
-      "complement",
-      ["집합 연산", "여집합"],
-      ["전체집합 기준 누락"],
+      template.id,
+      template.questionType,
+      ["여집합", ...template.conceptTags],
+      template.reasonTags,
     );
   }
 
@@ -138,9 +227,10 @@ function generateSetReviewQuestion(kind: SetReviewKind, kindIndex: number, varia
       ],
       "부분집합이 되려면 왼쪽 집합의 모든 원소가 오른쪽 집합에 있어야 합니다.",
       seed,
-      "subset",
-      ["부분집합"],
-      ["부분집합 조건 오해"],
+      template.id,
+      template.questionType,
+      ["부분집합", ...template.conceptTags],
+      template.reasonTags,
     );
   }
 
@@ -156,9 +246,10 @@ function generateSetReviewQuestion(kind: SetReviewKind, kindIndex: number, varia
       ],
       "집합은 순서를 보지 않고 어떤 원소가 들어 있는지를 봅니다.",
       seed,
-      "set-order",
-      ["집합", "순서 무시"],
-      ["집합에서 순서가 중요하다고 오해"],
+      template.id,
+      template.questionType,
+      ["집합", "순서 무시", ...template.conceptTags],
+      template.reasonTags,
     );
   }
 
@@ -169,9 +260,10 @@ function generateSetReviewQuestion(kind: SetReviewKind, kindIndex: number, varia
       ["교집합", "차집합", "여집합"],
       "`a | b`는 두 set의 원소를 모두 모으는 합집합 연산입니다.",
       seed,
-      "python-union",
-      ["Python set", "합집합"],
-      ["Python set 연산자 의미 혼동"],
+      template.id,
+      template.questionType,
+      ["Python set", "합집합", ...template.conceptTags],
+      template.reasonTags,
     );
   }
 
@@ -181,12 +273,22 @@ function generateSetReviewQuestion(kind: SetReviewKind, kindIndex: number, varia
     ["합집합", "A의 여집합", "B - A"],
     "`a & b`는 두 set에 공통으로 들어 있는 원소만 남기는 교집합 연산입니다.",
     seed,
-    "python-intersection",
-    ["Python set", "교집합"],
-    ["Python set 연산자 의미 혼동"],
+    template.id,
+    template.questionType,
+    ["Python set", "교집합", ...template.conceptTags],
+    template.reasonTags,
   );
 }
 
-export function generateSetReviewQuestions(variants: number[] = []) {
-  return setReviewKinds.map((kind, index) => generateSetReviewQuestion(kind, index, variants[index] ?? 0));
+export function generateSetReviewQuestions(variants: number[] = [], templateIds: string[] = []) {
+  const templates = templateIds.length
+    ? templateIds
+        .map((id) => setReviewTemplates.find((template) => template.id === id))
+        .filter((template): template is SetReviewTemplate => Boolean(template))
+    : setReviewTemplates;
+
+  return templates.map((template) => {
+    const index = setReviewTemplates.findIndex((item) => item.id === template.id);
+    return generateSetReviewQuestion(template.kind, index, variants[index] ?? 0);
+  });
 }
