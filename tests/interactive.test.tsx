@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -14,14 +14,16 @@ import {
   validateAiChatPayload,
 } from "../src/lib/aiChat";
 import ConditionalPlayground from "../src/components/interactive/ConditionalPlayground";
+import ChapterAiChatbot from "../src/components/interactive/ChapterAiChatbot";
 import CountingPlayground from "../src/components/interactive/CountingPlayground";
 import CounterexamplePlayground from "../src/components/interactive/CounterexamplePlayground";
 import MultipleChoiceQuiz from "../src/components/interactive/MultipleChoiceQuiz";
 import SetVennPlayground from "../src/components/interactive/SetVennPlayground";
 import TruthTablePlayground from "../src/components/interactive/TruthTablePlayground";
+import PersonalizedPathPanel from "../src/components/personalization/PersonalizedPathPanel";
 import { buildAiLearningContext } from "../src/lib/aiLearningContext";
 import { containsPromptInjectionText } from "../src/lib/aiSafety";
-import { normalizeCoachMemo, validateAiCoachPayload } from "../src/lib/aiCoach";
+import { aiCoachUsageStorageKey, normalizeCoachMemo, validateAiCoachPayload } from "../src/lib/aiCoach";
 import {
   getChapterNavigation,
   getReadyChaptersBySubjectAndLevel,
@@ -35,6 +37,7 @@ import {
   conceptMasteryStorageKey,
   getLearningInsights,
   getRecommendedChapters,
+  learningProfileStorageKey,
   questionAttemptsStorageKey,
   quizResultsStorageKey,
 } from "../src/lib/personalization";
@@ -46,7 +49,7 @@ import {
   sanitizeReviewPlanResponse,
   validateReviewPlanPayload,
 } from "../src/lib/reviewPlan";
-import { getSupplementalReviewQuestions, reviewQuestionCount } from "../src/lib/reviewQuestions";
+import { getSupplementalReviewQuestions, normalizeReviewQuestions, reviewQuestionCount } from "../src/lib/reviewQuestions";
 import { evaluateSetOperation } from "../src/lib/setUtils";
 
 describe("logic helpers", () => {
@@ -217,6 +220,24 @@ describe("review question counts", () => {
         `${chapter.slug} should render ${reviewQuestionCount} review questions`,
       ).toBe(reviewQuestionCount);
     }
+  });
+
+  it("rebalances rendered review quiz answer positions", () => {
+    const questions = Array.from({ length: 8 }, (_, index) => ({
+      prompt: `문제 ${index + 1}`,
+      choices: ["정답", "오답 A", "오답 B", "오답 C"] as [string, string, string, string],
+      correctIndex: 0,
+      explanation: "해설",
+    }));
+    const normalized = normalizeReviewQuestions("unknown", "종합 점검", questions);
+
+    expect(normalized.map((question) => question.correctIndex)).toEqual([0, 1, 2, 3, 0, 1, 2, 3]);
+    normalized.forEach((question) => {
+      expect(question.choices[question.correctIndex]).toBe("정답");
+    });
+    expect(normalizeReviewQuestions("unknown", "연습 문제", questions).map((question) => question.correctIndex)).toEqual(
+      Array(8).fill(0),
+    );
   });
 
   it("keeps linear algebra quiz answer positions mixed", () => {
@@ -429,6 +450,88 @@ describe("CounterexamplePlayground", () => {
     await user.clear(within(playground).getByLabelText("3번째"));
     await user.type(within(playground).getByLabelText("3번째"), "1");
     expect(within(playground).getByText("[3, 2, 1]은 오름차순 정렬 조건을 만족하지 않으므로 반례가 아닙니다.")).toBeInTheDocument();
+  });
+});
+
+describe("ChapterAiChatbot", () => {
+  afterEach(() => {
+    window.localStorage.clear();
+    vi.unstubAllGlobals();
+  });
+
+  it("submits with Enter and keeps Shift+Enter as a line break", async () => {
+    const user = userEvent.setup();
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ answer: "명제 예시 답변", source: "fallback" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<ChapterAiChatbot slug="logic" chapterTitle="명제와 논리" />);
+
+    await user.click(screen.getByRole("button", { name: "AI 챗봇 열기" }));
+    const input = screen.getByLabelText("AI 챗봇 질문");
+
+    await user.type(input, "첫 줄");
+    await user.keyboard("{Shift>}{Enter}{/Shift}");
+    await user.type(input, "둘째 줄");
+
+    expect(input).toHaveValue("첫 줄\n둘째 줄");
+    expect(fetchMock).not.toHaveBeenCalled();
+
+    await user.keyboard("{Enter}");
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/ai/chat",
+      expect.objectContaining({
+        method: "POST",
+        body: expect.stringContaining("첫 줄\\n둘째 줄"),
+      }),
+    );
+    expect(
+      screen.getByText((_, element) => element?.textContent === "첫 줄\n둘째 줄"),
+    ).toHaveClass("whitespace-pre-wrap");
+    expect(await screen.findByText("명제 예시 답변")).toBeInTheDocument();
+  });
+});
+
+describe("PersonalizedPathPanel", () => {
+  const readyChapters = roadmapSubjects
+    .flatMap((subject) => subject.levels)
+    .flatMap((level) => level.chapters)
+    .filter((chapter) => chapter.status === "ready");
+
+  afterEach(() => {
+    window.localStorage.clear();
+    vi.unstubAllGlobals();
+  });
+
+  it("keeps mobile path controls reachable and does not count fallback coach memos as AI usage", async () => {
+    const user = userEvent.setup();
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ memo: "fallback memo", source: "fallback" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    window.localStorage.setItem(
+      learningProfileStorageKey,
+      JSON.stringify({ goal: "foundation", level: "beginner", style: "code" }),
+    );
+
+    render(<PersonalizedPathPanel readyChapters={readyChapters} />);
+
+    expect(await screen.findByRole("button", { name: "다음 추천" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "이전 추천" })).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "메모 생성" }));
+
+    expect(await screen.findByText("fallback memo")).toBeInTheDocument();
+    expect(window.localStorage.getItem(aiCoachUsageStorageKey)).toBeNull();
   });
 });
 

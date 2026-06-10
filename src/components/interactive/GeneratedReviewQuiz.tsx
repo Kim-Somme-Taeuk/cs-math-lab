@@ -124,7 +124,7 @@ export default function GeneratedReviewQuiz({ chapter }: { chapter: "sets" }) {
   const slug = "sets";
   const chapterConceptId = getConceptIdForChapter(slug);
   const currentQuestionId = getQuestionId(slug, "종합 점검", currentQuestion, currentIndex);
-  const explanationVisible = visibleExplanations[currentIndex] ?? false;
+  const explanationVisible = visibleExplanations[currentIndex] ?? (submitted && !isCorrect);
   const currentFeedback = explanationFeedback[currentIndex];
   const currentConcept = currentQuestion.conceptTags?.[0] ?? "종합 점검";
 
@@ -171,17 +171,20 @@ export default function GeneratedReviewQuiz({ chapter }: { chapter: "sets" }) {
         </p>
       </div>
 
-      <div className="mt-4 flex gap-1.5" aria-label="문제 진행 상황">
+      <div className="mt-4 grid grid-cols-5 gap-1.5 sm:flex" aria-label="문제 진행 상황">
         {normalizedQuestions.map((_, index) => (
           <button
             key={index}
             type="button"
             onClick={() => setCurrentIndex(index)}
-            className={`h-2 flex-1 rounded-full ${
+            className={`flex h-9 min-w-8 flex-1 items-center justify-center rounded-md text-xs font-black ${
               index === currentIndex ? "bg-slate-950" : answers[index] !== undefined ? "bg-teal-500" : "bg-slate-200"
-            }`}
+            } ${index === currentIndex ? "text-white" : answers[index] !== undefined ? "text-white" : "text-slate-600"} focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500`}
             aria-label={`문제 ${index + 1}로 이동`}
-          />
+            aria-current={index === currentIndex ? "step" : undefined}
+          >
+            {index + 1}
+          </button>
         ))}
       </div>
 
@@ -319,6 +322,12 @@ export default function GeneratedReviewQuiz({ chapter }: { chapter: "sets" }) {
           disabled={!allAnswered}
           onClick={() => {
             setSubmitted(true);
+            setVisibleExplanations(
+              normalizedQuestions.reduce((next, question, index) => {
+                if (answers[index] !== question.correctIndex) next[index] = true;
+                return next;
+              }, {} as Record<number, boolean>),
+            );
             saveQuizRecord({ slug, title: "종합 점검", questions: normalizedQuestions, answers });
           }}
           className="rounded-md bg-slate-950 px-5 py-3 text-sm font-black text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"

@@ -7,7 +7,6 @@ import {
   aiChatOutOfScopeAnswer,
   aiChatUnsafeRequestAnswer,
   aiChatWindowMs,
-  isAiChatInScope,
   isOffTopicAiChatRequest,
   isPromptInjectionAttempt,
   nextAiChatBlockMs,
@@ -152,13 +151,6 @@ export async function POST(request: Request) {
   }
 
   if (isOffTopicAiChatRequest(body.messages)) {
-    return NextResponse.json({
-      answer: aiChatOutOfScopeAnswer,
-      source: "fallback",
-    } satisfies AiChatResponsePayload);
-  }
-
-  if (!isAiChatInScope(body.messages, material)) {
     return NextResponse.json({
       answer: aiChatOutOfScopeAnswer,
       source: "fallback",

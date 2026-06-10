@@ -93,6 +93,9 @@ export function GradientDescentPlayground() {
               return <circle key={index} cx={point.x} cy={point.y} r={index === path.length - 1 ? 5 : 3.5} fill={index === 0 ? "#f97316" : "#14b8a6"} />;
             })}
           </svg>
+          <p className="mt-2 rounded-md bg-slate-50 px-3 py-2 text-sm font-bold leading-6 text-slate-700" aria-live="polite">
+            시작 x={start.toFixed(1)}, 학습률 {rate.toFixed(2)}에서 8번 이동한 결과는 x={current.x.toFixed(3)}, 손실 {current.y.toFixed(3)}입니다.
+          </p>
         </div>
       </div>
     </section>
@@ -221,6 +224,10 @@ export function NumericalIntegrationPlayground() {
             );
           })}
         </div>
+        <p className="rounded-md bg-white px-3 py-2 text-sm font-bold leading-6 text-slate-700 lg:col-span-2" aria-live="polite">
+          {method === "rectangle" ? "직사각형" : "사다리꼴"} 방법으로 구간 {slices}개를 사용했습니다.
+          근사값은 {estimate.toFixed(3)}이고 정확한 값과의 오차는 {error.toFixed(3)}입니다.
+        </p>
       </div>
     </section>
   );
@@ -259,6 +266,9 @@ export function LearningRatePlayground() {
             <p className="mt-1 text-sm font-bold leading-6 text-slate-800">{behavior}</p>
           </div>
         </div>
+        <p className="mt-3 rounded-md bg-slate-50 px-3 py-2 text-sm font-bold leading-6 text-slate-700" aria-live="polite">
+          학습률 {rate.toFixed(2)}에서는 {behavior} 마지막 손실은 {finalLoss.toFixed(3)}입니다.
+        </p>
       </div>
     </section>
   );

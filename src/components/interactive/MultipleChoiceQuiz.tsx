@@ -62,8 +62,9 @@ export default function MultipleChoiceQuiz({ questions, title = "연습 문제" 
   const currentConceptId = currentQuestion.conceptId ?? chapterConceptId;
   const currentConcept = (currentQuestion.conceptTags ?? fallbackConcepts)[0] ?? "문제 해설";
   const currentQuestionId = getQuestionId(slug, title, currentQuestion, currentIndex);
-  const explanationVisible = visibleExplanations[currentIndex] ?? false;
+  const explanationVisible = visibleExplanations[currentIndex] ?? (submitted && !isCorrect);
   const currentFeedback = explanationFeedback[currentIndex];
+  const reviewHref = title === "종합 점검" ? "#review" : "#definition";
 
   function saveCurrentExplanationFeedback(status: "understood" | "confused") {
     setExplanationFeedback((current) => ({ ...current, [currentIndex]: status }));
@@ -98,8 +99,9 @@ export default function MultipleChoiceQuiz({ questions, title = "연습 문제" 
               onClick={() => setCurrentIndex(index)}
               className={`flex h-9 min-w-8 flex-1 items-center justify-center rounded-md text-xs font-black ${
                 index === currentIndex ? "bg-slate-950" : answers[index] !== undefined ? "bg-teal-500" : "bg-slate-200"
-              } ${index === currentIndex ? "text-white" : answers[index] !== undefined ? "text-white" : "text-slate-600"}`}
+              } ${index === currentIndex ? "text-white" : answers[index] !== undefined ? "text-white" : "text-slate-600"} focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500`}
               aria-label={`문제 ${index + 1}로 이동`}
+              aria-current={index === currentIndex ? "step" : undefined}
             >
               {index + 1}
             </button>
@@ -150,7 +152,7 @@ export default function MultipleChoiceQuiz({ questions, title = "연습 문제" 
               <button
                 type="button"
                 onClick={() => setVisibleExplanations((current) => ({ ...current, [currentIndex]: !explanationVisible }))}
-                className="rounded-md bg-white px-3 py-2 text-sm font-black text-slate-800 hover:bg-slate-100"
+                className="rounded-md bg-white px-3 py-2 text-sm font-black text-slate-800 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
               >
                 {explanationVisible ? "해설 닫기" : "해설 보기"}
               </button>
@@ -166,6 +168,22 @@ export default function MultipleChoiceQuiz({ questions, title = "연습 문제" 
                   </p>
                 ) : null}
                 <p className="mt-2">{renderInlineCode(currentQuestion.explanation)}</p>
+                {!isCorrect ? (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <a
+                      href={reviewHref}
+                      className="rounded-md bg-slate-950 px-3 py-2 text-sm font-black text-white hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
+                    >
+                      관련 설명 다시 보기
+                    </a>
+                    <a
+                      href="#practice"
+                      className="rounded-md border border-slate-300 px-3 py-2 text-sm font-black text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
+                    >
+                      실험으로 확인
+                    </a>
+                  </div>
+                ) : null}
                 <div className="mt-3 grid grid-cols-2 gap-2">
                   <button
                     type="button"
@@ -174,7 +192,7 @@ export default function MultipleChoiceQuiz({ questions, title = "연습 문제" 
                       currentFeedback === "understood"
                         ? "border-teal-600 bg-teal-50 text-teal-800"
                         : "border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
-                    }`}
+                    } focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500`}
                   >
                     이해했음
                   </button>
@@ -185,7 +203,7 @@ export default function MultipleChoiceQuiz({ questions, title = "연습 문제" 
                       currentFeedback === "confused"
                         ? "border-amber-500 bg-amber-50 text-amber-800"
                         : "border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
-                    }`}
+                    } focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500`}
                   >
                     아직 어려움
                   </button>
@@ -208,7 +226,7 @@ export default function MultipleChoiceQuiz({ questions, title = "연습 문제" 
               type="button"
               disabled={currentIndex === 0}
               onClick={() => setCurrentIndex((current) => Math.max(0, current - 1))}
-              className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-300"
+              className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 disabled:cursor-not-allowed disabled:text-slate-300"
             >
               이전
             </button>
@@ -216,7 +234,7 @@ export default function MultipleChoiceQuiz({ questions, title = "연습 문제" 
               type="button"
             disabled={currentIndex === normalizedQuestions.length - 1}
             onClick={() => setCurrentIndex((current) => Math.min(normalizedQuestions.length - 1, current + 1))}
-              className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-300"
+              className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 disabled:cursor-not-allowed disabled:text-slate-300"
             >
               다음
             </button>
@@ -227,9 +245,15 @@ export default function MultipleChoiceQuiz({ questions, title = "연습 문제" 
           disabled={!allAnswered}
           onClick={() => {
             setSubmitted(true);
+            setVisibleExplanations(
+              normalizedQuestions.reduce((next, question, index) => {
+                if (answers[index] !== question.correctIndex) next[index] = true;
+                return next;
+              }, {} as Record<number, boolean>),
+            );
             saveQuizRecord({ slug, title, questions: normalizedQuestions, answers });
           }}
-          className="rounded-md bg-slate-950 px-5 py-3 text-sm font-black text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+          className="rounded-md bg-slate-950 px-5 py-3 text-sm font-black text-white hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 disabled:cursor-not-allowed disabled:bg-slate-300"
         >
           채점하기
         </button>

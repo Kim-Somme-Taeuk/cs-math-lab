@@ -53,12 +53,14 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
   const readyChapters = getReadyChaptersInSameLevel(slug);
   const { previous, next } = getChapterNavigation(slug);
   const Content = (await loader()).default;
+  const estimatedMinutes = chapter.level === 1 ? "10-15분" : chapter.level === 2 ? "15-20분" : "20분 내외";
+  const conceptSummary = chapter.conceptTags?.slice(0, 3).join(", ") ?? chapter.csConnection;
 
   return (
     <main className="mx-auto max-w-6xl px-0 py-0 sm:px-5 sm:py-10">
       <ChapterAiChatbot slug={slug} chapterTitle={chapter.title} />
-      <details className="group fixed bottom-4 right-4 z-50 lg:hidden">
-        <summary className="flex h-12 w-12 list-none items-center justify-center rounded-full bg-slate-950/40 text-white shadow-lg shadow-slate-900/20 backdrop-blur marker:hidden">
+      <details className="group fixed bottom-4 left-4 z-40 lg:hidden">
+        <summary className="flex h-11 w-11 list-none items-center justify-center rounded-full bg-slate-950/55 text-white shadow-lg shadow-slate-900/20 backdrop-blur marker:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500">
           <span className="sr-only">챕터 이동 열기</span>
           <span className="grid gap-1" aria-hidden="true">
             <span className="block h-0.5 w-5 rounded-full bg-white" />
@@ -66,7 +68,7 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
             <span className="block h-0.5 w-5 rounded-full bg-white" />
           </span>
         </summary>
-        <div className="absolute bottom-14 right-0 w-[min(21rem,calc(100vw-2rem))] overflow-hidden rounded-lg border border-slate-200 bg-white shadow-2xl shadow-slate-900/20">
+        <div className="absolute bottom-14 left-0 w-[min(21rem,calc(100vw-2rem))] overflow-hidden rounded-lg border border-slate-200 bg-white shadow-2xl shadow-slate-900/20">
           <div className="max-h-[72vh] overflow-y-auto p-4">
             <h2 className="text-sm font-bold text-slate-500">챕터 안에서</h2>
             <nav className="mt-3 grid grid-cols-2 gap-1 border-b border-slate-200 pb-4" aria-label="모바일 챕터 섹션">
@@ -74,7 +76,7 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
                 <a
                   key={section.id}
                   href={`#${section.id}`}
-                  className="rounded-md px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                  className="rounded-md px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
                 >
                   {section.label}
                 </a>
@@ -90,7 +92,7 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
                     item.slug === slug
                       ? "bg-slate-950 text-white"
                       : "text-slate-700 hover:bg-slate-100"
-                  }`}
+                  } focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500`}
                 >
                   {item.order}. {item.title}
                 </Link>
@@ -98,12 +100,12 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
             </div>
             <div className="mt-4 grid gap-2 border-t border-slate-200 pt-4">
               {previous ? (
-                <Link className="rounded-md border border-slate-300 px-3 py-2 text-sm font-black text-slate-800" href={`/chapters/${previous.slug}`}>
+                <Link className="rounded-md border border-slate-300 px-3 py-2 text-sm font-black text-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500" href={`/chapters/${previous.slug}`}>
                   이전: {previous.shortTitle}
                 </Link>
               ) : null}
               {next ? (
-                <Link className="rounded-md bg-slate-950 px-3 py-2 text-sm font-black text-white" href={`/chapters/${next.slug}`}>
+                <Link className="rounded-md bg-slate-950 px-3 py-2 text-sm font-black text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500" href={`/chapters/${next.slug}`}>
                   다음: {next.shortTitle}
                 </Link>
               ) : null}
@@ -120,6 +122,20 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
             {chapter.title}
           </h1>
           <p className="mt-4 text-lg leading-8 text-slate-700">{chapter.description}</p>
+          <dl className="mt-5 grid gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm sm:grid-cols-3">
+            <div>
+              <dt className="font-black text-slate-500">학습량</dt>
+              <dd className="mt-1 font-bold text-slate-800">{estimatedMinutes}</dd>
+            </div>
+            <div>
+              <dt className="font-black text-slate-500">주요 개념</dt>
+              <dd className="mt-1 font-bold text-slate-800">{conceptSummary}</dd>
+            </div>
+            <div>
+              <dt className="font-black text-slate-500">전공 연결</dt>
+              <dd className="mt-1 font-bold text-slate-800">{chapter.csConnection}</dd>
+            </div>
+          </dl>
           <div className="math-content mt-8">
             <ChapterSlugProvider slug={slug}>
               <Content />
@@ -134,7 +150,7 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
               <a
                 key={section.id}
                 href={`#${section.id}`}
-                className="rounded-md px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                className="rounded-md px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
               >
                 {section.label}
               </a>
@@ -150,7 +166,7 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
                   item.slug === slug
                     ? "bg-slate-950 text-white"
                     : "text-slate-700 hover:bg-slate-100"
-                }`}
+                } focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500`}
               >
                 {item.order}. {item.title}
               </Link>
@@ -158,12 +174,12 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
           </div>
           <div className="mt-6 grid gap-2 border-t border-slate-200 pt-4">
             {previous ? (
-              <Link className="text-sm font-bold text-slate-700 hover:text-teal-700" href={`/chapters/${previous.slug}`}>
+              <Link className="text-sm font-bold text-slate-700 hover:text-teal-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500" href={`/chapters/${previous.slug}`}>
                 이전: {previous.title}
               </Link>
             ) : null}
             {next ? (
-              <Link className="text-sm font-bold text-slate-700 hover:text-teal-700" href={`/chapters/${next.slug}`}>
+              <Link className="text-sm font-bold text-slate-700 hover:text-teal-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500" href={`/chapters/${next.slug}`}>
                 다음: {next.title}
               </Link>
             ) : null}

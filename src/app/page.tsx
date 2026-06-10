@@ -15,16 +15,19 @@ export default function Home() {
               수학 개념을 전공 맥락과
               <br className="hidden sm:block" /> 직접 연결합니다.
             </h1>
+            <p className="mt-4 max-w-2xl text-sm font-semibold leading-6 text-slate-600">
+              처음이라면 조건문, 테스트, 필터링의 기반이 되는 이산수학 Level 1의 명제와 논리부터 시작하면 됩니다.
+            </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 href="/chapters/logic"
-                className="rounded-md bg-slate-950 px-5 py-3 text-sm font-bold text-white hover:bg-slate-800"
+                className="rounded-md bg-slate-950 px-5 py-3 text-sm font-bold text-white hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
               >
                 첫 챕터 시작
               </Link>
               <Link
                 href="/roadmap"
-                className="rounded-md bg-teal-700 px-5 py-3 text-sm font-bold text-white hover:bg-teal-800"
+                className="rounded-md bg-teal-700 px-5 py-3 text-sm font-bold text-white hover:bg-teal-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
               >
                 로드맵 보기
               </Link>
@@ -44,7 +47,7 @@ export default function Home() {
             <Link
               key={subject.id}
               href={`/subjects/${subject.id}`}
-              className="rounded-lg border border-slate-200 bg-white p-5 hover:border-teal-500"
+              className="rounded-lg border border-slate-200 bg-white p-5 hover:border-teal-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
             >
               <div className="flex items-start justify-between gap-3">
                 <h3 className="font-black text-slate-950">{subject.title}</h3>
@@ -55,10 +58,15 @@ export default function Home() {
                       : "bg-amber-50 text-amber-700"
                   }`}
                 >
-                  {subject.status === "active" ? "진행 중" : "예정"}
+                  {subject.status === "active" ? "학습 가능" : "계획 중"}
                 </span>
               </div>
               <p className="mt-3 text-sm leading-6 text-slate-600">{subject.description}</p>
+              {subject.status === "planned" ? (
+                <p className="mt-3 rounded-md bg-amber-50 px-3 py-2 text-xs font-bold leading-5 text-amber-800">
+                  아직 공개 전입니다. 현재는 계획 목록만 볼 수 있습니다.
+                </p>
+              ) : null}
             </Link>
           ))}
         </div>

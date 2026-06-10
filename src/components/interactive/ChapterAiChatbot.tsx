@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
   aiChatBaseBlockMs,
   aiChatClientBlockCountStorageKey,
@@ -79,7 +79,14 @@ export default function ChapterAiChatbot({ slug, chapterTitle }: { slug: string;
   const [messages, setMessages] = useState<AiChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [blockedMessage, setBlockedMessage] = useState<string | null>(null);
+  const transcriptEndRef = useRef<HTMLDivElement | null>(null);
   const visibleMessages = useMemo(() => messages.slice(-6), [messages]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    transcriptEndRef.current?.scrollIntoView?.({ block: "end" });
+  }, [loading, messages, open]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -136,7 +143,7 @@ export default function ChapterAiChatbot({ slug, chapterTitle }: { slug: string;
       <button
         type="button"
         onClick={() => setOpen((current) => !current)}
-        className="fixed bottom-20 right-4 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-teal-600 text-white shadow-lg shadow-slate-900/25 ring-1 ring-white/60 hover:bg-teal-700 lg:bottom-6 lg:right-6"
+        className="fixed bottom-4 right-4 z-40 flex h-11 w-11 items-center justify-center rounded-full bg-teal-600 text-white shadow-lg shadow-slate-900/25 ring-1 ring-white/60 hover:bg-teal-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 lg:bottom-6 lg:right-6 lg:h-12 lg:w-12"
         aria-label={open ? "AI 챗봇 닫기" : "AI 챗봇 열기"}
         aria-expanded={open}
       >
@@ -146,7 +153,7 @@ export default function ChapterAiChatbot({ slug, chapterTitle }: { slug: string;
       {open ? (
         <section
           aria-label="AI 챗봇"
-          className="fixed bottom-36 right-4 z-50 flex max-h-[min(38rem,calc(100vh-10rem))] w-[min(23rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-2xl shadow-slate-900/25 lg:bottom-20 lg:right-6"
+          className="fixed bottom-20 right-4 z-50 flex max-h-[min(38rem,calc(100vh-7rem))] w-[min(23rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-2xl shadow-slate-900/25 lg:bottom-20 lg:right-6"
         >
           <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-3">
             <div className="min-w-0">
@@ -156,7 +163,7 @@ export default function ChapterAiChatbot({ slug, chapterTitle }: { slug: string;
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-xl font-black text-slate-500 hover:bg-slate-100"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-xl font-black text-slate-500 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
               aria-label="AI 챗봇 닫기"
             >
               ×
@@ -172,7 +179,7 @@ export default function ChapterAiChatbot({ slug, chapterTitle }: { slug: string;
             {visibleMessages.map((message, index) => (
               <div
                 key={`${message.role}-${index}-${message.content.slice(0, 12)}`}
-                className={`rounded-md border p-3 text-sm leading-6 ${
+                className={`whitespace-pre-wrap rounded-md border p-3 text-sm leading-6 ${
                   message.role === "user"
                     ? "ml-8 border-teal-200 bg-teal-50 text-slate-900"
                     : "mr-8 border-slate-200 bg-white text-slate-700"
@@ -186,6 +193,7 @@ export default function ChapterAiChatbot({ slug, chapterTitle }: { slug: string;
                 답변 생성 중...
               </p>
             ) : null}
+            <div ref={transcriptEndRef} />
           </div>
 
           <form onSubmit={submit} className="border-t border-slate-200 bg-white p-3">
@@ -199,15 +207,21 @@ export default function ChapterAiChatbot({ slug, chapterTitle }: { slug: string;
               id="chapter-ai-chat-input"
               value={input}
               onChange={(event) => setInput(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key !== "Enter" || event.shiftKey || event.nativeEvent.isComposing) return;
+
+                event.preventDefault();
+                event.currentTarget.form?.requestSubmit();
+              }}
               maxLength={700}
               rows={3}
-              className="w-full resize-none rounded-md border border-slate-300 px-3 py-2 text-sm leading-6 outline-none focus:border-teal-500"
+              className="w-full resize-none rounded-md border border-slate-300 px-3 py-2 text-sm leading-6 outline-none focus:border-teal-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
               placeholder="이 챕터에서 헷갈리는 점을 질문하세요."
             />
             <button
               type="submit"
               disabled={loading || input.trim().length === 0}
-              className="mt-2 w-full rounded-md bg-slate-950 px-3 py-2 text-sm font-black text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+              className="mt-2 w-full rounded-md bg-slate-950 px-3 py-2 text-sm font-black text-white hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 disabled:cursor-not-allowed disabled:bg-slate-300"
             >
               질문 보내기
             </button>

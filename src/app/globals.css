@@ -35,6 +35,16 @@ select {
   font: inherit;
 }
 
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible {
+  outline: 2px solid #14b8a6;
+  outline-offset: 2px;
+}
+
 code,
 pre,
 kbd,
@@ -168,5 +178,44 @@ samp {
   .math-content > section[aria-label] select,
   .math-content > section[aria-label] input {
     font-size: 0.875rem;
+  }
+}
+
+@keyframes path-page-enter-next {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes path-page-enter-prev {
+  from {
+    opacity: 0;
+    transform: translateX(-18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.path-page-motion-next {
+  animation: path-page-enter-next 180ms ease-out;
+}
+
+.path-page-motion-prev {
+  animation: path-page-enter-prev 180ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .path-page-motion-next,
+  .path-page-motion-prev {
+    animation: none;
   }
 }

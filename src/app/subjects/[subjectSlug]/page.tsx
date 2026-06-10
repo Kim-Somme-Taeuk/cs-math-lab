@@ -30,9 +30,9 @@ export function generateStaticParams() {
 }
 
 function statusLabel(status: ChapterStatus) {
-  if (status === "ready") return "공개 중";
+  if (status === "ready") return "학습 가능";
   if (status === "draft") return "준비 중";
-  return "예정";
+  return "계획 중";
 }
 
 function levelStatus(level: Level) {
@@ -45,6 +45,27 @@ function firstReadyChapter(subject: Subject) {
   return subject.levels.flatMap((level) => level.chapters).find((chapter) => chapter.status === "ready");
 }
 
+function firstReadyChapterByLevel(subject: Subject) {
+  return subject.levels
+    .map((level) => ({
+      level,
+      chapter: level.chapters.find((chapter) => chapter.status === "ready"),
+    }))
+    .filter((item): item is { level: Level; chapter: Chapter } => Boolean(item.chapter));
+}
+
+function chapterTitleBySlug(slug: string) {
+  return roadmapSubjects
+    .flatMap((subject) => subject.levels)
+    .flatMap((level) => level.chapters)
+    .find((chapter) => chapter.slug === slug)?.shortTitle;
+}
+
+function studyLoadLabel(chapter: Chapter) {
+  const minutes = chapter.level === 1 ? "10-15분" : chapter.level === 2 ? "15-20분" : "20분 내외";
+  return `예상 ${minutes}`;
+}
+
 export default async function SubjectPage({ params }: SubjectPageProps) {
   const { subjectSlug } = await params;
   const subject = roadmapSubjects.find((item) => item.id === subjectSlug);
@@ -54,6 +75,7 @@ export default async function SubjectPage({ params }: SubjectPageProps) {
   }
 
   const startChapter = firstReadyChapter(subject);
+  const levelStartChapters = firstReadyChapterByLevel(subject);
 
   return (
     <main className="mx-auto max-w-6xl px-5 py-6 sm:py-8">
@@ -66,36 +88,53 @@ export default async function SubjectPage({ params }: SubjectPageProps) {
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">{subject.title}</h1>
             <span className={`rounded-md px-2.5 py-1 text-xs font-bold ${subjectStatusStyles[subject.status]}`}>
-              {subject.status === "active" ? "진행 중" : "예정"}
+              {subject.status === "active" ? "학습 가능" : "계획 중"}
             </span>
           </div>
+          <p className="mt-3 text-sm leading-6 text-slate-600">{subject.description}</p>
         </div>
 
         {startChapter ? (
-          <div className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white p-3 sm:min-w-80">
-            <div>
-              <p className="text-xs font-bold text-slate-500">추천 시작점</p>
-              <p className="text-base font-black text-slate-950">{startChapter.title}</p>
+          <div className="rounded-lg border border-slate-200 bg-white p-3 sm:min-w-80">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-bold text-slate-500">추천 시작점</p>
+                <p className="text-base font-black text-slate-950">{startChapter.title}</p>
+                <p className="mt-1 text-xs font-bold text-slate-500">처음이면 Level 1부터, 익숙하면 Level별 시작점을 고르세요.</p>
+              </div>
+                <Link
+                  href={`/chapters/${startChapter.slug}`}
+                  className="inline-flex shrink-0 justify-center rounded-md bg-slate-950 px-3 py-2 text-sm font-black text-white hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
+                >
+                  시작
+                </Link>
             </div>
-              <Link
-                href={`/chapters/${startChapter.slug}`}
-                className="inline-flex shrink-0 justify-center rounded-md bg-slate-950 px-3 py-2 text-sm font-black text-white hover:bg-slate-800"
-              >
-                시작
-              </Link>
+            <div className="mt-3 flex flex-wrap gap-2 border-t border-slate-200 pt-3">
+              {levelStartChapters.map(({ level, chapter }) => (
+                <Link
+                  key={level.level}
+                  href={`/chapters/${chapter.slug}`}
+                  className="rounded-md bg-slate-50 px-3 py-2 text-xs font-black text-slate-700 hover:bg-teal-50 hover:text-teal-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
+                >
+                  Level {level.level}부터
+                </Link>
+              ))}
+            </div>
           </div>
         ) : (
           <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 sm:min-w-80">
+            <div>
             <p className="text-xs font-bold text-amber-700">아직 공개 전</p>
             <p className="mt-1 text-sm font-bold leading-6 text-slate-800">
-              이 과목은 준비 중입니다. 지금은 공개된 과목부터 학습할 수 있습니다.
+              이 과목은 계획 중입니다. 지금은 공개된 과목부터 학습할 수 있고, 아래 목록은 예정 범위입니다.
             </p>
             <Link
               href="/roadmap"
-              className="mt-3 inline-flex rounded-md bg-slate-950 px-3 py-2 text-sm font-black text-white hover:bg-slate-800"
+              className="mt-3 inline-flex rounded-md bg-slate-950 px-3 py-2 text-sm font-black text-white hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
             >
               공개 과목 보기
             </Link>
+            </div>
           </div>
         )}
       </section>
@@ -124,21 +163,38 @@ function LevelSection({ level }: { level: Level }) {
               {statusLabel(status)}
             </span>
           </div>
+          <p className="mt-2 text-sm leading-6 text-slate-600">{level.description}</p>
         </div>
       </div>
 
-      <ol className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {level.chapters.map((chapter) => (
-          <li key={chapter.slug}>
-            <ChapterCard chapter={chapter} />
-          </li>
-        ))}
-      </ol>
+      {status === "planned" ? (
+        <details className="mt-4 rounded-md border border-dashed border-slate-300 bg-slate-50 p-3">
+          <summary className="cursor-pointer text-sm font-black text-slate-700 marker:text-slate-400">
+            계획 중인 챕터 {level.chapters.length}개 보기
+          </summary>
+          <ol className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {level.chapters.map((chapter) => (
+              <li key={chapter.slug}>
+                <ChapterCard chapter={chapter} />
+              </li>
+            ))}
+          </ol>
+        </details>
+      ) : (
+        <ol className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {level.chapters.map((chapter) => (
+            <li key={chapter.slug}>
+              <ChapterCard chapter={chapter} />
+            </li>
+          ))}
+        </ol>
+      )}
     </section>
   );
 }
 
 function ChapterCard({ chapter }: { chapter: Chapter }) {
+  const prerequisiteTitles = chapter.prerequisites?.map(chapterTitleBySlug).filter(Boolean).slice(0, 2) ?? [];
   const content = (
     <div className="flex h-full flex-col justify-between gap-3">
       <div>
@@ -156,6 +212,20 @@ function ChapterCard({ chapter }: { chapter: Chapter }) {
             {statusLabel(chapter.status)}
           </span>
         </div>
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          <span className="rounded bg-slate-50 px-2 py-1 text-[11px] font-black text-slate-500">
+            {studyLoadLabel(chapter)}
+          </span>
+          {prerequisiteTitles.length > 0 ? (
+            <span className="rounded bg-teal-50 px-2 py-1 text-[11px] font-black text-teal-700">
+              먼저: {prerequisiteTitles.join(", ")}
+            </span>
+          ) : (
+            <span className="rounded bg-teal-50 px-2 py-1 text-[11px] font-black text-teal-700">
+              선행 없음
+            </span>
+          )}
+        </div>
       </div>
       <p className="text-xs font-bold text-slate-400">{chapter.csConnection}</p>
     </div>
@@ -165,7 +235,7 @@ function ChapterCard({ chapter }: { chapter: Chapter }) {
     return (
       <Link
         href={`/chapters/${chapter.slug}`}
-        className="block h-full rounded-md border border-slate-200 bg-white p-3 hover:border-teal-300 hover:bg-teal-50"
+        className="block h-full rounded-md border border-slate-200 bg-white p-3 hover:border-teal-300 hover:bg-teal-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
       >
         {content}
       </Link>

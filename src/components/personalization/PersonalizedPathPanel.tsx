@@ -75,6 +75,20 @@ const styleOptions: Array<{ value: LearningStyle; label: string }> = [
 
 const pathPageSize = 3;
 
+const goalReasonLabels: Record<LearningGoal, string> = {
+  foundation: "기초 보강",
+  course: "전공 수업",
+  "coding-test": "코테 대비",
+  portfolio: "포트폴리오",
+};
+
+const styleReasonLabels: Record<LearningStyle, string> = {
+  code: "코드 연결",
+  examples: "예제 중심",
+  practice: "문제 풀이",
+  short: "짧게 학습",
+};
+
 function readProfile() {
   try {
     const stored = window.localStorage.getItem(learningProfileStorageKey);
@@ -201,6 +215,43 @@ function incrementCoachUsage() {
   return nextUsage;
 }
 
+function recommendationReasons(
+  chapter: Chapter,
+  profile: LearningProfile | null,
+  completedChapters: string[],
+  quizResults: QuizResult[],
+  chapterTitleBySlug: Map<string, string>,
+) {
+  const reasons: string[] = [];
+
+  if (profile) {
+    reasons.push(goalReasonLabels[profile.goal], styleReasonLabels[profile.style]);
+  } else {
+    reasons.push("기본 순서");
+  }
+
+  const missingPrerequisites = chapter.prerequisites?.filter((slug) => !completedChapters.includes(slug)) ?? [];
+  if (missingPrerequisites.length === 0 && chapter.prerequisites && chapter.prerequisites.length > 0) {
+    reasons.push("선행 완료");
+  } else if (missingPrerequisites.length > 0) {
+    const missingTitles = missingPrerequisites
+      .slice(0, 2)
+      .map((slug) => chapterTitleBySlug.get(slug) ?? slug)
+      .join(", ");
+    reasons.push(`선행: ${missingTitles}`);
+  } else {
+    reasons.push("입문 가능");
+  }
+
+  const missedConcepts = new Set(quizResults.flatMap((result) => result.missedConcepts ?? []));
+  const matchedWeakConcept = chapter.conceptTags?.find((tag) => missedConcepts.has(tag));
+  if (matchedWeakConcept) {
+    reasons.push(`복습: ${matchedWeakConcept}`);
+  }
+
+  return Array.from(new Set(reasons)).slice(0, 3);
+}
+
 export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPathPanelProps) {
   const [profile, setProfile] = useState<LearningProfile | null>(null);
   const [draftProfile, setDraftProfile] = useState<LearningProfile>(defaultProfile);
@@ -214,6 +265,8 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
   const [aiCoachLoading, setAiCoachLoading] = useState(false);
   const [aiCoachUsageCount, setAiCoachUsageCount] = useState(0);
   const [pathPageIndex, setPathPageIndex] = useState(0);
+  const [pathMotionDirection, setPathMotionDirection] = useState<"next" | "previous">("next");
+  const [pathMotionEnabled, setPathMotionEnabled] = useState(false);
 
   useEffect(() => {
     const storedProfile = readProfile();
@@ -242,17 +295,6 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
     setPathPageIndex((current) => Math.min(current, pathPageCount - 1));
   }, [pathPageCount]);
 
-  useEffect(() => {
-    const lastCompletedSlug = completedChapters.at(-1);
-    const lastCompletedIndex = lastCompletedSlug
-      ? recommendedChapters.findIndex((chapter) => chapter.slug === lastCompletedSlug)
-      : -1;
-
-    if (lastCompletedIndex >= 0) {
-      setPathPageIndex(Math.min(lastCompletedIndex, pathPageCount - 1));
-    }
-  }, [completedChapters, pathPageCount, recommendedChapters]);
-
   const aiLearningContext = useMemo(() => {
     return buildAiLearningContext({
       profile,
@@ -265,6 +307,10 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
   }, [completedChapters, conceptMastery, profile, quizResults, readyChapters, understandingChecks]);
 
   const aiContextHash = useMemo(() => hashText(JSON.stringify(aiLearningContext)), [aiLearningContext]);
+  const chapterTitleBySlug = useMemo(
+    () => new Map(readyChapters.map((chapter) => [chapter.slug, chapter.shortTitle || chapter.title])),
+    [readyChapters],
+  );
   const visibleRecommendedChapters = recommendedChapters.slice(pathPageIndex, pathPageIndex + pathPageSize);
 
   if (readyChapters.length === 0) {
@@ -275,6 +321,7 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
     window.localStorage.setItem(learningProfileStorageKey, JSON.stringify(draftProfile));
     setProfile(draftProfile);
     setEditing(false);
+    setPathMotionEnabled(false);
     setPathPageIndex(0);
   }
 
@@ -285,6 +332,15 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
 
     window.localStorage.setItem(completedChaptersStorageKey, JSON.stringify(nextCompleted));
     setCompletedChapters(nextCompleted);
+  }
+
+  function movePathPage(direction: "next" | "previous") {
+    setPathMotionDirection(direction);
+    setPathMotionEnabled(true);
+    setPathPageIndex((current) => {
+      if (direction === "previous") return Math.max(0, current - 1);
+      return Math.min(pathPageCount - 1, current + 1);
+    });
   }
 
   async function generateAiCoachMemo() {
@@ -309,9 +365,6 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
     setAiCoachSource(null);
 
     try {
-      const nextUsage = incrementCoachUsage();
-      setAiCoachUsageCount(nextUsage.count);
-
       const payload: AiCoachRequestPayload = {
         context: aiLearningContext,
       };
@@ -332,6 +385,8 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
       setAiCoachMemo(memo);
       setAiCoachSource(result.source);
       if (result.source === "ai") {
+        const nextUsage = incrementCoachUsage();
+        setAiCoachUsageCount(nextUsage.count);
         writeCachedCoachMemo(aiContextHash, memo);
       }
     } catch {
@@ -348,12 +403,15 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
         <div>
           <p className="text-sm font-bold text-teal-700">개인화 추천</p>
           <h2 className="mt-1 text-2xl font-black tracking-tight text-slate-950">내 학습 경로</h2>
+          <p className="mt-1 text-xs font-bold leading-5 text-slate-500">
+            목표, 수준, 퀴즈와 이해도 기록을 이 브라우저에 저장해 추천에 사용합니다.
+          </p>
         </div>
         {profile && !editing ? (
           <button
             type="button"
             onClick={() => setEditing(true)}
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-black text-slate-800 hover:bg-slate-100"
+            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-black text-slate-800 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
           >
             다시 설정
           </button>
@@ -384,7 +442,7 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
             <button
               type="button"
               onClick={saveProfile}
-              className="w-full rounded-md bg-slate-950 px-5 py-3 text-sm font-black text-white hover:bg-slate-800 sm:w-auto"
+              className="w-full rounded-md bg-slate-950 px-5 py-3 text-sm font-black text-white hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 sm:w-auto"
             >
               추천 경로 만들기
             </button>
@@ -434,7 +492,7 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
                   type="button"
                   onClick={generateAiCoachMemo}
                   disabled={aiCoachLoading}
-                  className="rounded-md bg-slate-950 px-3 py-2 text-xs font-black text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300 sm:text-sm"
+                  className="rounded-md bg-slate-950 px-3 py-2 text-xs font-black text-white hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 disabled:cursor-not-allowed disabled:bg-slate-300 sm:text-sm"
                 >
                   {aiCoachLoading ? "생성 중" : "메모 생성"}
                 </button>
@@ -452,7 +510,7 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
                   <Link
                     key={chapter.slug}
                     href={`/chapters/${chapter.slug}`}
-                    className="rounded-md bg-white px-3 py-2 text-sm font-bold text-slate-800 hover:bg-amber-100"
+                    className="rounded-md bg-white px-3 py-2 text-sm font-bold text-slate-800 hover:bg-amber-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
                   >
                     {chapter.title}
                   </Link>
@@ -470,31 +528,32 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
               <button
                 type="button"
                 aria-label="이전 추천 경로"
-                onClick={() => {
-                  setPathPageIndex((current) => Math.max(0, current - 1));
-                }}
+                onClick={() => movePathPage("previous")}
                 disabled={pathPageIndex === 0}
-                className="absolute left-1 top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-slate-950/40 text-base font-black text-white shadow-sm backdrop-blur hover:bg-slate-950/60 disabled:cursor-not-allowed disabled:bg-slate-950/10 disabled:text-white/40 sm:flex"
+                className="absolute left-1 top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-slate-950/40 text-base font-black text-white shadow-sm backdrop-blur hover:bg-slate-950/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 disabled:cursor-not-allowed disabled:bg-slate-950/10 disabled:text-white/40 sm:flex"
               >
                 &lt;
               </button>
               <ol
-                className="grid gap-3 sm:grid-cols-3 sm:px-8"
+                key={`path-page-${pathPageIndex}-${pathMotionDirection}`}
+                className={`grid gap-3 sm:grid-cols-3 sm:px-8 ${
+                  pathMotionEnabled
+                    ? pathMotionDirection === "previous"
+                      ? "path-page-motion-prev"
+                      : "path-page-motion-next"
+                    : ""
+                }`}
               >
                 {visibleRecommendedChapters.map((chapter, index) => {
                   const completed = completedChapters.includes(chapter.slug);
                   const recommendationIndex = pathPageIndex + index;
+                  const reasons = recommendationReasons(chapter, profile, completedChapters, quizResults, chapterTitleBySlug);
 
                   return (
                     <li
                       key={chapter.slug}
-                      className="relative min-h-36 rounded-md border border-slate-200 bg-white p-2 pb-10 sm:p-3"
+                      className="relative min-h-36 rounded-md border border-slate-200 bg-white p-2 sm:p-3"
                     >
-                      <Link
-                        href={`/chapters/${chapter.slug}`}
-                        className="absolute inset-0 rounded-md sm:hidden"
-                        aria-label={`${chapter.title} 학습하기`}
-                      />
                       <div className="flex items-center justify-between gap-2 sm:items-start">
                         <div className="min-w-0">
                           <p className="text-[11px] font-black text-teal-700 sm:text-xs">추천 {recommendationIndex + 1}</p>
@@ -502,6 +561,13 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
                             {chapter.title}
                           </h3>
                           <p className="mt-1 hidden text-xs font-bold text-slate-400 sm:block">{chapter.csConnection}</p>
+                          <div className="mt-2 flex flex-wrap gap-1.5">
+                            {reasons.map((reason) => (
+                              <span key={reason} className="rounded bg-teal-50 px-2 py-1 text-[11px] font-black text-teal-700">
+                                {reason}
+                              </span>
+                            ))}
+                          </div>
                         </div>
                         <span
                           className={`hidden shrink-0 rounded-md px-2 py-1 text-xs font-bold sm:block ${
@@ -511,26 +577,17 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
                           {completed ? "완료" : "진행 전"}
                         </span>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => toggleCompleted(chapter.slug)}
-                        className={`absolute bottom-2 right-2 z-10 flex h-7 min-w-12 appearance-none items-center justify-center rounded-full border border-transparent px-3 text-center text-[11px] font-black leading-none sm:hidden ${
-                          completed ? "bg-teal-100 text-teal-800" : "bg-slate-100 text-slate-600"
-                        }`}
-                      >
-                        {completed ? "완료" : "체크"}
-                      </button>
-                      <div className="mt-2 hidden items-center justify-end gap-2 sm:grid sm:grid-cols-[1fr_auto] sm:mt-3">
+                      <div className="mt-3 grid grid-cols-[1fr_auto] items-center gap-2">
                         <Link
                           href={`/chapters/${chapter.slug}`}
-                          className="flex h-9 items-center justify-center rounded-md bg-slate-950 px-3 text-center text-[13px] font-black leading-none text-white hover:bg-slate-800"
+                          className="flex h-9 items-center justify-center rounded-md bg-slate-950 px-3 text-center text-[13px] font-black leading-none text-white hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
                         >
                           학습
                         </Link>
                         <button
                           type="button"
                           onClick={() => toggleCompleted(chapter.slug)}
-                          className={`flex h-9 min-w-14 appearance-none items-center justify-center rounded-md border border-slate-300 px-3 text-center text-[12px] font-black leading-none hover:bg-slate-100 ${
+                          className={`flex h-9 min-w-14 appearance-none items-center justify-center rounded-md border border-slate-300 px-3 text-center text-[12px] font-black leading-none hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 ${
                             completed ? "bg-white text-slate-700" : "bg-white text-slate-600"
                           }`}
                         >
@@ -544,13 +601,29 @@ export default function PersonalizedPathPanel({ readyChapters }: PersonalizedPat
               <button
                 type="button"
                 aria-label="다음 추천 경로"
-                onClick={() => {
-                  setPathPageIndex((current) => Math.min(pathPageCount - 1, current + 1));
-                }}
+                onClick={() => movePathPage("next")}
                 disabled={pathPageIndex >= pathPageCount - 1}
-                className="absolute right-1 top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-slate-950/40 text-base font-black text-white shadow-sm backdrop-blur hover:bg-slate-950/60 disabled:cursor-not-allowed disabled:bg-slate-950/10 disabled:text-white/40 sm:flex"
+                className="absolute right-1 top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-slate-950/40 text-base font-black text-white shadow-sm backdrop-blur hover:bg-slate-950/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 disabled:cursor-not-allowed disabled:bg-slate-950/10 disabled:text-white/40 sm:flex"
               >
                 &gt;
+              </button>
+            </div>
+            <div className="mt-3 grid grid-cols-2 gap-2 sm:hidden">
+              <button
+                type="button"
+                onClick={() => movePathPage("previous")}
+                disabled={pathPageIndex === 0}
+                className="h-10 rounded-md border border-slate-300 bg-white px-3 text-sm font-black text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 disabled:cursor-not-allowed disabled:text-slate-300"
+              >
+                이전 추천
+              </button>
+              <button
+                type="button"
+                onClick={() => movePathPage("next")}
+                disabled={pathPageIndex >= pathPageCount - 1}
+                className="h-10 rounded-md border border-slate-300 bg-white px-3 text-sm font-black text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 disabled:cursor-not-allowed disabled:text-slate-300"
+              >
+                다음 추천
               </button>
             </div>
           </div>
@@ -584,7 +657,7 @@ function OptionGroup<TValue extends string>({
               value === option.value
                 ? "border-slate-950 bg-slate-950 text-white"
                 : "border-slate-200 bg-white text-slate-700 hover:border-slate-400"
-            }`}
+            } focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500`}
           >
             {option.label}
           </button>

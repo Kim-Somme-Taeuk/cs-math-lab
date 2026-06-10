@@ -639,9 +639,26 @@ export function getSupplementalReviewQuestions(slug: string) {
   return supplementalReviewQuestions[slug] ?? [];
 }
 
+function rebalanceCorrectAnswerPosition(question: QuizQuestion, index: number): QuizQuestion {
+  const targetCorrectIndex = index % question.choices.length;
+
+  if (question.correctIndex === targetCorrectIndex) return question;
+
+  const correctChoice = question.choices[question.correctIndex];
+  const distractors = question.choices.filter((_, choiceIndex) => choiceIndex !== question.correctIndex);
+  const choices = [...distractors];
+  choices.splice(targetCorrectIndex, 0, correctChoice);
+
+  return {
+    ...question,
+    choices: choices as QuizQuestion["choices"],
+    correctIndex: targetCorrectIndex,
+  };
+}
+
 export function normalizeReviewQuestions(slug: string, title: string, questions: QuizQuestion[]) {
   if (title !== "종합 점검") return questions;
 
   const merged = [...questions, ...getSupplementalReviewQuestions(slug)];
-  return merged.slice(0, reviewQuestionCount);
+  return merged.slice(0, reviewQuestionCount).map(rebalanceCorrectAnswerPosition);
 }
