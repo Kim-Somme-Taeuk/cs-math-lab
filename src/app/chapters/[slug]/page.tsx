@@ -4,6 +4,7 @@ import ChapterAiChatbot from "@/components/interactive/ChapterAiChatbot";
 import { ChapterSlugProvider } from "@/components/interactive/ChapterSlugProvider";
 import { getChapter, getChapterNavigation, getReadyChapters, getReadyChaptersInSameLevel } from "@/lib/chapters";
 import { chapterContentLoaders } from "@/lib/content";
+import { getStudyLoadEstimate } from "@/lib/studyLoad";
 
 const sectionLinks = [
   { id: "why", label: "왜 배우나" },
@@ -53,7 +54,7 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
   const readyChapters = getReadyChaptersInSameLevel(slug);
   const { previous, next } = getChapterNavigation(slug);
   const Content = (await loader()).default;
-  const estimatedMinutes = chapter.level === 1 ? "10-15분" : chapter.level === 2 ? "15-20분" : "20분 내외";
+  const studyLoad = getStudyLoadEstimate(chapter);
   const conceptSummary = chapter.conceptTags?.slice(0, 3).join(", ") ?? chapter.csConnection;
 
   return (
@@ -125,7 +126,7 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
           <dl className="mt-5 grid gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm sm:grid-cols-3">
             <div>
               <dt className="font-black text-slate-500">학습량</dt>
-              <dd className="mt-1 font-bold text-slate-800">{estimatedMinutes}</dd>
+              <dd className="mt-1 font-bold text-slate-800">{studyLoad.label}</dd>
             </div>
             <div>
               <dt className="font-black text-slate-500">주요 개념</dt>

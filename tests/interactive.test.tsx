@@ -52,6 +52,7 @@ import {
 } from "../src/lib/reviewPlan";
 import { getSupplementalReviewQuestions, normalizeReviewQuestions, reviewQuestionCount } from "../src/lib/reviewQuestions";
 import { evaluateSetOperation } from "../src/lib/setUtils";
+import { getStudyLoadEstimate } from "../src/lib/studyLoad";
 
 describe("logic helpers", () => {
   it("evaluates implication and biconditional truth values correctly", () => {
@@ -367,6 +368,50 @@ describe("review question counts", () => {
   });
 });
 
+describe("study load estimates", () => {
+  it("uses chapter content instead of a fixed level-only duration", () => {
+    const logic = roadmapSubjects
+      .flatMap((subject) => subject.levels)
+      .flatMap((level) => level.chapters)
+      .find((chapter) => chapter.slug === "logic");
+    const gradientDescent = roadmapSubjects
+      .flatMap((subject) => subject.levels)
+      .flatMap((level) => level.chapters)
+      .find((chapter) => chapter.slug === "gradient-descent");
+
+    expect(logic).toBeDefined();
+    expect(gradientDescent).toBeDefined();
+
+    const logicEstimate = getStudyLoadEstimate(logic!);
+    const gradientEstimate = getStudyLoadEstimate(gradientDescent!);
+
+    expect(logicEstimate.label).toMatch(/^초보자 기준 \d+-\d+분$/);
+    expect(gradientEstimate.label).toMatch(/^초보자 기준 \d+-\d+분$/);
+    expect(logicEstimate.basis?.textCharacters).toBeGreaterThan(gradientEstimate.basis?.textCharacters ?? 0);
+    expect(logicEstimate.minutes?.high).not.toBe(15);
+    expect(gradientEstimate.minutes?.low).not.toBe(20);
+  });
+
+  it("estimates every ready chapter from its own content", () => {
+    const readyChapters = roadmapSubjects
+      .flatMap((subject) => subject.levels)
+      .flatMap((level) => level.chapters)
+      .filter((chapter) => chapter.status === "ready");
+    const labels = new Set<string>();
+
+    for (const chapter of readyChapters) {
+      const estimate = getStudyLoadEstimate(chapter);
+
+      expect(estimate.minutes, `${chapter.slug} should have a content-based estimate`).not.toBeNull();
+      expect(estimate.basis?.textCharacters, `${chapter.slug} should count chapter text`).toBeGreaterThan(0);
+      expect(estimate.label, `${chapter.slug} should use beginner wording`).toContain("초보자 기준");
+      labels.add(estimate.label);
+    }
+
+    expect(labels.size).toBeGreaterThan(8);
+  });
+});
+
 describe("TruthTablePlayground", () => {
   it("updates basic logic operations", async () => {
     const user = userEvent.setup();
@@ -496,6 +541,26 @@ describe("ChapterAiChatbot", () => {
       screen.getByText((_, element) => element?.textContent === "첫 줄\n둘째 줄"),
     ).toHaveClass("whitespace-pre-wrap");
     expect(await screen.findByText("명제 예시 답변")).toBeInTheDocument();
+  });
+
+  it("renders math notation in assistant answers", async () => {
+    const user = userEvent.setup();
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ answer: "AND 연산자 $P \\land Q$는 두 명제가 모두 참일 때 참입니다.", source: "ai" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const { container } = render(<ChapterAiChatbot slug="logic" chapterTitle="명제와 논리" />);
+
+    await user.click(screen.getByRole("button", { name: "AI 챗봇 열기" }));
+    await user.type(screen.getByLabelText("AI 챗봇 질문"), "AND가 뭐야?");
+    await user.keyboard("{Enter}");
+
+    await screen.findByText(/AND 연산자/);
+    expect(container.querySelector(".katex")).not.toBeNull();
   });
 });
 

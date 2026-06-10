@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { roadmapSubjects, type ChapterStatus } from "@/lib/chapters";
+import { getStudyLoadEstimate } from "@/lib/studyLoad";
 
 const subjectStatusStyles = {
   active: "bg-teal-50 text-teal-700",
@@ -62,8 +63,7 @@ function chapterTitleBySlug(slug: string) {
 }
 
 function studyLoadLabel(chapter: Chapter) {
-  const minutes = chapter.level === 1 ? "10-15분" : chapter.level === 2 ? "15-20분" : "20분 내외";
-  return `예상 ${minutes}`;
+  return getStudyLoadEstimate(chapter).label;
 }
 
 export default async function SubjectPage({ params }: SubjectPageProps) {
@@ -259,21 +259,85 @@ function ChapterVisual({ chapter }: { chapter: Chapter }) {
   const fill = muted ? "bg-slate-200" : "bg-teal-500";
   const softFill = muted ? "bg-slate-100" : "bg-teal-50";
   const text = muted ? "text-slate-400" : "text-teal-700";
+  const visualTags = chapter.conceptTags?.slice(0, 2) ?? [chapter.shortTitle];
+  const visualPattern = chapter.slug.split("").reduce((sum, letter) => sum + letter.charCodeAt(0), 0) % 4;
 
   return (
-    <div className={`mb-3 h-14 overflow-hidden rounded-md border ${muted ? "border-slate-200 bg-slate-50" : "border-teal-100 bg-teal-50/50"}`}>
-      {chapter.level === 1 ? (
-        <LevelOneVisual slug={chapter.slug} stroke={stroke} fill={fill} softFill={softFill} text={text} />
-      ) : chapter.level === 2 && chapter.subjectId === "discrete-math" ? (
-        <LevelTwoVisual slug={chapter.slug} stroke={stroke} fill={fill} softFill={softFill} text={text} />
-      ) : chapter.subjectId === "linear-algebra" ? (
-        <LinearAlgebraVisual slug={chapter.slug} level={chapter.level} stroke={stroke} fill={fill} softFill={softFill} text={text} />
-      ) : chapter.subjectId === "calculus" ? (
-        <CalculusVisual slug={chapter.slug} level={chapter.level} stroke={stroke} fill={fill} softFill={softFill} text={text} />
-      ) : (
-        <PlannedVisual order={chapter.order} stroke={stroke} fill={fill} softFill={softFill} text={text} />
-      )}
+    <div
+      className={`relative mb-3 h-20 overflow-hidden rounded-md border ${
+        muted ? "border-slate-200 bg-slate-50" : "border-teal-100 bg-teal-50/50"
+      }`}
+      aria-label={`${chapter.title} 개념 그래픽`}
+    >
+      <div className="absolute inset-0 opacity-70">
+        <ChapterVisualPattern variant={visualPattern} muted={muted} />
+      </div>
+      <div className="relative h-12">
+        {chapter.level === 1 ? (
+          <LevelOneVisual slug={chapter.slug} stroke={stroke} fill={fill} softFill={softFill} text={text} />
+        ) : chapter.level === 2 && chapter.subjectId === "discrete-math" ? (
+          <LevelTwoVisual slug={chapter.slug} stroke={stroke} fill={fill} softFill={softFill} text={text} />
+        ) : chapter.subjectId === "linear-algebra" ? (
+          <LinearAlgebraVisual slug={chapter.slug} level={chapter.level} stroke={stroke} fill={fill} softFill={softFill} text={text} />
+        ) : chapter.subjectId === "calculus" ? (
+          <CalculusVisual slug={chapter.slug} level={chapter.level} stroke={stroke} fill={fill} softFill={softFill} text={text} />
+        ) : (
+          <PlannedVisual order={chapter.order} stroke={stroke} fill={fill} softFill={softFill} text={text} />
+        )}
+      </div>
+      <div className="relative flex h-8 items-center gap-1.5 border-t border-white/70 px-2">
+        {visualTags.map((tag) => (
+          <span
+            key={tag}
+            className={`max-w-[7.5rem] truncate rounded px-1.5 py-0.5 text-[10px] font-black ${
+              muted ? "bg-white text-slate-400" : "bg-white/90 text-teal-800"
+            }`}
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
     </div>
+  );
+}
+
+function ChapterVisualPattern({ variant, muted }: { variant: number; muted: boolean }) {
+  const color = muted ? "bg-slate-200" : "bg-teal-200";
+
+  if (variant === 0) {
+    return (
+      <>
+        <span className={`absolute -right-3 top-2 h-10 w-10 rounded-full ${color}`} />
+        <span className={`absolute left-3 top-5 h-1 w-16 rounded-full ${color}`} />
+      </>
+    );
+  }
+
+  if (variant === 1) {
+    return (
+      <div className="absolute inset-0 grid grid-cols-6 gap-1 p-2">
+        {Array.from({ length: 12 }).map((_, index) => (
+          <span key={index} className={`h-1.5 rounded-full ${index % 3 === 0 ? color : "bg-white/70"}`} />
+        ))}
+      </div>
+    );
+  }
+
+  if (variant === 2) {
+    return (
+      <>
+        <span className={`absolute left-4 top-2 h-9 w-9 rotate-45 rounded ${color}`} />
+        <span className={`absolute right-7 top-6 h-5 w-12 rounded-full ${color}`} />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <span className={`absolute left-5 top-3 h-10 w-px rotate-45 ${color}`} />
+      <span className={`absolute left-10 top-3 h-10 w-px rotate-45 ${color}`} />
+      <span className={`absolute left-16 top-3 h-10 w-px rotate-45 ${color}`} />
+    </>
   );
 }
 

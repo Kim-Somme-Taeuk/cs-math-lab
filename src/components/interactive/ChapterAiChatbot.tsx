@@ -1,5 +1,6 @@
 "use client";
 
+import katex from "katex";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
   aiChatBaseBlockMs,
@@ -15,6 +16,12 @@ import {
 
 type LocalUsage = {
   timestamps: number[];
+};
+
+type MessagePart = {
+  type: "text" | "math";
+  value: string;
+  displayMode?: boolean;
 };
 
 function readJson<T>(key: string, fallback: T): T {
@@ -52,6 +59,107 @@ function checkLocalRateLimit(now = Date.now()) {
 
   window.localStorage.setItem(aiChatClientUsageStorageKey, JSON.stringify({ timestamps: [...timestamps, now] }));
   return { allowed: true, waitMs: 0 };
+}
+
+function isEscaped(text: string, index: number) {
+  let slashCount = 0;
+
+  for (let cursor = index - 1; cursor >= 0 && text[cursor] === "\\"; cursor -= 1) {
+    slashCount += 1;
+  }
+
+  return slashCount % 2 === 1;
+}
+
+function findNextMathStart(text: string, from: number): { index: number; delimiter: "$" | "$$"; displayMode: boolean } | null {
+  for (let index = from; index < text.length; index += 1) {
+    if (text[index] !== "$" || isEscaped(text, index)) continue;
+
+    return {
+      index,
+      delimiter: text.startsWith("$$", index) ? "$$" : "$",
+      displayMode: text.startsWith("$$", index),
+    };
+  }
+
+  return null;
+}
+
+function findClosingDelimiter(text: string, delimiter: "$" | "$$", from: number) {
+  for (let index = from; index < text.length; index += 1) {
+    if (!text.startsWith(delimiter, index) || isEscaped(text, index)) continue;
+
+    return index;
+  }
+
+  return -1;
+}
+
+function parseMathParts(text: string) {
+  const parts: MessagePart[] = [];
+  let cursor = 0;
+
+  while (cursor < text.length) {
+    const start = findNextMathStart(text, cursor);
+
+    if (!start) {
+      parts.push({ type: "text", value: text.slice(cursor) });
+      break;
+    }
+
+    const mathStart = start.index + start.delimiter.length;
+    const end = findClosingDelimiter(text, start.delimiter, mathStart);
+
+    if (end < 0) {
+      parts.push({ type: "text", value: text.slice(cursor) });
+      break;
+    }
+
+    const math = text.slice(mathStart, end).trim();
+
+    if (!math) {
+      parts.push({ type: "text", value: text.slice(cursor, end + start.delimiter.length) });
+      cursor = end + start.delimiter.length;
+      continue;
+    }
+
+    if (start.index > cursor) {
+      parts.push({ type: "text", value: text.slice(cursor, start.index) });
+    }
+
+    parts.push({ type: "math", value: math, displayMode: start.displayMode });
+    cursor = end + start.delimiter.length;
+  }
+
+  return parts;
+}
+
+function MathText({ source, displayMode = false }: { source: string; displayMode?: boolean }) {
+  const html = useMemo(
+    () =>
+      katex.renderToString(source, {
+        displayMode,
+        strict: false,
+        throwOnError: false,
+      }),
+    [displayMode, source],
+  );
+
+  if (displayMode) {
+    return <span className="my-2 block overflow-x-auto" dangerouslySetInnerHTML={{ __html: html }} />;
+  }
+
+  return <span className="inline-block align-baseline" dangerouslySetInnerHTML={{ __html: html }} />;
+}
+
+function AssistantMessageContent({ content }: { content: string }) {
+  const parts = useMemo(() => parseMathParts(content), [content]);
+
+  return parts.map((part, index) => {
+    if (part.type === "text") return <span key={`text-${index}`}>{part.value}</span>;
+
+    return <MathText key={`math-${index}-${part.value}`} source={part.value} displayMode={part.displayMode} />;
+  });
 }
 
 function ChatIcon() {
@@ -185,7 +293,7 @@ export default function ChapterAiChatbot({ slug, chapterTitle }: { slug: string;
                     : "mr-8 border-slate-200 bg-white text-slate-700"
                 }`}
               >
-                {message.content}
+                {message.role === "assistant" ? <AssistantMessageContent content={message.content} /> : message.content}
               </div>
             ))}
             {loading ? (
