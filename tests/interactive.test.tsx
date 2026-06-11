@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   aiChatMaxBlockMs,
+  aiChatTutorInstructions,
   isAiChatInScope,
   isOffTopicAiChatRequest,
   isPromptInjectionAttempt,
@@ -31,6 +32,7 @@ import {
   getReadyChaptersInSameLevel,
   roadmapSubjects,
 } from "../src/lib/chapters";
+import { getChapterVisualSpec } from "../src/lib/chapterVisualSpecs";
 import { getPlannerModel, getTutorModel } from "../src/lib/ai/config";
 import { chapterContentLoaders } from "../src/lib/content";
 import { generateSetReviewQuestions, setReviewTemplates } from "../src/lib/generatedReview";
@@ -445,6 +447,39 @@ describe("study load estimates", () => {
     }
 
     expect(labels.size).toBeGreaterThan(8);
+  });
+});
+
+describe("chapter card visuals", () => {
+  it("assigns a chapter-specific visual spec to every ready chapter", () => {
+    const readyChapters = roadmapSubjects
+      .flatMap((subject) => subject.levels)
+      .flatMap((level) => level.chapters)
+      .filter((chapter) => chapter.status === "ready");
+
+    for (const chapter of readyChapters) {
+      const spec = getChapterVisualSpec(chapter.slug);
+
+      expect(spec, `${chapter.slug} should not use the generic copied card graphic`).not.toBeNull();
+      expect(spec?.title.length, `${chapter.slug} needs a specific visual title`).toBeGreaterThan(0);
+      expect(spec?.tokens.length, `${chapter.slug} needs visual tokens`).toBeGreaterThanOrEqual(3);
+    }
+  });
+
+  it("keeps ready chapter visuals on explicit slug-specific renderers", () => {
+    const subjectPageSource = readFileSync(join(process.cwd(), "src/app/subjects/[subjectSlug]/page.tsx"), "utf8");
+    const shapeOnlyStripSource = subjectPageSource.slice(
+      subjectPageSource.indexOf("function ShapeOnlyStrip"),
+      subjectPageSource.indexOf("function LevelOneVisual"),
+    );
+    const readyChapters = roadmapSubjects
+      .flatMap((subject) => subject.levels)
+      .flatMap((level) => level.chapters)
+      .filter((chapter) => chapter.status === "ready");
+
+    for (const { slug } of readyChapters) {
+      expect(shapeOnlyStripSource, `${slug} should not rely only on a generic visual kind`).toContain(`slug === "${slug}"`);
+    }
   });
 });
 
@@ -1096,6 +1131,16 @@ describe("personalized recommendations", () => {
         setsMaterial,
       ),
     ).toBe(true);
+  });
+
+  it("keeps AI chat instructions flexible but bounded to cs-math-lab", () => {
+    expect(aiChatTutorInstructions).toContain("너는 cs-math-lab의 AI 튜터다");
+    expect(aiChatTutorInstructions).toContain("현재 챕터와 cs-math-lab 문서 내용을 가장 우선");
+    expect(aiChatTutorInstructions).toContain("보충 설명");
+    expect(aiChatTutorInstructions).toContain("cs-math-lab 내용과 충돌하면");
+    expect(aiChatTutorInstructions).toContain("현재 챕터 범위 밖");
+    expect(aiChatTutorInstructions).toContain("신뢰할 수 없는 학습 질문");
+    expect(aiChatTutorInstructions).toContain("이전 지시 무시");
   });
 
   it("detects prompt injection attempts before AI chat scope handling", () => {
