@@ -60,6 +60,14 @@ export function getStudyLoadEstimate(chapter: Chapter): StudyLoadEstimate {
   const source = chapterSource(chapter);
 
   if (!source) {
+    if (chapter.studyMinutes) {
+      return {
+        label: `초보자 기준 ${chapter.studyMinutes.low}-${chapter.studyMinutes.high}분`,
+        minutes: chapter.studyMinutes,
+        basis: null,
+      };
+    }
+
     return {
       label: "콘텐츠 확정 후 산정",
       minutes: null,
@@ -84,8 +92,8 @@ export function getStudyLoadEstimate(chapter: Chapter): StudyLoadEstimate {
   const formulaMinutes = Math.min(12, formulas * 0.75);
   const prerequisiteBuffer = chapter.level === 1 ? 5 : chapter.level === 2 ? 10 : 15;
   const total = 5 + readingMinutes + quizMinutes + playgroundMinutes + checkMinutes + codeMinutes + formulaMinutes + prerequisiteBuffer;
-  const low = roundDownToFive(total * 0.9);
-  const high = roundUpToFive(total * 1.2);
+  const low = chapter.studyMinutes?.low ?? roundDownToFive(total * 0.9);
+  const high = chapter.studyMinutes?.high ?? roundUpToFive(total * 1.2);
 
   return {
     label: `초보자 기준 ${low}-${high}분`,

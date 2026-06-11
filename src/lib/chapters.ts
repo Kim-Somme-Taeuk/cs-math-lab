@@ -24,6 +24,10 @@ export type Chapter = {
   prerequisites?: string[];
   conceptTags?: string[];
   trackTags?: LearningTrackTag[];
+  studyMinutes?: {
+    low: number;
+    high: number;
+  };
 };
 
 export type RoadmapLevel = {
@@ -42,6 +46,90 @@ export type RoadmapSubject = {
 };
 
 type LearningMeta = Pick<Chapter, "subjectId" | "conceptId" | "prerequisites" | "conceptTags" | "trackTags">;
+
+// 초심자가 본문, 예시, 인터랙티브 실험, 종합 점검을 처음 한 번 완주하는 기준입니다.
+const beginnerStudyMinutesBySlug: Record<string, NonNullable<Chapter["studyMinutes"]>> = {
+  logic: { low: 25, high: 35 },
+  conditionals: { low: 20, high: 30 },
+  sets: { low: 25, high: 35 },
+  functions: { low: 30, high: 40 },
+  relations: { low: 25, high: 30 },
+  induction: { low: 30, high: 40 },
+  counting: { low: 20, high: 25 },
+  graphs: { low: 20, high: 25 },
+  "proof-techniques": { low: 35, high: 45 },
+  "logical-equivalence": { low: 30, high: 40 },
+  "predicate-logic": { low: 30, high: 40 },
+  "equivalence-relations": { low: 20, high: 30 },
+  "partial-orders": { low: 20, high: 30 },
+  "inclusion-exclusion": { low: 20, high: 30 },
+  "pigeonhole-principle": { low: 15, high: 20 },
+  recurrences: { low: 30, high: 40 },
+  trees: { low: 20, high: 30 },
+  "asymptotic-analysis": { low: 40, high: 55 },
+  "recursion-recurrences": { low: 40, high: 55 },
+  "discrete-probability": { low: 35, high: 50 },
+  "number-theory": { low: 30, high: 40 },
+  "modular-arithmetic": { low: 30, high: 40 },
+  "euclidean-algorithm": { low: 25, high: 30 },
+  "boolean-algebra": { low: 25, high: 30 },
+  "dag-topological-sort": { low: 25, high: 30 },
+  "shortest-paths": { low: 25, high: 30 },
+  vectors: { low: 15, high: 20 },
+  "vector-operations": { low: 20, high: 25 },
+  "dot-product": { low: 20, high: 25 },
+  matrices: { low: 15, high: 20 },
+  "matrix-multiplication": { low: 25, high: 35 },
+  "linear-transformations": { low: 25, high: 35 },
+  "basis-dimension": { low: 30, high: 35 },
+  "inverse-matrices": { low: 30, high: 40 },
+  "eigenvectors-intro": { low: 30, high: 40 },
+  "linear-combination-span": { low: 25, high: 35 },
+  "linear-independence": { low: 25, high: 35 },
+  subspaces: { low: 30, high: 40 },
+  determinants: { low: 30, high: 40 },
+  "rank-column-space": { low: 30, high: 40 },
+  "linear-systems": { low: 30, high: 40 },
+  "orthogonality-projection": { low: 30, high: 40 },
+  "least-squares": { low: 35, high: 45 },
+  "eigen-diagonalization": { low: 35, high: 50 },
+  "coordinate-systems-transform-matrices": { low: 30, high: 40 },
+  "affine-transformations-homogeneous-coordinates": { low: 30, high: 40 },
+  "rotations-2d-3d": { low: 30, high: 40 },
+  "graphics-pipeline-intro": { low: 30, high: 40 },
+  "pca-dimensionality-reduction": { low: 35, high: 45 },
+  "svd-intuition": { low: 35, high: 50 },
+  "matrix-factorization-numerical-stability": { low: 35, high: 45 },
+  "gradient-jacobian-intro": { low: 35, high: 45 },
+  "neural-network-linear-layers": { low: 35, high: 45 },
+  "calculus-functions-graphs": { low: 15, high: 20 },
+  "rate-of-change": { low: 20, high: 30 },
+  limits: { low: 30, high: 40 },
+  continuity: { low: 20, high: 30 },
+  "meaning-of-derivative": { low: 30, high: 40 },
+  "basic-derivative-rules": { low: 25, high: 30 },
+  "derivative-graph-reading": { low: 25, high: 35 },
+  "optimization-intro": { low: 25, high: 35 },
+  "numerical-derivative": { low: 25, high: 35 },
+  "meaning-of-integral": { low: 30, high: 40 },
+  "riemann-sums": { low: 30, high: 40 },
+  "basic-integral-rules": { low: 25, high: 35 },
+  "fundamental-theorem-calculus": { low: 35, high: 45 },
+  "area-accumulation": { low: 25, high: 35 },
+  "multivariable-functions": { low: 30, high: 40 },
+  "partial-derivatives": { low: 30, high: 40 },
+  gradient: { low: 35, high: 45 },
+  "chain-rule": { low: 35, high: 45 },
+  "optimization-problems": { low: 30, high: 40 },
+  "gradient-descent": { low: 35, high: 45 },
+  "learning-rate": { low: 25, high: 35 },
+  "loss-functions": { low: 30, high: 40 },
+  "autodiff-intro": { low: 40, high: 55 },
+  "numerical-integration": { low: 30, high: 40 },
+  "differential-equations-intro": { low: 35, high: 45 },
+  "euler-method-simulation": { low: 35, high: 45 },
+  "calculus-in-machine-learning": { low: 40, high: 55 },
+};
 
 const learningMetaBySlug: Record<string, LearningMeta> = {
   logic: {
@@ -538,6 +626,7 @@ function withLearningMeta(chapters: Chapter[]) {
     ...chapter,
     ...learningMetaBySlug[chapter.slug],
     conceptId: learningMetaBySlug[chapter.slug]?.conceptId ?? chapter.conceptId ?? `chapter:${chapter.slug}`,
+    studyMinutes: chapter.studyMinutes ?? beginnerStudyMinutesBySlug[chapter.slug],
   })));
 }
 

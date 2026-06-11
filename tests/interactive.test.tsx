@@ -407,7 +407,7 @@ describe("review question counts", () => {
 });
 
 describe("study load estimates", () => {
-  it("uses chapter content instead of a fixed level-only duration", () => {
+  it("uses chapter metadata instead of a fixed level-only duration", () => {
     const logic = roadmapSubjects
       .flatMap((subject) => subject.levels)
       .flatMap((level) => level.chapters)
@@ -425,22 +425,30 @@ describe("study load estimates", () => {
 
     expect(logicEstimate.label).toMatch(/^초보자 기준 \d+-\d+분$/);
     expect(gradientEstimate.label).toMatch(/^초보자 기준 \d+-\d+분$/);
+    expect(logicEstimate.minutes).toEqual(logic!.studyMinutes);
+    expect(gradientEstimate.minutes).toEqual(gradientDescent!.studyMinutes);
     expect(logicEstimate.basis?.textCharacters).toBeGreaterThan(gradientEstimate.basis?.textCharacters ?? 0);
     expect(logicEstimate.minutes?.high).not.toBe(15);
     expect(gradientEstimate.minutes?.low).not.toBe(20);
   });
 
-  it("estimates every ready chapter from its own content", () => {
+  it("stores a beginner study time estimate on every ready chapter", () => {
     const readyChapters = roadmapSubjects
       .flatMap((subject) => subject.levels)
       .flatMap((level) => level.chapters)
       .filter((chapter) => chapter.status === "ready");
     const labels = new Set<string>();
 
+    expect(readyChapters).toHaveLength(80);
+
     for (const chapter of readyChapters) {
       const estimate = getStudyLoadEstimate(chapter);
 
-      expect(estimate.minutes, `${chapter.slug} should have a content-based estimate`).not.toBeNull();
+      expect(chapter.studyMinutes, `${chapter.slug} should store a metadata estimate`).toBeDefined();
+      expect(chapter.studyMinutes!.low, `${chapter.slug} should have a realistic lower bound`).toBeGreaterThanOrEqual(15);
+      expect(chapter.studyMinutes!.high, `${chapter.slug} should have a realistic upper bound`).toBeLessThanOrEqual(60);
+      expect(chapter.studyMinutes!.high, `${chapter.slug} should have a range`).toBeGreaterThan(chapter.studyMinutes!.low);
+      expect(estimate.minutes, `${chapter.slug} should use its metadata estimate`).toEqual(chapter.studyMinutes);
       expect(estimate.basis?.textCharacters, `${chapter.slug} should count chapter text`).toBeGreaterThan(0);
       expect(estimate.label, `${chapter.slug} should use beginner wording`).toContain("초보자 기준");
       labels.add(estimate.label);
