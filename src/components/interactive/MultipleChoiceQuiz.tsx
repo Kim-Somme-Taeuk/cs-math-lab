@@ -290,8 +290,8 @@ export default function MultipleChoiceQuiz({ questions, title = "연습 문제" 
             </button>
             <button
               type="button"
-            disabled={currentIndex === normalizedQuestions.length - 1}
-            onClick={() => setCurrentIndex((current) => Math.min(normalizedQuestions.length - 1, current + 1))}
+              disabled={currentIndex === normalizedQuestions.length - 1}
+              onClick={() => setCurrentIndex((current) => Math.min(normalizedQuestions.length - 1, current + 1))}
               className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 disabled:cursor-not-allowed disabled:text-slate-300"
             >
               다음

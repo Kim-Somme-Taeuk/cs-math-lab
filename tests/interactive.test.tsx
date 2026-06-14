@@ -18,6 +18,7 @@ import ConditionalPlayground from "../src/components/interactive/ConditionalPlay
 import ChapterAiChatbot from "../src/components/interactive/ChapterAiChatbot";
 import CountingPlayground from "../src/components/interactive/CountingPlayground";
 import CounterexamplePlayground from "../src/components/interactive/CounterexamplePlayground";
+import FunctionGraphPlayground from "../src/components/interactive/FunctionGraphPlayground";
 import MultipleChoiceQuiz from "../src/components/interactive/MultipleChoiceQuiz";
 import SetVennPlayground from "../src/components/interactive/SetVennPlayground";
 import TruthTablePlayground from "../src/components/interactive/TruthTablePlayground";
@@ -56,6 +57,27 @@ import {
 import { getSupplementalReviewQuestions, normalizeReviewQuestions, reviewQuestionCount } from "../src/lib/reviewQuestions";
 import { evaluateSetOperation } from "../src/lib/setUtils";
 import { getStudyLoadEstimate } from "../src/lib/studyLoad";
+
+describe("FunctionGraphPlayground", () => {
+  it("shows the selected formula and keeps quadratic graph ends curved", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<FunctionGraphPlayground />);
+
+    expect(screen.getByText("f(x) = x + 1")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "이차 함수" }));
+
+    expect(screen.getByText("f(x) = x² / 2 - 1")).toBeInTheDocument();
+
+    const points = container.querySelector("polyline")?.getAttribute("points")?.trim().split(" ") ?? [];
+    const firstY = points[0]?.split(",")[1];
+    const secondY = points[1]?.split(",")[1];
+
+    expect(firstY).toBeDefined();
+    expect(secondY).toBeDefined();
+    expect(firstY).not.toBe(secondY);
+  });
+});
 
 describe("logic helpers", () => {
   it("evaluates implication and biconditional truth values correctly", () => {

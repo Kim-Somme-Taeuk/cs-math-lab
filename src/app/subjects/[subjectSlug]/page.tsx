@@ -32,7 +32,7 @@ export function generateStaticParams() {
 }
 
 function statusLabel(status: ChapterStatus) {
-  if (status === "ready") return "학습 가능";
+  if (status === "ready") return "공개 중";
   if (status === "draft") return "준비 중";
   return "계획 중";
 }
@@ -89,7 +89,7 @@ export default async function SubjectPage({ params }: SubjectPageProps) {
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">{subject.title}</h1>
             <span className={`rounded-md px-2.5 py-1 text-xs font-bold ${subjectStatusStyles[subject.status]}`}>
-              {subject.status === "active" ? "학습 가능" : "계획 중"}
+              {subject.status === "active" ? "진행 중" : "계획 중"}
             </span>
           </div>
           <p className="mt-3 text-sm leading-6 text-slate-600">{subject.description}</p>

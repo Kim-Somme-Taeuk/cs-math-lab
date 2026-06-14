@@ -10,6 +10,12 @@ const functionLabels: Record<FunctionKind, string> = {
   exponential: "지수 함수",
 };
 
+const functionExpressions: Record<FunctionKind, string> = {
+  linear: "f(x) = x + 1",
+  quadratic: "f(x) = x² / 2 - 1",
+  exponential: "f(x) = 2^(x / 2)",
+};
+
 function evaluate(kind: FunctionKind, x: number) {
   if (kind === "linear") return x + 1;
   if (kind === "quadratic") return (x * x) / 2 - 1;
@@ -17,9 +23,16 @@ function evaluate(kind: FunctionKind, x: number) {
 }
 
 function toPoint(x: number, y: number) {
+  const yMin = -3;
+  const yMax = 8;
   const px = 32 + ((x + 4) / 8) * 256;
-  const py = 132 - ((y + 4) / 8) * 104;
-  return `${px},${py}`;
+  const py = 132 - ((y - yMin) / (yMax - yMin)) * 104;
+  return { x: px, y: py };
+}
+
+function toPointString(x: number, y: number) {
+  const point = toPoint(x, y);
+  return `${point.x},${point.y}`;
 }
 
 export default function FunctionGraphPlayground() {
@@ -28,13 +41,13 @@ export default function FunctionGraphPlayground() {
   const output = evaluate(kind, input);
   const points = useMemo(
     () =>
-      Array.from({ length: 33 }, (_, index) => {
-        const x = -4 + index * 0.25;
-        const y = Math.max(-4, Math.min(4, evaluate(kind, x)));
-        return toPoint(x, y);
+      Array.from({ length: 65 }, (_, index) => {
+        const x = -4 + index * 0.125;
+        return toPointString(x, evaluate(kind, x));
       }).join(" "),
     [kind],
   );
+  const inputPoint = toPoint(input, output);
 
   return (
     <section aria-label="함수 그래프 실험" className="mt-3 mb-7 rounded-lg border border-slate-200 bg-slate-50 p-3 sm:p-4">
@@ -74,6 +87,10 @@ export default function FunctionGraphPlayground() {
               onChange={(event) => setInput(Number(event.target.value))}
             />
           </label>
+          <div className="rounded-md border border-teal-100 bg-teal-50 p-3">
+            <p className="text-xs font-bold text-teal-700">현재 식</p>
+            <p className="mt-1 text-lg font-black text-slate-950">{functionExpressions[kind]}</p>
+          </div>
           <div className="grid grid-cols-2 gap-2">
             <div className="rounded-md bg-slate-50 p-3">
               <p className="text-xs font-bold text-slate-500">입력</p>
@@ -88,10 +105,10 @@ export default function FunctionGraphPlayground() {
 
         <div className="rounded-lg border border-slate-200 bg-white p-3">
           <svg viewBox="0 0 320 160" className="h-48 w-full" role="img" aria-label={`${functionLabels[kind]} 그래프`}>
-            <path d="M32 80 H288" stroke="#cbd5e1" strokeWidth="1.5" />
+            <path d="M32 104 H288" stroke="#cbd5e1" strokeWidth="1.5" />
             <path d="M160 20 V132" stroke="#cbd5e1" strokeWidth="1.5" />
             <polyline points={points} fill="none" stroke="#0f766e" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-            <circle cx={toPoint(input, Math.max(-4, Math.min(4, output))).split(",")[0]} cy={toPoint(input, Math.max(-4, Math.min(4, output))).split(",")[1]} r="5" fill="#0f172a" />
+            <circle cx={inputPoint.x} cy={inputPoint.y} r="5" fill="#0f172a" />
           </svg>
         </div>
       </div>

@@ -251,7 +251,7 @@ export default function ChapterAiChatbot({ slug, chapterTitle }: { slug: string;
       <button
         type="button"
         onClick={() => setOpen((current) => !current)}
-        className="fixed bottom-4 right-4 z-40 flex h-11 w-11 items-center justify-center rounded-full bg-teal-600 text-white shadow-lg shadow-slate-900/25 ring-1 ring-white/60 hover:bg-teal-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 lg:bottom-6 lg:right-6 lg:h-12 lg:w-12"
+        className="fixed bottom-20 right-4 z-40 flex h-11 w-11 items-center justify-center rounded-full bg-teal-600 text-white shadow-lg shadow-slate-900/25 ring-1 ring-white/60 hover:bg-teal-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 lg:bottom-6 lg:right-6 lg:h-12 lg:w-12"
         aria-label={open ? "AI 챗봇 닫기" : "AI 챗봇 열기"}
         aria-expanded={open}
       >
@@ -261,7 +261,7 @@ export default function ChapterAiChatbot({ slug, chapterTitle }: { slug: string;
       {open ? (
         <section
           aria-label="AI 챗봇"
-          className="fixed bottom-20 right-4 z-50 flex max-h-[min(38rem,calc(100vh-7rem))] w-[min(23rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-2xl shadow-slate-900/25 lg:bottom-20 lg:right-6"
+          className="fixed bottom-36 right-4 z-50 flex max-h-[min(38rem,calc(100vh-11rem))] w-[min(23rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-2xl shadow-slate-900/25 lg:bottom-20 lg:right-6 lg:max-h-[min(38rem,calc(100vh-7rem))]"
         >
           <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-3">
             <div className="min-w-0">
